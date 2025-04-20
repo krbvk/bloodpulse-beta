@@ -47,19 +47,33 @@ export function PushNotificationManager() {
     });
 
     setSubscription(sub);
-    await subscribeUser(JSON.parse(JSON.stringify(sub)));
+    try {
+      await subscribeUser(sub);
+    } catch (error) {
+      console.error("Subscription error:", error);
+    }
   }
 
   async function unsubscribeFromPush() {
-    await subscription?.unsubscribe();
-    setSubscription(null);
-    await unsubscribeUser();
+    if (subscription) {
+      try {
+        await subscription.unsubscribe();
+        setSubscription(null);
+        await unsubscribeUser();
+      } catch (error) {
+        console.error("Unsubscription error:", error);
+      }
+    }
   }
 
   async function sendTestNotification() {
     if (subscription) {
-      await sendNotification(message);
-      setMessage("");
+      try {
+        await sendNotification(message);
+        setMessage("");
+      } catch (error) {
+        console.error("Notification error:", error);
+      }
     }
   }
 

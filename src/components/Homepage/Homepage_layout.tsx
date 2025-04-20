@@ -37,10 +37,10 @@ const HomePageLayout = () => {
     );
   }
 
-  const { name, email, image } = session.user || {};
+  const { name, email, image } = session.user ?? {};
   const initials = name ? getInitials(name) : "";
 
-  let imageUrl = image || "";
+  let imageUrl = image ?? "";
 
   if (imageUrl && !imageUrl.includes("sz=")) {
     imageUrl = `${imageUrl}?sz=200`; 
