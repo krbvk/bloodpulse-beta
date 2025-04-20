@@ -2,7 +2,7 @@ import "@/styles/globals.css";
 import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Provider } from "@/components/ui/provider";
-import { SessionProviders } from "@/components/SessionProviders"; // 👈 your new wrapper
+import { SessionProviders } from "@/components/SessionProviders";
 
 export const metadata: Metadata = {
   title: "Bloodpulse",

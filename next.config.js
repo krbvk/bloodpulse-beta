@@ -10,6 +10,10 @@ const config = {
         optimizePackageImports: ["@chakra-ui/react"],
     },
 
+    images: {
+      domains: ['lh3.googleusercontent.com'],
+    },
+
     async headers() {
         return [
             {
