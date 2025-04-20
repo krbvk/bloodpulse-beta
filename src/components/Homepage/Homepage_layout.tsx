@@ -46,8 +46,6 @@ const HomePageLayout = () => {
     imageUrl = `${imageUrl}?sz=200`; 
   }
 
-  console.log("User Image URL:", imageUrl);
-
   const handleSignOut = async () => {
     await signOut({ redirect: false });
     router.push("/");
@@ -68,13 +66,14 @@ const HomePageLayout = () => {
           <Box position="relative" width="120px" height="120px">
             <Image
               src={imageUrl}
-              alt={name || "User Avatar"}
-              layout="fill"
-              objectFit="cover"
+              alt={name ?? "User Avatar"}
+              fill
               style={{
                 borderRadius: "50%",
                 boxShadow: "md",
+                objectFit: "cover", 
               }}
+              sizes="(max-width: 768px) 120px, 200px"
             />
           </Box>
         ) : (

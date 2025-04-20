@@ -20,7 +20,7 @@ export function PushNotificationManager() {
   useEffect(() => {
     if ("serviceWorker" in navigator && "PushManager" in window) {
       setIsSupported(true);
-      registerServiceWorker();
+      void registerServiceWorker();
     }
   }, []);
 
