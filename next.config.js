@@ -10,6 +10,16 @@ const config = {
         optimizePackageImports: ["@chakra-ui/react"],
     },
 
+    images: {
+      remotePatterns: [
+        {
+          protocol: 'https',
+          hostname: 'lh3.googleusercontent.com',
+          pathname: '/**',
+        },
+      ],
+    },
+
     async headers() {
         return [
             {
