@@ -16,13 +16,7 @@ export function ColorModeProvider({ children }: { children: React.ReactNode }) {
 
 export type ColorMode = "light" | "dark";
 
-export interface UseColorModeReturn {
-  colorMode: ColorMode;
-  setColorMode: (colorMode: ColorMode) => void;
-  toggleColorMode: () => void;
-}
-
-export function useColorMode(): UseColorModeReturn {
+export function useColorMode() {
   const { resolvedTheme, setTheme } = useTheme();
   const toggleColorMode = () => {
     setTheme(resolvedTheme === "dark" ? "light" : "dark");
