@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button, Text, Input, Heading } from "@chakra-ui/react";
-import { Box } from "@chakra-ui/react";
+import { Button, Text, TextInput, Title, Paper, Stack } from "@mantine/core";
 import { subscribeUser, unsubscribeUser, sendNotification } from "@/app/action";
 
 function urlBase64ToUint8Array(base64String: string) {
@@ -82,32 +81,35 @@ export function PushNotificationManager() {
   }
 
   return (
-    <Box shadow="sm" p="lg" borderRadius="md" borderWidth="1px">
-      <Heading as="h3" size="md">Push Notifications</Heading>
-      {subscription ? (
-        <>
-          <Text>You are subscribed to push notifications.</Text>
-          <Button color="red" mt="md" onClick={unsubscribeFromPush}>
-            Unsubscribe
-          </Button>
-          <Input
-            placeholder="Enter notification message"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            mt="md"
-          />
-          <Button mt="md" onClick={sendTestNotification}>
-            Send Test
-          </Button>
-        </>
-      ) : (
-        <>
-          <Text>You are not subscribed to push notifications.</Text>
-          <Button color="blue" mt="md" onClick={subscribeToPush}>
-            Subscribe
-          </Button>
-        </>
-      )}
-    </Box>
+    <Paper shadow="sm" p="md" radius="md" withBorder>
+      <Stack gap="md">
+        <Title order={3} size="h3">
+          Push Notifications
+        </Title>
+        {subscription ? (
+          <>
+            <Text>You are subscribed to push notifications.</Text>
+            <Button color="red" variant="filled" onClick={unsubscribeFromPush}>
+              Unsubscribe
+            </Button>
+            <TextInput
+              placeholder="Enter notification message"
+              value={message}
+              onChange={(e) => setMessage(e.currentTarget.value)}
+            />
+            <Button variant="filled" onClick={sendTestNotification}>
+              Send Test
+            </Button>
+          </>
+        ) : (
+          <>
+            <Text>You are not subscribed to push notifications.</Text>
+            <Button color="blue" variant="filled" onClick={subscribeToPush}>
+              Subscribe
+            </Button>
+          </>
+        )}
+      </Stack>
+    </Paper>
   );
 }

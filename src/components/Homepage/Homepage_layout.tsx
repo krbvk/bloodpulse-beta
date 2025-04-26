@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
-import { Button, Text, VStack, Box } from "@chakra-ui/react";
+import { Button, Text, Stack, Paper, Box, Avatar, Group } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -23,17 +23,16 @@ const HomePageLayout = () => {
 
   if (!session) {
     return (
-      <Box
-        maxW="sm"
+      <Paper
+        radius="lg"
+        p="xl"
+        mt={96}
         mx="auto"
-        mt={24}
-        p={8}
-        bg="red.50"
-        borderRadius="lg"
-        boxShadow="md"
+        withBorder
+        style={{ maxWidth: 400, backgroundColor: "#fff0f0" }}
       >
-        <Text>Unauthorized! Please sign in to access this page.</Text>
-      </Box>
+        <Text color="red">Unauthorized! Please sign in to access this page.</Text>
+      </Paper>
     );
   }
 
@@ -43,7 +42,7 @@ const HomePageLayout = () => {
   let imageUrl = image ?? "";
 
   if (imageUrl && !imageUrl.includes("sz=")) {
-    imageUrl = `${imageUrl}?sz=200`; 
+    imageUrl = `${imageUrl}?sz=200`;
   }
 
   const handleSignOut = async () => {
@@ -52,63 +51,57 @@ const HomePageLayout = () => {
   };
 
   return (
-    <Box
-      maxW="sm"
+    <Paper
+      shadow="lg"
+      radius="lg"
+      p="xl"
+      mt={96}
       mx="auto"
-      mt={24}
-      p={8}
-      bg="white"
-      borderRadius="lg"
-      boxShadow="lg"
+      withBorder
+      style={{ maxWidth: 400, backgroundColor: "#ffffff" }}
     >
-      <VStack gap={6}>
+      <Stack gap="lg" align="center">
         {imageUrl ? (
-          <Box position="relative" width="120px" height="120px">
+          <Box style={{ position: "relative", width: 120, height: 120 }}>
             <Image
               src={imageUrl}
               alt={name ?? "User Avatar"}
               fill
               style={{
                 borderRadius: "50%",
-                boxShadow: "md",
-                objectFit: "cover", 
+                objectFit: "cover",
               }}
               sizes="(max-width: 768px) 120px, 200px"
             />
           </Box>
         ) : (
-          <Box
-            borderRadius="full"
-            boxSize="120px"
-            bg="gray.300"
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            color="white"
-            fontSize="3xl"
-            boxShadow="md"
+          <Avatar
+            radius="xl"
+            size={120}
+            color="gray"
+            style={{ backgroundColor: "#ccc", fontSize: 36 }}
           >
             {initials}
-          </Box>
+          </Avatar>
         )}
-        <Text fontSize="2xl" fontWeight="bold" color="red.800" textAlign="center">
+        <Text size="xl" fw={700} c="red.8" ta="center">
           Welcome, {name}
         </Text>
-        <Text fontSize="lg" color="gray.600" textAlign="center">
+        <Text size="md" c="gray.6" ta="center">
           {email}
         </Text>
 
         <Button
           onClick={handleSignOut}
-          colorScheme="red"
-          width="100%"
+          fullWidth
           size="lg"
-          boxShadow="md"
+          color="red"
+          variant="filled"
         >
           Sign Out
         </Button>
-      </VStack>
-    </Box>
+      </Stack>
+    </Paper>
   );
 };
 
