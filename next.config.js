@@ -7,7 +7,7 @@ import "./src/env.js";
 /** @type {import("next").NextConfig} */
 const config = {
     experimental: {
-        optimizePackageImports: ["@chakra-ui/react"],
+        optimizePackageImports: ["@mantine/core", "@mantine/hooks"],
     },
 
     images: {

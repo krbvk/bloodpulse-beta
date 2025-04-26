@@ -1,12 +1,12 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react"; 
-import { Button, Text, VStack, Box } from "@chakra-ui/react";
+import { signIn, useSession } from "next-auth/react";
+import { Button, Text, Stack, Box, Paper } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export function SignIn() {
-  const { status } = useSession(); 
+  const { status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export function SignIn() {
 
     if (response?.ok) {
       router.push("/homepage");
-    } 
+    }
   };
 
   if (status === "loading") {
@@ -28,25 +28,26 @@ export function SignIn() {
   }
 
   return (
-    <Box
-      maxW="sm"
+    <Paper
+      shadow="md"
+      radius="lg"
+      p="xl"
+      mt={96}
       mx="auto"
-      mt={24}
-      p={8}
-      bg="red.50"
-      borderRadius="lg"
-      boxShadow="md"
+      withBorder
+      style={{ maxWidth: 400, backgroundColor: "#fff0f0" }}
     >
-      <VStack gap={6}>
+      <Stack gap="lg">
         <Button
           onClick={handleSignIn}
-          colorScheme="red"
-          width="100%"
+          fullWidth
           size="lg"
+          color="red"
+          variant="filled"
         >
           Sign In with Google
         </Button>
-      </VStack>
-    </Box>
+      </Stack>
+    </Paper>
   );
 }

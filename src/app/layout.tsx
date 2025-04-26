@@ -1,10 +1,10 @@
 import "@/styles/globals.css";
 import { type Metadata } from "next";
 import { Geist } from "next/font/google";
-import { Provider } from "@/components/ui/provider";
 import { SessionProviders } from "@/components/SessionProviders";
-import { ColorModeProvider } from "@/components/ui/color-mode";
-
+import { MantineProvider, ColorSchemeScript, createTheme, mantineHtmlProps } from "@mantine/core";
+import '@mantine/core/styles.css';
+import '@mantine/carousel/styles.css';
 export const metadata: Metadata = {
   title: "Bloodpulse",
   description: "Bloodpulse beta application",
@@ -15,17 +15,22 @@ const geist = Geist({
   subsets: ["latin"],
 });
 
+const theme = createTheme({
+  /** Put your mantine theme override here */
+})
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" {...mantineHtmlProps}>
+      <head>
+        <ColorSchemeScript />
+      </head>
       <body className={geist.className}>
-      <ColorModeProvider>
-        <Provider>
+        <MantineProvider theme={theme}>
           <SessionProviders>{children}</SessionProviders>
-        </Provider>
-      </ColorModeProvider>
+        </MantineProvider>
       </body>
     </html>
   );
