@@ -1,4 +1,6 @@
-import { Card, Image, Stack, Title, Text } from "@mantine/core";
+import { Card, Box, Title, Text, Group, Stack } from "@mantine/core";
+import ServiceImage from "@/components/Slides/ServiceImage1.svg";
+import Image from "next/image";
 
 export default function Services() {
   return (
@@ -7,62 +9,88 @@ export default function Services() {
       p="xl"
       style={{
         background: "#fff",
-        border: "1px solid #d7ccc8",
-        // borderRadius: "12px",
-        // boxShadow: "0 6px 15px rgba(0,0,0,0.2)",
+        // border: "1px solid #d7ccc8",
+        // boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
       }}
     >
-      {/* <Image
-        src="/images/services-hero.jpg"
-        alt="Our Services"
-        height={240}
-        style={{ borderRadius: "8px" }}
-      /> */}
-      <Stack align="center" gap="sm" mt="md">
-        <Title order={2} style={{ fontFamily: "'Dancing Script', cursive" }}>
-          Our Services
-        </Title>
-        <Text size="sm" color="dimmed">
-          Explore all the ways you can help save lives—donate blood, organize a drive,
-          or volunteer at events near you.
-        </Text>
-        <Text size="sm" color="dimmed">
-          Explore all the ways you can help save lives—donate blood, organize a drive,
-          or volunteer at events near you.
-        </Text>
-        <Text size="sm" color="dimmed">
-          Explore all the ways you can help save lives—donate blood, organize a drive,
-          or volunteer at events near you.
-        </Text>
-        <Text size="sm" color="dimmed">
-          Explore all the ways you can help save lives—donate blood, organize a drive,
-          or volunteer at events near you.
-        </Text>
-        <Text size="sm" color="dimmed">
-          Explore all the ways you can help save lives—donate blood, organize a drive,
-          or volunteer at events near you.
-        </Text>
-        <Text size="sm" color="dimmed">
-          Explore all the ways you can help save lives—donate blood, organize a drive,
-          or volunteer at events near you.
-        </Text>
-        <Text size="sm" color="dimmed">
-          Explore all the ways you can help save lives—donate blood, organize a drive,
-          or volunteer at events near you.
-        </Text>
-        <Text size="sm" color="dimmed">
-          Explore all the ways you can help save lives—donate blood, organize a drive,
-          or volunteer at events near you.
-        </Text>
-        <Text size="sm" color="dimmed">
-          Explore all the ways you can help save lives—donate blood, organize a drive,
-          or volunteer at events near you.
-        </Text>
-        <Text size="sm" color="dimmed">
-          Explore all the ways you can help save lives—donate blood, organize a drive,
-          or volunteer at events near you.
-        </Text>
-      </Stack>
+      {/* Title */}
+      <Title
+        order={2}
+        style={{
+          fontWeight: 700,
+          fontSize: 28,
+          marginBottom: 32,
+          color: "#000",
+          textAlign: "center",
+        }}
+      >
+        What <span style={{ color: "red" }}>We Can Offer</span>
+      </Title>
+
+      {/* Top Group (SVG Image + Description) */}
+      <Group align="flex-start" justify="center" gap="xl" grow>
+        {/* SVG Image */}
+        <Box
+          style={{
+            width: "55%",
+            height: 300,
+            borderRadius: 12,
+            overflow: "hidden",
+          }}
+        >
+          <Image
+            src={ServiceImage}
+            alt="Slide graphic"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        </Box>
+
+        {/* Description card */}
+        <Card
+          shadow="sm"
+          padding="md"
+          radius="md"
+          style={{
+            background: "#fff",
+            boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
+            border: "1px solid red",
+            width: "35%",
+            minHeight: 300,
+          }}
+        >
+          <Stack gap="lg">
+            {[
+              "Become a Donor — we can help if you want to donate blood.",
+              "Blood booking — we can help you book an appointment.",
+              "Blood type filtering — you can browse and search the blood type you need.",
+            ].map((text, i) => (
+              <Box key={i} style={{ textAlign: "left" }}>
+                <Box
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: "50%",
+                    backgroundColor: "#d32f2f",
+                    color: "#fff",
+                    display: "inline-flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    fontWeight: 700,
+                    fontSize: 14,
+                    marginBottom: 8,
+                  }}
+                >
+                  {i + 1}
+                </Box>
+                <Text size="sm">{text}</Text>
+              </Box>
+            ))}
+          </Stack>
+        </Card>
+      </Group>
     </Card>
   );
 }
