@@ -81,7 +81,9 @@ const HomePageCarousel = () => {
             root: { backgroundColor: "transparent", position: "relative" },
             slide: { backgroundColor: "transparent" },
           }}
-          getEmblaApi={(api) => (carouselRef.current = api)}
+          getEmblaApi={(api: EmblaCarouselType) => {
+            carouselRef.current = api;
+          }}
         >
           {slideComponents.map((Slide, idx) => (
             <Carousel.Slide key={idx}>{Slide}</Carousel.Slide>

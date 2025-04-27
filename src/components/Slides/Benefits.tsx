@@ -1,7 +1,9 @@
-import { Card, Box, Title, Text} from "@mantine/core";
+import { Card, Box, Title, Text } from "@mantine/core";
 import { IconCirclePlus } from "@tabler/icons-react";
-import Image from "next/image";
-import BenefitImage from "@/components/Slides/BenefitImage1.svg";
+import Image, { type StaticImageData } from "next/image";
+import BenefitImageSrc from "@/components/Slides/BenefitImage1.svg";
+
+const BenefitImage = BenefitImageSrc as StaticImageData;
 
 export default function Benefits() {
   const items = [
@@ -17,78 +19,70 @@ export default function Benefits() {
       p="xl"
       style={{
         background: "#fff",
-        // border: "1px solid #d7ccc8",
-        // boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
         display: "flex",
-        flexDirection: "row", // Side-by-side layout
-        gap: 32, // Space between left content and right image
+        flexDirection: "row",
+        gap: 32,
       }}
     >
-      {/* Left side: Benefits with Red Cross and Description */}
       <Box
         style={{
           display: "flex",
           flexDirection: "column",
           gap: 12,
-          width: "50%", // Smaller width for the left box
-          maxHeight: "450px", // Adjusted max height
-          overflowY: "auto", // Ensures scrolling if needed
+          width: "50%",
+          maxHeight: "450px",
+          overflowY: "auto",
         }}
       >
         <Title order={2} style={{ textAlign: "center", marginBottom: 16 }}>
           Benefits of <span style={{ color: "red" }}>Donating Blood</span>
         </Title>
 
-        {items.map((text, idx) => {
-          return (
-            <Box
-              key={idx}
-              style={{
-                position: "relative",
-                padding: "12px 16px",
-                borderRadius: 8,
-                background: "#fff",
-                border: "2px solid #d32f2f",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                marginBottom: 12,
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              {/* Red cross icon */}
-              <IconCirclePlus
-                size={20}
-                stroke={2}
-                color="#d32f2f"
-                style={{ marginRight: 8 }}
-              />
-              {/* Text */}
-              <Text size="sm">{text}</Text>
-            </Box>
-          );
-        })}
+        {items.map((text, idx) => (
+          <Box
+            key={idx}
+            style={{
+              position: "relative",
+              padding: "12px 16px",
+              borderRadius: 8,
+              background: "#fff",
+              border: "2px solid #d32f2f",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              marginBottom: 12,
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <IconCirclePlus
+              size={20}
+              stroke={2}
+              color="#d32f2f"
+              style={{ marginRight: 8 }}
+            />
+            <Text size="sm">{text}</Text>
+          </Box>
+        ))}
       </Box>
 
-      {/* Right side: Smaller Image container */}
       <Box
         style={{
-          width: "35%", // Smaller width for the image container
-          height: "auto", // Ensure image maintains proper aspect ratio
+          width: "35%",
+          height: "auto",
           borderRadius: 8,
           overflow: "hidden",
           display: "flex",
           justifyContent: "center",
-          marginLeft: "10%"
+          marginLeft: "10%",
         }}
       >
         <Image
           src={BenefitImage}
           alt="Benefit Image"
           style={{
-            width: "80%", // Adjusted width to make the image smaller
+            width: "80%",
             height: "auto",
             objectFit: "cover",
-            alignSelf: "center", // Align image to center
+            alignSelf: "center",
           }}
         />
       </Box>

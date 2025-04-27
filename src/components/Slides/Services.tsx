@@ -1,6 +1,8 @@
 import { Card, Box, Title, Text, Group, Stack } from "@mantine/core";
-import ServiceImage from "@/components/Slides/ServiceImage1.svg";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
+import ServiceImageSrc from "@/components/Slides/ServiceImage1.svg";
+
+const ServiceImage = ServiceImageSrc as StaticImageData;
 
 export default function Services() {
   return (
@@ -9,14 +11,11 @@ export default function Services() {
       p="xl"
       style={{
         background: "#fff",
-        // border: "1px solid #d7ccc8",
-        // boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
         display: "flex",
         flexDirection: "column",
         height: "100%",
       }}
     >
-      {/* Title */}
       <Title
         order={2}
         style={{
@@ -30,9 +29,7 @@ export default function Services() {
         What <span style={{ color: "red" }}>We Can Offer</span>
       </Title>
 
-      {/* Top Group (SVG Image + Description) */}
       <Group align="flex-start" justify="center" gap="xl" grow>
-        {/* SVG Image */}
         <Box
           style={{
             width: "55%",
@@ -48,7 +45,6 @@ export default function Services() {
           />
         </Box>
 
-        {/* Description card */}
         <Card
           shadow="sm"
           padding="md"
