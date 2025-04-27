@@ -7,6 +7,7 @@ import { useRef, useState } from "react";
 import Autoplay from "embla-carousel-autoplay";
 import Services from "@/components/Slides/Services";
 import Benefits from "@/components/Slides/Benefits";
+import type { EmblaCarouselType } from 'embla-carousel';
 
 const HomePageCarousel = () => {
   const slideComponents = [
@@ -15,8 +16,7 @@ const HomePageCarousel = () => {
     <Services key="services-3" />
   ];
   const [active, setActive] = useState(0);
-  const carouselRef = useRef<any>(null);
-  // disable plugin-level stopOnInteraction & stopOnMouseEnter
+  const carouselRef = useRef<EmblaCarouselType | null>(null);
   const autoplay = useRef(
     Autoplay({
       delay: 15000,

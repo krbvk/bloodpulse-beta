@@ -1,4 +1,4 @@
-import { Card, Box, Title, Text, Group } from "@mantine/core";
+import { Card, Box, Title, Text} from "@mantine/core";
 import { IconCirclePlus } from "@tabler/icons-react";
 import Image from "next/image";
 import BenefitImage from "@/components/Slides/BenefitImage1.svg";

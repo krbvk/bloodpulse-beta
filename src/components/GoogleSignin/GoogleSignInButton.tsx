@@ -1,7 +1,7 @@
 "use client";
 
 import { signIn, useSession } from "next-auth/react";
-import { Button, Text, Stack, Box, Paper } from "@mantine/core";
+import { Button, Text, Stack, Paper } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 

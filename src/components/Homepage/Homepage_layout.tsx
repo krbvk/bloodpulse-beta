@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
-import { Button, Text, Stack, Paper, Box, Avatar, Group } from "@mantine/core";
+import { Button, Text, Stack, Paper, Box, Avatar } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
