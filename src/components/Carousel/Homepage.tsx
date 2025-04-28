@@ -3,17 +3,17 @@
 import { Carousel } from "@mantine/carousel";
 import { Paper, Box, Group } from "@mantine/core";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Autoplay from "embla-carousel-autoplay";
 import Services from "@/components/Slides/Services";
 import Benefits from "@/components/Slides/Benefits";
-import type { EmblaCarouselType } from 'embla-carousel';
+import type { EmblaCarouselType } from "embla-carousel";
 
 const HomePageCarousel = () => {
   const slideComponents = [
     <Services key="services-1" />,
     <Benefits key="benefits-2" />,
-    <Services key="services-3" />
+    <Services key="services-3" />,
   ];
   const [active, setActive] = useState(0);
   const carouselRef = useRef<EmblaCarouselType | null>(null);
@@ -37,23 +37,43 @@ const HomePageCarousel = () => {
     autoplay.current?.stop();
   };
 
-  const handleArrowMouseEnter = () => autoplay.current?.stop();
-  const handleArrowMouseLeave = () => autoplay.current?.play();
+  // Keyboard arrow navigation
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "ArrowLeft") {
+      goToPreviousSlide();
+    } else if (event.key === "ArrowRight") {
+      goToNextSlide();
+    }
+  };
+
+  useEffect(() => {
+    // Add keydown event listener
+    window.addEventListener("keydown", handleKeyDown);
+
+    // Cleanup the event listener when component unmounts
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <Paper
       radius="lg"
-      p="xl"
-      mt={96}
-      mx="auto"
+      p={0}
+      m={0}
       style={{
-        maxWidth: 1000,
+        height: "100vh",
+        width: "100vw",
         backgroundColor: "#fff",
-        border: "1px solid #ccc",
-        padding: "40px",
+        backgroundImage: `
+          linear-gradient(to right, #d32f2f 2px, transparent 2px),
+          linear-gradient(to bottom, #d32f2f 2px, transparent 2px)
+        `,
+        backgroundSize: "100px 100px",
+        backgroundPosition: "center center",
         position: "relative",
         boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
-        borderRadius: "12px",
+        borderRadius: "0",
         overflow: "hidden",
       }}
     >
@@ -68,18 +88,24 @@ const HomePageCarousel = () => {
           borderRadius: "8px 8px 0 0",
         }}
       />
-      <Box style={{ position: "relative" }}>
+      <Box style={{ position: "relative", height: "100%", width: "100%" }}>
         <Carousel
           loop
-          height={450}
           draggable
           slidesToScroll={1}
           onSlideChange={setActive}
           withControls={false}
           plugins={[autoplay.current]}
           styles={{
-            root: { backgroundColor: "transparent", position: "relative" },
-            slide: { backgroundColor: "transparent" },
+            root: { backgroundColor: "transparent", position: "relative", height: "100%" },
+            slide: {
+              backgroundColor: "transparent",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+              width: "100%",
+            },
           }}
           getEmblaApi={(api: EmblaCarouselType) => {
             carouselRef.current = api;
@@ -92,8 +118,6 @@ const HomePageCarousel = () => {
 
         <Box
           onClick={goToPreviousSlide}
-          onMouseEnter={handleArrowMouseEnter}
-          onMouseLeave={handleArrowMouseLeave}
           style={{
             position: "absolute",
             top: "50%",
@@ -102,17 +126,16 @@ const HomePageCarousel = () => {
             zIndex: 10,
             cursor: "pointer",
             opacity: 0.7,
-            transition: "opacity 300ms, transform 300ms",
           }}
           className="left-arrow"
         >
-          <IconChevronLeft size={36} />
+          <div className="arrow-circle">
+            <IconChevronLeft size={28} />
+          </div>
         </Box>
 
         <Box
           onClick={goToNextSlide}
-          onMouseEnter={handleArrowMouseEnter}
-          onMouseLeave={handleArrowMouseLeave}
           style={{
             position: "absolute",
             top: "50%",
@@ -121,15 +144,27 @@ const HomePageCarousel = () => {
             zIndex: 10,
             cursor: "pointer",
             opacity: 0.7,
-            transition: "opacity 300ms, transform 300ms",
           }}
           className="right-arrow"
         >
-          <IconChevronRight size={36} />
+          <div className="arrow-circle">
+            <IconChevronRight size={28} />
+          </div>
         </Box>
       </Box>
 
-      <Group justify="center" mt="md">
+      {/* Circle Indicators */}
+      <Group
+        justify="center"
+        style={{
+          position: "absolute",
+          bottom: "20px",  // Position at the bottom
+          left: "50%",
+          transform: "translateX(-50%)",  // Center horizontally
+          zIndex: 20,  // Ensure it stays on top of other content
+          display: "flex",  // Use flexbox to align the items horizontally
+        }}
+      >
         {slideComponents.map((_, index) => (
           <Box
             key={index}
@@ -140,24 +175,49 @@ const HomePageCarousel = () => {
             }}
             style={{
               width: active === index ? 20 : 12,
-              height: 6,
-              borderRadius: 4,
-              backgroundColor: active === index ? "#000" : "#555",
-              transition: "width 300ms ease",
+              height: 12,  // Circle height
+              borderRadius: "50%",  // Make them round
+              backgroundColor: active === index ? "#fff" : "black",  // Active is white, inactive is gray
+              transition: "width 300ms ease, background-color 300ms ease",
               cursor: "pointer",
+              margin: "0 5px",  // Spacing between indicators
             }}
           />
         ))}
       </Group>
 
       <style jsx>{`
-        .left-arrow:hover {
-          opacity: 1;
-          transform: translateY(-50%) translateX(-8px);
+        .left-arrow,
+        .right-arrow {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 10;
+          cursor: pointer;
+          opacity: 0.8;
+          transition: opacity 300ms, transform 300ms;
         }
-        .right-arrow:hover {
-          opacity: 1;
-          transform: translateY(-50%) translateX(8px);
+
+        .arrow-circle {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          background: transparent;  /* No semi-transparent black background */
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .arrow-circle svg {
+          color: white;  /* White arrow icon */
+        }
+
+        .left-arrow .arrow-circle {
+          clip-path: polygon(50% 0%, 0% 25%, 50% 50%, 100% 25%, 50% 0%);  /* Left broken heart */
+        }
+
+        .right-arrow .arrow-circle {
+          clip-path: polygon(0% 25%, 50% 0%, 100% 25%, 50% 50%, 0% 25%);  /* Right broken heart */
         }
       `}</style>
     </Paper>

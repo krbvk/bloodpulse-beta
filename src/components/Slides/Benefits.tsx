@@ -1,4 +1,4 @@
-import { Card, Box, Title, Text } from "@mantine/core";
+import { Card, Box, Title, Text, Stack } from "@mantine/core";
 import { IconCirclePlus } from "@tabler/icons-react";
 import Image, { type StaticImageData } from "next/image";
 import BenefitImageSrc from "@/components/Slides/BenefitImage1.svg";
@@ -15,76 +15,115 @@ export default function Benefits() {
 
   return (
     <Card
-      radius="md"
-      p="xl"
+      radius="0"
+      p={0}
+      m={0}
       style={{
-        background: "#fff",
+        backgroundColor: "rgba(255, 255, 255, 0.2)",
+        border: "2px solid rgba(255, 255, 255, 0.2)",
         display: "flex",
-        flexDirection: "row",
-        gap: 32,
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh", // Full screen height
+        width: "100vw",  // Full screen width
+        boxSizing: "border-box",
       }}
     >
       <Box
         style={{
           display: "flex",
-          flexDirection: "column",
-          gap: 12,
-          width: "50%",
-          maxHeight: "450px",
-          overflowY: "auto",
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "3rem",
+          width: "100%",
+          maxWidth: "1200px",
+          padding: "2rem",
         }}
       >
-        <Title order={2} style={{ textAlign: "center", marginBottom: 16 }}>
-          Benefits of <span style={{ color: "red" }}>Donating Blood</span>
-        </Title>
-
-        {items.map((text, idx) => (
-          <Box
-            key={idx}
+        {/* Left side - Text content */}
+        <Box
+          style={{
+            flex: 1,
+            maxWidth: "600px",
+            display: "flex",
+            flexDirection: "column",
+            backgroundColor: "#fff",
+            gap: "1rem",
+            border: "2px solid #d32f2f",  // Added border
+            boxShadow: "0 2px 12px rgba(0, 0, 0, 0.1)",  // Added box shadow
+            padding: "1rem",
+            marginLeft: "-50px",  // Move the left content 50px to the left
+            borderRadius: "12px",  // Round the corners
+          }}
+        >
+          {/* Title on top of the left content */}
+          <Title
+            order={2}
             style={{
-              position: "relative",
-              padding: "12px 16px",
-              borderRadius: 8,
-              background: "#fff",
-              border: "2px solid #d32f2f",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              marginBottom: 12,
-              display: "flex",
-              alignItems: "center",
+              textAlign: "center",
+              marginBottom: "1.5rem",
+              fontWeight: 700,
+              fontSize: 28,
+              color: "#d32f2f",
             }}
           >
-            <IconCirclePlus
-              size={20}
-              stroke={2}
-              color="#d32f2f"
-              style={{ marginRight: 8 }}
-            />
-            <Text size="sm">{text}</Text>
-          </Box>
-        ))}
-      </Box>
+            Benefits of <span style={{ color: "red" }}>Donating Blood</span>
+          </Title>
 
-      <Box
-        style={{
-          width: "35%",
-          height: "auto",
-          borderRadius: 8,
-          overflow: "hidden",
-          display: "flex",
-          justifyContent: "center",
-          marginLeft: "10%",
-        }}
-      >
-        <Image
-          src={BenefitImage}
-          alt="Benefit Image"
+          <Stack gap="md">
+            {items.map((text, idx) => (
+              <Box
+                key={idx}
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: 8,
+                  background: "#fff",
+                  border: "2px solid #d32f2f",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <IconCirclePlus
+                  size={18}
+                  stroke={2}
+                  color="#d32f2f"
+                  style={{ marginRight: 8 }}
+                />
+                <Text size="sm">{text}</Text>
+              </Box>
+            ))}
+          </Stack>
+        </Box>
+
+        {/* Right side - Image */}
+        <Box
           style={{
-            width: "80%",
-            height: "auto",
-            objectFit: "cover",
-            alignSelf: "center",
+            flex: 1,
+            maxWidth: "300px",  // Reduced the width of the image container by 50% (600px -> 300px)
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#fff",
+            border: "2px solid #d32f2f",  // Added border
+            boxShadow: "0 2px 12px rgba(0, 0, 0, 0.1)",  // Added box shadow
+            padding: "1rem",
+            marginRight: "-50px",  // Move the image container 50px to the right
+            borderRadius: "12px",  // Round the corners
           }}
-        />
+        >
+          <Image
+            src={BenefitImage}
+            alt="Benefit Image"
+            style={{
+              width: "100%",  // Set the image width to 100% of the container
+              height: "auto",
+              objectFit: "contain",
+            }}
+          />
+        </Box>
       </Box>
     </Card>
   );
