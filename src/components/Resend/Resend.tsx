@@ -28,7 +28,7 @@ export function ResendSignIn() {
   const resendAction = async (formData: FormData) => {
     const data: Record<string, string> = {};
     formData.forEach((value, key) => {
-      data[key] = value.toString();
+      data[key] = typeof value === "string" ? value : String(value);
     });
 
     setLoading(true); 
