@@ -26,25 +26,23 @@ export function ResendSignIn() {
   }, [status, router]);
 
   const resendAction = async (formData: FormData) => {
-    const data: Record<string, string> = {};
-    formData.forEach((value, key) => {
-      data[key] = typeof value === "string" ? value : String(value);
-    });
-
-    setLoading(true); 
-
-    const res = await signIn("resend", {
-      ...data,
-      redirect: false, 
-    });
-
-    setLoading(false); 
-
-    if (res?.ok) {
-      setEmailSent(true); 
-    } else {
-      setEmailSent(false);
+    const email = formData.get("email");
+  
+    if (typeof email !== "string") {
+      console.error("Email must be a string");
+      return;
     }
+  
+    setLoading(true);
+  
+    const res = await signIn("resend", {
+      email,
+      redirect: false,
+    });
+  
+    setLoading(false);
+  
+    setEmailSent(res?.ok ?? false);
   };
 
   if (status === "loading" || loading) {
