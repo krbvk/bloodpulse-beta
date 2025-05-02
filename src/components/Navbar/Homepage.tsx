@@ -1,8 +1,10 @@
 "use client";
 
 import { Box, Group, Text, Button, Container, Flex } from "@mantine/core";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
+  const router = useRouter();
   return (
     <Box
       component="header"
@@ -20,10 +22,10 @@ const Navbar = () => {
         <Flex align="center" justify="space-between">
           {/* Left - Navigation Links */}
           <Group gap="md">
-            <Button variant="subtle" color="dark" size="md" radius="md">
+            <Button variant="subtle" color="dark" size="md" radius="md" onClick={() => router.push("/")}>
               Home
             </Button>
-            <Button variant="subtle" color="dark" size="md" radius="md">
+            <Button variant="subtle" color="dark" size="md" radius="md" onClick={() => router.push("/")}>
               About
             </Button>
           </Group>
@@ -44,7 +46,7 @@ const Navbar = () => {
 
           {/* Right - Auth Buttons */}
           <Group gap="sm">
-            <Button variant="filled" color="red" size="md" radius="md">
+            <Button variant="filled" color="red" size="md" radius="md" onClick={() => router.push("/login")}>
               Sign In / Sign Up
             </Button>
           </Group>

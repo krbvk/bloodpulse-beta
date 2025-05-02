@@ -1,7 +1,7 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
-
+import Resend from "next-auth/providers/resend"
 import { db } from "@/server/db";
 
 /**
@@ -33,6 +33,9 @@ declare module "next-auth" {
 export const authConfig = {
   providers: [
     Google,
+    Resend({
+      from: process.env.RESEND_FROM_EMAIL,
+    })
     /**
      * ...add more providers here.
      *

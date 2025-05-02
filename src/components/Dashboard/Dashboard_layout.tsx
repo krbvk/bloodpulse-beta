@@ -13,7 +13,7 @@ const getInitials = (name: string) => {
     .slice(0, 2);
 };
 
-const HomePageLayout = () => {
+const DashboardLayout = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -105,4 +105,4 @@ const HomePageLayout = () => {
   );
 };
 
-export default HomePageLayout;
+export default DashboardLayout;
