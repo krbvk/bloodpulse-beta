@@ -1,12 +1,12 @@
 "use client";
 
 import { signIn, useSession } from "next-auth/react";
-import { Button, Text, Stack, Box } from "@mantine/core";
+import { Button, Text, Box } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { IconBrandGoogle } from '@tabler/icons-react';
+import { IconBrandFacebook } from '@tabler/icons-react';
 
-export function GoogleSignInButton() {
+export function FacebookSignInButton() {
   const { status } = useSession();
   const router = useRouter();
 
@@ -17,7 +17,7 @@ export function GoogleSignInButton() {
   }, [status, router]);
 
   const handleSignIn = async () => {
-    const response = await signIn("google");
+    const response = await signIn("facebook");
     if (response?.ok) {
       router.push("/dashboard");
     }
@@ -34,11 +34,11 @@ export function GoogleSignInButton() {
         h={50}
         onClick={handleSignIn}
         size="lg"
-        color="red"
+        color="blue"
         variant="filled"
-        leftSection={<IconBrandGoogle size={24} />}
+        leftSection={<IconBrandFacebook size={24} />}
       >
-        Sign In with Google
+        Sign In with Facebook
       </Button>
     </Box>
   );

@@ -1,12 +1,12 @@
-import { ResendSignIn } from '@/components/Resend/Resend'
-import { GoogleSignInButton } from '@/components/GoogleSignin/GoogleSignInButton'
+import Navbar from '@/components/Navbar/Homepage'
 import React from 'react'
+import Options from '@/components/SignInOptions/Options'
 
 const page = () => {
   return (
     <div>
-        <ResendSignIn />
-        <GoogleSignInButton />
+        <Navbar />
+        <Options />
     </div>
   )
 }
