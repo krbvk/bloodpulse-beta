@@ -50,11 +50,10 @@ const HomePageCarousel = () => {
     // Add keydown event listener
     window.addEventListener("keydown", handleKeyDown);
 
-    // Cleanup the event listener when component unmounts
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [handleKeyDown]);
 
   return (
     <Paper
