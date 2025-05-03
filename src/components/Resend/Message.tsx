@@ -37,7 +37,7 @@ export default function EmailMessage() {
             <IconMail size={32} color="white" />
           </div>
           <Text style={{ textAlign: "left" }} c="white">
-            Check your email for the sign-in link&excl;
+            Check your email for the sign-in link&apos;s&excl;
           </Text>
         </Flex>
       </Center>
@@ -49,7 +49,7 @@ export default function EmailMessage() {
           color: "white",
         }}
       >
-        If you can't find the email, be sure to check your spam or junk folder.
+        If you can&apos;t find the email, be sure to check your spam or junk folder.
       </Text>
     </Paper>
   );

@@ -37,23 +37,21 @@ const HomePageCarousel = () => {
     autoplay.current?.stop();
   };
 
-  // Keyboard arrow navigation
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key === "ArrowLeft") {
-      goToPreviousSlide();
-    } else if (event.key === "ArrowRight") {
-      goToNextSlide();
-    }
-  };
-
   useEffect(() => {
-    // Add keydown event listener
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") {
+        goToPreviousSlide();
+      } else if (event.key === "ArrowRight") {
+        goToNextSlide();
+      }
+    };
+  
     window.addEventListener("keydown", handleKeyDown);
-
+  
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [handleKeyDown]);
+  }, []); 
 
   return (
     <Paper
