@@ -5,15 +5,16 @@ import { Paper, Box, Group } from "@mantine/core";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { useRef, useState, useEffect } from "react";
 import Autoplay from "embla-carousel-autoplay";
-import Services from "@/components/Slides/Services";
-import Benefits from "@/components/Slides/Benefits";
+const Services = lazy(() => import("@/components/Slides/Services"));
+const Benefits = lazy(() => import("@/components/Slides/Benefits"));
 import type { EmblaCarouselType } from "embla-carousel";
+import { lazy, Suspense } from "react";
 
 const HomePageCarousel = () => {
   const slideComponents = [
-    <Services key="services-1" />,
-    <Benefits key="benefits-2" />,
-    <Services key="services-3" />,
+    <Suspense key="services-1" fallback={<div>Loading...</div>}><Services /></Suspense>,
+    <Suspense key="benefits-2" fallback={<div>Loading...</div>}><Benefits /></Suspense>,
+    <Suspense key="services-3" fallback={<div>Loading...</div>}><Services /></Suspense>,
   ];
   const [active, setActive] = useState(0);
   const carouselRef = useRef<EmblaCarouselType | null>(null);
