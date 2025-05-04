@@ -35,7 +35,7 @@ const Navbar = () => {
               <Button component={Link} href="/" variant="subtle" color="dark" size="md" radius="md">
                 Home
               </Button>
-              <Button component={Link} href="/about" variant="subtle" color="dark" size="md" radius="md">
+              <Button component={Link} href="/" variant="subtle" color="dark" size="md" radius="md">
                 About
               </Button>
             </Group>
@@ -94,7 +94,7 @@ const Navbar = () => {
             </Button>
             <Button
               component={Link}
-              href="/about"
+              href="/"
               variant="subtle"
               color="dark"
               size="md"

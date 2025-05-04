@@ -1,4 +1,5 @@
 "use client";
+
 import Navbar from "@/components/Navbar/Homepage";
 import EmailMessage from "@/components/Resend/Message";
 import { Box, Text, Paper } from "@mantine/core";
@@ -15,7 +16,12 @@ export default function Message() {
           alignItems: "center",
           justifyContent: "center",
           padding: "20px",
-          backgroundColor: "white", 
+          backgroundImage: `
+          linear-gradient(to right, #d32f2f 2px, transparent 2px),
+          linear-gradient(to bottom, #d32f2f 2px, transparent 2px)
+        `,
+          backgroundSize: "100px 100px",
+          backgroundPosition: "center center",
         }}
       >
         <Paper
