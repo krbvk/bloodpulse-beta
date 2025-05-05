@@ -14,8 +14,8 @@ import { lazy, Suspense } from "react";
 const HomePageCarousel = () => {
   const slideComponents = [
     <Suspense key="introduction-1" fallback={<div>Loading...</div>}><Introduction /></Suspense>,
-    <Suspense key="services-2" fallback={<div>Loading...</div>}><Services /></Suspense>,
-    <Suspense key="benefits-3" fallback={<div>Loading...</div>}><Benefits /></Suspense>,
+    <Suspense key="benefits-2" fallback={<div>Loading...</div>}><Benefits /></Suspense>,
+    <Suspense key="services-3" fallback={<div>Loading...</div>}><Services /></Suspense>,
   ];
   const [active, setActive] = useState(0);
   const carouselRef = useRef<EmblaCarouselType | null>(null);
@@ -64,10 +64,6 @@ const HomePageCarousel = () => {
         height: "100vh",
         width: "100vw",
         backgroundColor: "#fff",
-        backgroundImage: `
-          linear-gradient(to right, #d32f2f 2px, transparent 2px),
-          linear-gradient(to bottom, #d32f2f 2px, transparent 2px)
-        `,
         backgroundSize: "100px 100px",
         backgroundPosition: "center center",
         position: "relative",

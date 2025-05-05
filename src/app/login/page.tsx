@@ -1,15 +1,25 @@
-import Navbar from '@/components/Navbar/Homepage'
-import React from 'react'
-import Options from '@/components/SignInOptions/Options'
-import { Box } from '@mantine/core'
+'use client';
 
-const page = () => {
+import Navbar from '@/components/Navbar/Homepage';
+import Options from '@/components/SignInOptions/Options';
+import { Box } from '@mantine/core';
+
+export default function LoginPage() {
   return (
-    <Box>
-        <Navbar />
+    <Box style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <Navbar />
+      <Box
+        style={{
+          minHeight: '100vh',
+          paddingTop: 65,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundImage: 'linear-gradient(to right, #fdecea, #fff)',
+        }}
+      >
         <Options />
+      </Box>
     </Box>
-  )
+  );
 }
-
-export default page

@@ -32,10 +32,10 @@ const Navbar = () => {
         <Flex align="center" justify="space-between">
           {!isMobile && (
             <Group gap="md">
-              <Button component={Link} href="/" variant="subtle" color="dark" size="md" radius="md">
+              <Button component={Link} href="/" variant="subtle" color="dark" size="md" radius="md" leftSection={<IconHome size={18} />}              >
                 Home
               </Button>
-              <Button component={Link} href="/" variant="subtle" color="dark" size="md" radius="md">
+              <Button component={Link} href="/about" variant="subtle" color="dark" size="md" radius="md" leftSection={<IconInfoCircle size={18} />}>
                 About
               </Button>
             </Group>
@@ -44,7 +44,7 @@ const Navbar = () => {
             size="xl"
             fw={900}
             style={{
-              color: "#FF4B2B",
+              color: "#FF4D4D",
               letterSpacing: "1px",
               fontFamily: "monospace",
               userSelect: "none",
@@ -54,7 +54,7 @@ const Navbar = () => {
           </Text>
           {!isMobile && (
             <Group gap="sm">
-              <Button component={Link} href="/login" variant="filled" color="red" size="md" radius="md">
+              <Button component={Link} href="/login" variant="filled" color="red" size="md" radius="md" leftSection={<IconLogin size={18} />}>
                 Sign In / Sign Up
               </Button>
             </Group>

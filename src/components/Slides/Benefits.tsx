@@ -1,11 +1,4 @@
-import {
-  Card,
-  Box,
-  Title,
-  Text,
-  Stack,
-  Divider,
-} from "@mantine/core";
+import { Card, Box, Title, Text, Stack, Divider } from "@mantine/core";
 import {
   IconHeart,
   IconHeartbeat,
@@ -13,8 +6,11 @@ import {
   IconDroplet,
   IconClockHour8,
 } from "@tabler/icons-react";
+import { useMediaQuery } from "@mantine/hooks";
 
 export default function Benefits() {
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
   const items = [
     {
       icon: IconDroplet,
@@ -47,7 +43,7 @@ export default function Benefits() {
         backgroundImage: "linear-gradient(to right, #fdecea, #fff)",
         border: "2px solid rgba(255, 255, 255, 0.15)",
         display: "flex",
-        justifyContent: "center",
+        justifyContent: isMobile ? "flex-end" : "center",
         alignItems: "center",
         minHeight: "100vh",
         width: "100vw",
@@ -57,14 +53,23 @@ export default function Benefits() {
       <Box
         style={{
           width: "95%",
-          maxWidth: "720px",
-          padding: "1rem 2rem",
+          maxWidth: isMobile ? "90%" : "720px",
+          padding: isMobile ? "0.5rem 1rem" : "1rem 2rem", 
           backgroundColor: "#fff",
           border: "1px solid #e0e0e0",
           boxShadow: "0 8px 24px rgba(0, 0, 0, 0.05)",
           borderRadius: "16px",
           maxHeight: "90vh",
-          overflow: "auto"
+          overflow: "auto",
+          transition: "transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = "scale(1.02)";
+          e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.05)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "scale(1)";
+          e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.05)";
         }}
       >
         <Title
@@ -73,11 +78,11 @@ export default function Benefits() {
             textAlign: "center",
             marginBottom: "0.5rem",
             fontWeight: 800,
-            fontSize: 26,
-            color: "#c62828",
+            fontSize: isMobile ? "20px" : "26px",
+            color: "black",
           }}
         >
-          Benefits of <span style={{ color: "#d32f2f" }}>Donating Blood</span>
+          Benefits of <span style={{ color: "#FF4D4D" }}>Donating Blood</span>
         </Title>
 
         <Divider my="sm" variant="dashed" color="red.4" />
@@ -96,6 +101,7 @@ export default function Benefits() {
                 alignItems: "flex-start",
                 gap: "0.75rem",
                 transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                flexDirection: isMobile ? "column" : "row", 
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "scale(1.02)";
@@ -119,9 +125,9 @@ export default function Benefits() {
                   marginTop: "2px",
                 }}
               >
-                <item.icon size={18} stroke={1.8} color="#d32f2f" />
+                <item.icon size={isMobile ? 16 : 18} stroke={1.8} color="#d32f2f" />
               </Box>
-              <Text size="sm" style={{ lineHeight: 1.5 }}>
+              <Text size="sm" style={{ lineHeight: 1.5, fontSize: isMobile ? "12px" : "14px" }}>
                 {item.text}
               </Text>
             </Box>
