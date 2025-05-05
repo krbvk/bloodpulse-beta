@@ -1,7 +1,8 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
-import Resend from "next-auth/providers/resend"
+import Resend from "next-auth/providers/resend";
+import Facebook from "next-auth/providers/facebook";
 import { db } from "@/server/db";
 
 /**
@@ -32,7 +33,12 @@ declare module "next-auth" {
  */
 export const authConfig = {
   providers: [
-    Google,
+    Google({
+      allowDangerousEmailAccountLinking: true,
+    }),
+    Facebook({
+      allowDangerousEmailAccountLinking: true,
+    }),
     Resend({
       from: process.env.RESEND_FROM_EMAIL,
     })

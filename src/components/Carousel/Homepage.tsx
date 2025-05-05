@@ -5,15 +5,17 @@ import { Paper, Box, Group } from "@mantine/core";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { useRef, useState, useEffect } from "react";
 import Autoplay from "embla-carousel-autoplay";
-import Services from "@/components/Slides/Services";
-import Benefits from "@/components/Slides/Benefits";
+const Services = lazy(() => import("@/components/Slides/Services"));
+const Benefits = lazy(() => import("@/components/Slides/Benefits"));
+const Introduction = lazy(() => import("@/components/Slides/Introduction"));
 import type { EmblaCarouselType } from "embla-carousel";
+import { lazy, Suspense } from "react";
 
 const HomePageCarousel = () => {
   const slideComponents = [
-    <Services key="services-1" />,
-    <Benefits key="benefits-2" />,
-    <Services key="services-3" />,
+    <Suspense key="introduction-1" fallback={<div>Loading...</div>}><Introduction /></Suspense>,
+    <Suspense key="benefits-2" fallback={<div>Loading...</div>}><Benefits /></Suspense>,
+    <Suspense key="services-3" fallback={<div>Loading...</div>}><Services /></Suspense>,
   ];
   const [active, setActive] = useState(0);
   const carouselRef = useRef<EmblaCarouselType | null>(null);
@@ -37,24 +39,21 @@ const HomePageCarousel = () => {
     autoplay.current?.stop();
   };
 
-  // Keyboard arrow navigation
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key === "ArrowLeft") {
-      goToPreviousSlide();
-    } else if (event.key === "ArrowRight") {
-      goToNextSlide();
-    }
-  };
-
   useEffect(() => {
-    // Add keydown event listener
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") {
+        goToPreviousSlide();
+      } else if (event.key === "ArrowRight") {
+        goToNextSlide();
+      }
+    };
+  
     window.addEventListener("keydown", handleKeyDown);
-
-    // Cleanup the event listener when component unmounts
+  
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, []); 
 
   return (
     <Paper
@@ -65,10 +64,6 @@ const HomePageCarousel = () => {
         height: "100vh",
         width: "100vw",
         backgroundColor: "#fff",
-        backgroundImage: `
-          linear-gradient(to right, #d32f2f 2px, transparent 2px),
-          linear-gradient(to bottom, #d32f2f 2px, transparent 2px)
-        `,
         backgroundSize: "100px 100px",
         backgroundPosition: "center center",
         position: "relative",
@@ -158,11 +153,11 @@ const HomePageCarousel = () => {
         justify="center"
         style={{
           position: "absolute",
-          bottom: "20px",  // Position at the bottom
+          bottom: "20px", 
           left: "50%",
-          transform: "translateX(-50%)",  // Center horizontally
-          zIndex: 20,  // Ensure it stays on top of other content
-          display: "flex",  // Use flexbox to align the items horizontally
+          transform: "translateX(-50%)", 
+          zIndex: 20,  
+          display: "flex", 
         }}
       >
         {slideComponents.map((_, index) => (
@@ -175,12 +170,12 @@ const HomePageCarousel = () => {
             }}
             style={{
               width: active === index ? 20 : 12,
-              height: 12,  // Circle height
-              borderRadius: "50%",  // Make them round
-              backgroundColor: active === index ? "#fff" : "black",  // Active is white, inactive is gray
+              height: 12,  
+              borderRadius: "50%",  
+              backgroundColor: active === index ? "#FF4D4D" : "black",  // Active is white, inactive is gray
               transition: "width 300ms ease, background-color 300ms ease",
               cursor: "pointer",
-              margin: "0 5px",  // Spacing between indicators
+              margin: "0 5px",  
             }}
           />
         ))}

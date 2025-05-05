@@ -7,7 +7,6 @@ import {
   Stack,
   Paper,
   TextInput,
-  Group,
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
@@ -16,7 +15,6 @@ export function ResendSignIn() {
   const { status } = useSession();
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
-  const [emailSent, setEmailSent] = useState(false); 
   const [loading, setLoading] = useState(false); 
 
   useEffect(() => {
@@ -27,22 +25,24 @@ export function ResendSignIn() {
 
   const resendAction = async (formData: FormData) => {
     const email = formData.get("email");
-  
+
     if (typeof email !== "string") {
       console.error("Email must be a string");
       return;
     }
-  
+
     setLoading(true);
-  
+
     const res = await signIn("resend", {
       email,
       redirect: false,
     });
-  
+
     setLoading(false);
-  
-    setEmailSent(res?.ok ?? false);
+
+    if (res?.ok) {
+      router.push("/resend-email"); 
+    }
   };
 
   if (status === "loading" || loading) {
@@ -54,33 +54,28 @@ export function ResendSignIn() {
       shadow="md"
       radius="lg"
       p="xl"
-      mt={48}
+      mt="md"
       mx="auto"
       withBorder
-      style={{ maxWidth: 400, backgroundColor: "#fff0f0" }}
+      style={{ maxWidth: 400, width: "100%", backgroundColor: "white" }}
     >
-      {emailSent ? (
-        <Text style={{ textAlign: "center", color: "green" }}>
-          Check your email for the sign-in link!
-        </Text>
-      ) : (
-        <form action={resendAction} ref={formRef}>
-          <Stack gap="lg">
-            <TextInput
-              label="Email"
-              placeholder="your@email.com"
-              name="email"
-              type="email"
-              required
-            />
-            <Group grow>
-              <Button type="submit" size="lg" color="blue">
-                Sign in with Email (Resend)
-              </Button>
-            </Group>
-          </Stack>
-        </form>
-      )}
+      <form action={resendAction} ref={formRef} style={{ width: "100%" }}>
+        <Stack gap="lg">
+          <Text style={{ textAlign: "center"}} size="md" c="black">
+            or sign in through email
+          </Text>
+          <TextInput
+            label="Email"
+            placeholder="your@email.com"
+            name="email"
+            type="email"
+            required
+          />
+          <Button type="submit" size="lg" color="blue" fullWidth>
+            Sign in with Email
+          </Button>
+        </Stack>
+      </form>
     </Paper>
   );
 }
