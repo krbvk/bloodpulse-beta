@@ -98,7 +98,7 @@ export default function Introduction() {
               textAlign: "center",
             }}
           >
-            Every drop counts. Be the reason someone gets a second chance at life. Step up and be a real-life hero.&quot;
+            &ldquo;Every drop counts. Be the reason someone gets a second chance at life. Step up and be a real-life hero.&rdquo;
           </Text>
 
           <Button
@@ -158,7 +158,7 @@ export default function Introduction() {
             color: "#e0e0e0",
             }}
         >
-            "I never thought a small act could mean so much — until I saw the gratitude in their eyes."
+              &ldquo;I never thought a small act could mean so much — until I saw the gratitude in their eyes.&rdquo;
         </Text>
         <Text size="sm" style={{ textAlign: "right", color: "#aaaaaa" }}>
             — Klyde Cedric D.0
