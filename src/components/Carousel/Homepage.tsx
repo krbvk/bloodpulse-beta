@@ -7,14 +7,15 @@ import { useRef, useState, useEffect } from "react";
 import Autoplay from "embla-carousel-autoplay";
 const Services = lazy(() => import("@/components/Slides/Services"));
 const Benefits = lazy(() => import("@/components/Slides/Benefits"));
+const Introduction = lazy(() => import("@/components/Slides/Introduction"));
 import type { EmblaCarouselType } from "embla-carousel";
 import { lazy, Suspense } from "react";
 
 const HomePageCarousel = () => {
   const slideComponents = [
-    <Suspense key="services-1" fallback={<div>Loading...</div>}><Services /></Suspense>,
-    <Suspense key="benefits-2" fallback={<div>Loading...</div>}><Benefits /></Suspense>,
-    <Suspense key="services-3" fallback={<div>Loading...</div>}><Services /></Suspense>,
+    <Suspense key="introduction-1" fallback={<div>Loading...</div>}><Introduction /></Suspense>,
+    <Suspense key="services-2" fallback={<div>Loading...</div>}><Services /></Suspense>,
+    <Suspense key="benefits-3" fallback={<div>Loading...</div>}><Benefits /></Suspense>,
   ];
   const [active, setActive] = useState(0);
   const carouselRef = useRef<EmblaCarouselType | null>(null);
@@ -156,11 +157,11 @@ const HomePageCarousel = () => {
         justify="center"
         style={{
           position: "absolute",
-          bottom: "20px",  // Position at the bottom
+          bottom: "20px", 
           left: "50%",
-          transform: "translateX(-50%)",  // Center horizontally
-          zIndex: 20,  // Ensure it stays on top of other content
-          display: "flex",  // Use flexbox to align the items horizontally
+          transform: "translateX(-50%)", 
+          zIndex: 20,  
+          display: "flex", 
         }}
       >
         {slideComponents.map((_, index) => (
@@ -173,12 +174,12 @@ const HomePageCarousel = () => {
             }}
             style={{
               width: active === index ? 20 : 12,
-              height: 12,  // Circle height
-              borderRadius: "50%",  // Make them round
-              backgroundColor: active === index ? "#fff" : "black",  // Active is white, inactive is gray
+              height: 12,  
+              borderRadius: "50%",  
+              backgroundColor: active === index ? "#FF4D4D" : "black",  // Active is white, inactive is gray
               transition: "width 300ms ease, background-color 300ms ease",
               cursor: "pointer",
-              margin: "0 5px",  // Spacing between indicators
+              margin: "0 5px",  
             }}
           />
         ))}

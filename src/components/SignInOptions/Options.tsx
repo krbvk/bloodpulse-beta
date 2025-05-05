@@ -8,17 +8,11 @@ import { ResendSignIn } from "../Resend/Resend";
 export default function Options() {
   return (
     <Flex
-    
       align="center"
       justify="center"
       style={{
         height: "100vh",
-        backgroundImage: `
-        linear-gradient(to right, #d32f2f 2px, transparent 2px),
-        linear-gradient(to bottom, #d32f2f 2px, transparent 2px)
-      `,
-        backgroundSize: "100px 100px",
-        backgroundPosition: "center center",
+        backgroundImage: "linear-gradient(to right, #fdecea, #fff)",
       }}
     >
       <Box

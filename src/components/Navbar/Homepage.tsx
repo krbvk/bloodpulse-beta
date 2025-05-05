@@ -94,7 +94,7 @@ const Navbar = () => {
             </Button>
             <Button
               component={Link}
-              href="/"
+              href="/about"
               variant="subtle"
               color="dark"
               size="md"

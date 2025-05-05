@@ -1,16 +1,41 @@
-import { Card, Box, Title, Text, Stack } from "@mantine/core";
-import { IconCirclePlus } from "@tabler/icons-react";
-import Image, { type StaticImageData } from "next/image";
-import BenefitImageSrc from "@/components/Slides/BenefitImage1.svg";
-
-const BenefitImage = BenefitImageSrc as StaticImageData;
+import {
+  Card,
+  Box,
+  Title,
+  Text,
+  Stack,
+  Divider,
+} from "@mantine/core";
+import {
+  IconHeart,
+  IconHeartbeat,
+  IconStethoscope,
+  IconDroplet,
+  IconClockHour8,
+} from "@tabler/icons-react";
 
 export default function Benefits() {
   const items = [
-    "Blood donation helps save lives and is crucial for maintaining an adequate hospital supply.",
-    "Donating blood keeps your circulation healthy and stimulates new red blood cell production.",
-    "Regular donations help maintain a stable blood supply and include a free health screening.",
-    "Blood donation can lower certain cancer risks and boost your mood by saving lives.",
+    {
+      icon: IconDroplet,
+      text: "Save Lives — Every donation has the potential to save up to three lives. You’re directly impacting people who are in urgent need.",
+    },
+    {
+      icon: IconHeartbeat,
+      text: "Improve Your Heart Health — Regular blood donation can lower your risk of heart disease and help regulate your iron levels, contributing to better cardiovascular health.",
+    },
+    {
+      icon: IconStethoscope,
+      text: "Free Health Checkup — Each time you donate, you receive a mini health checkup, including blood pressure, hemoglobin, and iron level tests, giving you valuable insight into your own health.",
+    },
+    {
+      icon: IconHeart,
+      text: "Regenerate New Blood Cells — Donating blood stimulates your body to create new red blood cells, keeping your circulatory system healthy and refreshed.",
+    },
+    {
+      icon: IconClockHour8,
+      text: "Help Ensure Blood Availability — Your donation helps maintain a steady blood supply in hospitals, making it easier to respond to emergencies and ensuring there is blood available when it’s most needed.",
+    },
   ];
 
   return (
@@ -19,111 +44,89 @@ export default function Benefits() {
       p={0}
       m={0}
       style={{
-        backgroundColor: "rgba(255, 255, 255, 0.2)",
-        border: "2px solid rgba(255, 255, 255, 0.2)",
+        backgroundImage: "linear-gradient(to right, #fdecea, #fff)",
+        border: "2px solid rgba(255, 255, 255, 0.15)",
         display: "flex",
-        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        height: "100vh", // Full screen height
-        width: "100vw",  // Full screen width
+        minHeight: "100vh",
+        width: "100vw",
         boxSizing: "border-box",
       }}
     >
       <Box
         style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: "3rem",
-          width: "100%",
-          maxWidth: "1200px",
-          padding: "2rem",
+          width: "95%",
+          maxWidth: "720px",
+          padding: "1rem 2rem",
+          backgroundColor: "#fff",
+          border: "1px solid #e0e0e0",
+          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.05)",
+          borderRadius: "16px",
+          maxHeight: "90vh",
+          overflow: "auto"
         }}
       >
-        {/* Left side - Text content */}
-        <Box
+        <Title
+          order={2}
           style={{
-            flex: 1,
-            maxWidth: "600px",
-            display: "flex",
-            flexDirection: "column",
-            backgroundColor: "#fff",
-            gap: "1rem",
-            border: "2px solid #d32f2f",  // Added border
-            boxShadow: "0 2px 12px rgba(0, 0, 0, 0.1)",  // Added box shadow
-            padding: "1rem",
-            marginLeft: "-50px",  // Move the left content 50px to the left
-            borderRadius: "12px",  // Round the corners
+            textAlign: "center",
+            marginBottom: "0.5rem",
+            fontWeight: 800,
+            fontSize: 26,
+            color: "#c62828",
           }}
         >
-          {/* Title on top of the left content */}
-          <Title
-            order={2}
-            style={{
-              textAlign: "center",
-              marginBottom: "1.5rem",
-              fontWeight: 700,
-              fontSize: 28,
-              color: "#d32f2f",
-            }}
-          >
-            Benefits of <span style={{ color: "red" }}>Donating Blood</span>
-          </Title>
+          Benefits of <span style={{ color: "#d32f2f" }}>Donating Blood</span>
+        </Title>
 
-          <Stack gap="md">
-            {items.map((text, idx) => (
+        <Divider my="sm" variant="dashed" color="red.4" />
+
+        <Stack gap="sm">
+          {items.map((item, idx) => (
+            <Box
+              key={idx}
+              style={{
+                padding: "12px",
+                borderRadius: "10px",
+                backgroundColor: "#fefefe",
+                border: "1px solid #f4c7c3",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "0.75rem",
+                transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "scale(1.02)";
+                e.currentTarget.style.boxShadow =
+                  "0 4px 10px rgba(0,0,0,0.08)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.boxShadow =
+                  "0 2px 6px rgba(0,0,0,0.05)";
+              }}
+            >
               <Box
-                key={idx}
                 style={{
-                  padding: "10px 14px",
-                  borderRadius: 8,
-                  background: "#fff",
-                  border: "2px solid #d32f2f",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  backgroundColor: "#ffebee",
+                  borderRadius: "50%",
+                  padding: "6px",
                   display: "flex",
                   alignItems: "center",
+                  justifyContent: "center",
+                  marginTop: "2px",
                 }}
               >
-                <IconCirclePlus
-                  size={18}
-                  stroke={2}
-                  color="#d32f2f"
-                  style={{ marginRight: 8 }}
-                />
-                <Text size="sm">{text}</Text>
+                <item.icon size={18} stroke={1.8} color="#d32f2f" />
               </Box>
-            ))}
-          </Stack>
-        </Box>
-
-        {/* Right side - Image */}
-        <Box
-          style={{
-            flex: 1,
-            maxWidth: "300px",  // Reduced the width of the image container by 50% (600px -> 300px)
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "#fff",
-            border: "2px solid #d32f2f",  // Added border
-            boxShadow: "0 2px 12px rgba(0, 0, 0, 0.1)",  // Added box shadow
-            padding: "1rem",
-            marginRight: "-50px",  // Move the image container 50px to the right
-            borderRadius: "12px",  // Round the corners
-          }}
-        >
-          <Image
-            src={BenefitImage}
-            alt="Benefit Image"
-            style={{
-              width: "100%",  // Set the image width to 100% of the container
-              height: "auto",
-              objectFit: "contain",
-            }}
-          />
-        </Box>
+              <Text size="sm" style={{ lineHeight: 1.5 }}>
+                {item.text}
+              </Text>
+            </Box>
+          ))}
+        </Stack>
       </Box>
     </Card>
   );
