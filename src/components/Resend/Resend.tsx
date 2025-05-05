@@ -62,7 +62,7 @@ export function ResendSignIn() {
       <form action={resendAction} ref={formRef} style={{ width: "100%" }}>
         <Stack gap="lg">
           <Text style={{ textAlign: "center"}} size="md" c="black">
-            or sign in through email
+            Continue with Email
           </Text>
           <TextInput
             label="Email"
@@ -72,7 +72,7 @@ export function ResendSignIn() {
             required
           />
           <Button type="submit" size="lg" color="blue" fullWidth>
-            Sign in with Email
+            Send login link
           </Button>
         </Stack>
       </form>
