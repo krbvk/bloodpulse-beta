@@ -98,7 +98,7 @@ export default function Introduction() {
               textAlign: "center",
             }}
           >
-            Every drop counts. Be the reason someone gets a second chance at life. Step up and be a real-life hero.
+            Every drop counts. Be the reason someone gets a second chance at life. Step up and be a real-life hero.&quot;
           </Text>
 
           <Button
