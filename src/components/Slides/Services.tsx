@@ -140,7 +140,7 @@ export default function Services() {
                       "0 2px 12px rgba(0,0,0,0.1)";
                   }}
                 >
-                  <Group align="center" gap="xs">
+                  <Group align="center" gap="xs" style={{ flexWrap: "nowrap", alignItems: "center", }}>
                     <Box
                       w={rem(isMobile ? 22 : 36)}
                       h={rem(isMobile ? 22 : 36)}
@@ -151,11 +151,12 @@ export default function Services() {
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
+                        flexShrink: 0,
                       }}
                     >
                       {item.icon}
                     </Box>
-                    <Text size={isMobile ? "xs" : "sm"} c="black">
+                    <Text size={isMobile ? "xs" : "sm"} c="black" style={{ wordBreak: "break-word", overflowWrap: "anywhere", lineHeight: 1.4, flex: 1 }}>
                       {item.text}
                     </Text>
                   </Group>
