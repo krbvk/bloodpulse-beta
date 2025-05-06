@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useMediaQuery } from '@mantine/hooks';
 import { IconHome, IconInfoCircle, IconLogin } from '@tabler/icons-react';
+import Image from "next/image";
 
 const Navbar = () => {
   const [opened, setOpened] = useState(false);
