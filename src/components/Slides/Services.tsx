@@ -1,11 +1,14 @@
+"use client";
+
 import {
-  Card,
   Box,
-  Title,
-  Text,
+  Card,
   Stack,
-  Grid,
+  Text,
+  Title,
   Button,
+  Group,
+  rem,
 } from "@mantine/core";
 import {
   IconHeart,
@@ -14,180 +17,186 @@ import {
 } from "@tabler/icons-react";
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
+import { useMediaQuery } from "@mantine/hooks";
 import ServiceImageSrc from "@/components/Slides/ServiceImage1.svg";
 
 const ServiceImage = ServiceImageSrc as StaticImageData;
 
 export default function Services() {
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
   const services = [
     {
-      icon: <IconHeart size={18} />,
+      icon: <IconHeart size={isMobile ? 16 : 20} />,
       text: "Become a Donor — we can help if you want to donate blood.",
     },
     {
-      icon: <IconCalendar size={18} />,
+      icon: <IconCalendar size={isMobile ? 16 : 20} />,
       text: "Blood booking — we can help you book an appointment.",
     },
     {
-      icon: <IconSearch size={18} />,
+      icon: <IconSearch size={isMobile ? 16 : 20} />,
       text: "Blood type filtering — you can browse and search the blood type you need.",
     },
   ];
 
   return (
-    <Card
-      radius="0"
-      p={0}
-      m={0}
+    <Box
+      w="100%"
+      h={isMobile ? "100vh" : "100vh"}
+      px="lg"
+      py={isMobile ? "lg" : "xl"}
       style={{
         backgroundImage: "linear-gradient(135deg, #fdecea 0%, #fff 100%)",
-        border: "none",
-        height: "100vh",
-        width: "100vw",
-        boxSizing: "border-box",
-        padding: "2rem",
         display: "flex",
-        alignItems: "center",
         justifyContent: "center",
+        alignItems: "center",
       }}
     >
-      <Grid
-        gutter="xl"
+      <Card
+        w="100%"
+        maw={1000}
+        p={isMobile ? "md" : "lg"}
+        radius="md"
+        withBorder
         style={{
-          maxWidth: 1200,
-          width: "100%",
+          border: "1px solid #e0e0e0",
+          backgroundColor: "#fff",
+          maxHeight: isMobile ? "80vh" : "unset",
         }}
+        shadow="xl"
       >
-        {/* Image Box */}
-        <Grid.Col span={{ base: 12, md: 6 }}>
+        <Group
+          wrap="wrap"
+          justify="center"
+          align="center"
+          gap={isMobile ? "sm" : "xl"}
+          w="100%"
+          style={{
+            flexDirection: isMobile ? "column" : "row",
+          }}
+        >
+          {/* Image */}
           <Box
+            w={{ base: "100%", md: "40%" }}
+            ta="center"
             style={{
-              height: "100%",
-              minHeight: 400,
-              backgroundColor: "#fff",
-              border: "2px solid #FF4D4D",
-              borderRadius: 12,
-              padding: "1rem",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              boxShadow: "0 2px 12px rgba(0, 0, 0, 0.1)",
+              maxHeight: isMobile ? "100px" : "300px",
             }}
           >
             <Image
               src={ServiceImage}
               alt="Service"
-              style={{ width: "100%", height: "auto", objectFit: "contain" }}
+              style={{
+                width: isMobile ? "150px" : "100%",
+                maxWidth: "500px",
+                height: "auto",
+                objectFit: "contain",
+                marginInline: "auto",
+              }}
             />
           </Box>
-        </Grid.Col>
 
-        {/* Text Box */}
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card
-            shadow="sm"
-            padding="xl"
-            radius="md"
-            style={{
-              height: "100%",
-              minHeight: 400,
-              background: "#fff",
-              border: "2px solid #FF4D4D",
-              boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "flex-start",
-              transition: "transform 0.2s ease, box-shadow 0.2s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "scale(1.02)";
-              e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.12)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "scale(1)";
-              e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.1)";
-            }}
+          {/* Text Section */}
+          <Stack
+            w={{ base: "100%", md: "55%" }}
+            gap={isMobile ? 12 : "lg"}
+            align="center"
+            justify="center"
           >
-            <Title
-              order={2}
-              mb="lg"
-              style={{
-                fontWeight: 800,
-                fontSize: 30,
-                lineHeight: 1.3,
-                textAlign: "center",
-              }}
-            >
+            <Title order={2} ta="center" fw={800} fz={isMobile ? 20 : 30} mb={isMobile ? 4 : 0}>
               What{" "}
               <Text
                 span
                 variant="gradient"
                 gradient={{ from: "#FF4D4D", to: "#FF4D4D" }}
-                style={{ fontSize: 30, fontWeight: 800 }}
+                style={{ fontSize: isMobile ? 20 : 30 }}
               >
                 We Can Offer
               </Text>
             </Title>
 
-            <Stack gap="lg" mb="lg">
+            <Stack w="100%" gap={isMobile ? 10 : "md"}>
               {services.map((item, i) => (
-                <Box
+                <Card
                   key={i}
+                  withBorder
+                  radius="md"
+                  padding={isMobile ? 8 : "md"}
+                  shadow="sm"
+                  component="div"
                   style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: "0.75rem",
-                    transition: "background 0.2s, box-shadow 0.2s",
-                    padding: "0.5rem",
-                    borderRadius: 8,
+                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
                     cursor: "pointer",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = "#FFF5F5";
-                    e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.05)";
+                    e.currentTarget.style.transform = "scale(1.02)";
+                    e.currentTarget.style.boxShadow =
+                      "0 6px 16px rgba(0,0,0,0.12)";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "transparent";
-                    e.currentTarget.style.boxShadow = "none";
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.boxShadow =
+                      "0 2px 12px rgba(0,0,0,0.1)";
                   }}
                 >
-                  <Box
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: "50%",
-                      backgroundColor: "#FF4D4D",
-                      color: "#fff",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      fontWeight: 700,
-                      fontSize: 14,
-                      flexShrink: 0,
-                    }}
-                  >
-                    {item.icon}
-                  </Box>
-                  <Text size="sm">{item.text}</Text>
-                </Box>
+                  <Group align="center" gap="xs">
+                    <Box
+                      w={rem(isMobile ? 22 : 36)}
+                      h={rem(isMobile ? 22 : 36)}
+                      style={{
+                        borderRadius: "50%",
+                        backgroundColor: "#FF4D4D",
+                        color: "#fff",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      {item.icon}
+                    </Box>
+                    <Text size={isMobile ? "xs" : "sm"} c="black">
+                      {item.text}
+                    </Text>
+                  </Group>
+                </Card>
               ))}
             </Stack>
 
-            <Box mt="auto" style={{ textAlign: "center" }}>
-              <Link href="/about">
-                <Button
-                  variant="filled"
-                  color="red"
-                  size="md"
-                  radius="xs"
-                >
-                  Learn More About Us
-                </Button>
-              </Link>
-            </Box>
-          </Card>
-        </Grid.Col>
-      </Grid>
-    </Card>
+            <Link href="/about">
+              <Button
+                variant="filled"
+                color="red"
+                size={isMobile ? "xs" : "md"}
+                radius="xs"
+                mt={isMobile ? 8 : 0}
+                style={{
+                  animation: "pulse 2s infinite",
+                  padding: isMobile ? "6px 10px" : undefined,
+                  fontSize: isMobile ? "0.75rem" : undefined,
+                }}
+              >
+                Learn more about our service
+              </Button>
+            </Link>
+          </Stack>
+        </Group>
+
+        {/* Pulse animation keyframes */}
+        <style jsx global>{`
+          @keyframes pulse {
+            0% {
+              box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.6);
+            }
+            70% {
+              box-shadow: 0 0 0 10px rgba(255, 77, 77, 0);
+            }
+            100% {
+              box-shadow: 0 0 0 0 rgba(255, 77, 77, 0);
+            }
+          }
+        `}</style>
+      </Card>
+    </Box>
   );
 }
