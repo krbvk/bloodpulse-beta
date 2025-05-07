@@ -18,7 +18,13 @@ import { useMediaQuery } from '@mantine/hooks';
 import { FaHeartbeat } from 'react-icons/fa';
 import { IconX } from '@tabler/icons-react';
 
-const servicesData = [
+type Service = {
+  title: string;
+  description: string;
+  imgSrc: string;
+};
+
+const servicesData: Service[] = [
   {
     title: 'Blood Donation',
     description:
@@ -42,11 +48,11 @@ const servicesData = [
 const Services = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [modalOpened, setModalOpened] = useState<boolean>(false);
-  const [selectedService, setSelectedService] = useState<any>(null);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
 
   const isMobile = useMediaQuery('(max-width: 768px)');
 
-  const openModal = (service: any) => {
+  const openModal = (service: Service) => {
     setSelectedService(service);
     setModalOpened(true);
   };
