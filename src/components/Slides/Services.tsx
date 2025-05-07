@@ -164,7 +164,7 @@ export default function Services() {
               ))}
             </Stack>
 
-            <Link href="/about">
+            <Link href="/about#services">
               <Button
                 variant="filled"
                 color="red"
