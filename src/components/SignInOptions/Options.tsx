@@ -13,6 +13,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import { GoogleSignInButton } from '../GoogleSignin/GoogleSignInButton';
 import { FacebookSignInButton } from '../Facebook/FacebookSignInButton';
 import { ResendSignIn } from '../Resend/Resend';
+import { MicrosoftSignInButton } from '../Microsoft/MicrosoftSigninButton';
 
 export default function Options() {
   const isMobile = useMediaQuery('(max-width: 600px)');
@@ -64,7 +65,8 @@ export default function Options() {
           }}
         >
           <GoogleSignInButton />
-          <FacebookSignInButton />
+          {/* <FacebookSignInButton /> */}
+          <MicrosoftSignInButton />
           <Divider
             label={
               <span

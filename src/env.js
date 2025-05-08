@@ -17,6 +17,9 @@ export const env = createEnv({
     AUTH_FACEBOOK_SECRET: z.string(),
     AUTH_RESEND_KEY: z.string(),
     RESEND_FROM_EMAIL: z.string().email(),
+    AUTH_MICROSOFT_ENTRA_ID_ID: z.string(),
+    AUTH_MICROSOFT_ENTRA_ID_SECRET: z.string(),
+    AUTH_MICROSOFT_ENTRA_ID_ISSUER: z.string(),
     DATABASE_URL: z.string().url(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
@@ -44,6 +47,9 @@ export const env = createEnv({
     AUTH_FACEBOOK_SECRET: process.env.AUTH_FACEBOOK_SECRET,
     AUTH_RESEND_KEY: process.env.AUTH_RESEND_KEY,
     RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
+    AUTH_MICROSOFT_ENTRA_ID_ID: process.env.AUTH_MICROSOFT_ENTRA_ID_ID,
+    AUTH_MICROSOFT_ENTRA_ID_SECRET: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET,
+    AUTH_MICROSOFT_ENTRA_ID_ISSUER: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
   },
