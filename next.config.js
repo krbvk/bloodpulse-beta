@@ -17,6 +17,16 @@ const config = {
           hostname: 'lh3.googleusercontent.com',
           pathname: '/**',
         },
+        {
+          protocol: 'https',
+          hostname: 'platform-lookaside.fbsbx.com',
+          pathname: '/**',
+        },
+        {
+          protocol: 'https',
+          hostname: 'scontent.fmnl3-4.fna.fbcdn.net',
+          pathname: '/**',
+        },
       ],
     },
 

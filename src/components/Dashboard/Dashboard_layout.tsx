@@ -13,6 +13,10 @@ const getInitials = (name: string) => {
     .slice(0, 2);
 };
 
+const isGoogleImage = (url: string) => {
+  return url.includes("lh3.googleusercontent.com");
+};
+
 const DashboardLayout = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -40,9 +44,9 @@ const DashboardLayout = () => {
   const initials = name ? getInitials(name) : "";
 
   let imageUrl = image ?? "";
-
   if (imageUrl && !imageUrl.includes("sz=")) {
-    imageUrl = `${imageUrl}?sz=200`;
+    const separator = imageUrl.includes("?") ? "&" : "?";
+    imageUrl = `${imageUrl}${separator}sz=200`;
   }
 
   const handleSignOut = async () => {
@@ -62,18 +66,41 @@ const DashboardLayout = () => {
     >
       <Stack gap="lg" align="center">
         {imageUrl ? (
-          <Box style={{ position: "relative", width: 120, height: 120 }}>
-            <Image
-              src={imageUrl}
-              alt={name ?? "User Avatar"}
-              fill
+          isGoogleImage(imageUrl) ? (
+            <Box style={{ position: "relative", width: 120, height: 120 }}>
+              <Image
+                src={imageUrl}
+                alt={name ?? "User Avatar"}
+                fill
+                style={{
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                }}
+                sizes="(max-width: 768px) 120px, 200px"
+              />
+            </Box>
+          ) : (
+            <Box
               style={{
+                width: 120,
+                height: 120,
                 borderRadius: "50%",
-                objectFit: "cover",
+                overflow: "hidden",
               }}
-              sizes="(max-width: 768px) 120px, 200px"
-            />
-          </Box>
+            >
+              <img
+                src={imageUrl}
+                alt={name ?? "User Avatar"}
+                width={120}
+                height={120}
+                style={{
+                  objectFit: "cover",
+                  width: "100%",
+                  height: "100%",
+                }}
+              />
+            </Box>
+          )
         ) : (
           <Avatar
             radius="xl"
