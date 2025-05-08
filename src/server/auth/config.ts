@@ -3,6 +3,7 @@ import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
 import Resend from "next-auth/providers/resend";
 import Facebook from "next-auth/providers/facebook";
+import Microsoft from "next-auth/providers/microsoft-entra-id"
 import { db } from "@/server/db";
 
 /**
@@ -41,6 +42,9 @@ export const authConfig = {
     }),
     Resend({
       from: process.env.RESEND_FROM_EMAIL,
+    }),
+    Microsoft({
+      allowDangerousEmailAccountLinking: true,
     })
     /**
      * ...add more providers here.
