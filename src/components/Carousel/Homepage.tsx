@@ -111,39 +111,43 @@ const HomePageCarousel = () => {
           ))}
         </Carousel>
 
+        {/* Left Arrow */}
         <Box
           onClick={goToPreviousSlide}
           style={{
             position: "absolute",
             top: "50%",
-            left: 0,
+            left: 15,  // Adjusted position
             transform: "translateY(-50%)",
-            zIndex: 10,
+            zIndex: 20,
             cursor: "pointer",
-            opacity: 0.7,
+            opacity: 1,
+            transition: "opacity 0.3s ease, transform 0.3s ease",
           }}
           className="left-arrow"
         >
-          <div className="arrow-circle">
-            <IconChevronLeft size={28} />
+          <div className="arrow-pill">
+            <IconChevronLeft size={28} color="black" />
           </div>
         </Box>
 
+        {/* Right Arrow */}
         <Box
           onClick={goToNextSlide}
           style={{
             position: "absolute",
             top: "50%",
-            right: 0,
+            right: 15,  // Adjusted position
             transform: "translateY(-50%)",
-            zIndex: 10,
+            zIndex: 20,
             cursor: "pointer",
-            opacity: 0.7,
+            opacity: 1,
+            transition: "opacity 0.3s ease, transform 0.3s ease",
           }}
           className="right-arrow"
         >
-          <div className="arrow-circle">
-            <IconChevronRight size={28} />
+          <div className="arrow-pill">
+            <IconChevronRight size={28} color="black"/>
           </div>
         </Box>
       </Box>
@@ -172,7 +176,7 @@ const HomePageCarousel = () => {
               width: active === index ? 20 : 12,
               height: 12,  
               borderRadius: "50%",  
-              backgroundColor: active === index ? "#FF4D4D" : "black",  // Active is white, inactive is gray
+              backgroundColor: active === index ? "#FF4D4D" : "black",  // Active is red, inactive is gray
               transition: "width 300ms ease, background-color 300ms ease",
               cursor: "pointer",
               margin: "0 5px",  
@@ -187,32 +191,50 @@ const HomePageCarousel = () => {
           position: absolute;
           top: 50%;
           transform: translateY(-50%);
-          z-index: 10;
+          z-index: 20;
           cursor: pointer;
-          opacity: 0.8;
-          transition: opacity 300ms, transform 300ms;
+          opacity: 1;
+          transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
-        .arrow-circle {
-          width: 48px;
-          height: 48px;
-          border-radius: 50%;
-          background: transparent;  /* No semi-transparent black background */
+        .arrow-pill {
           display: flex;
           align-items: center;
           justify-content: center;
+          width: 45px;   /* Slightly smaller button */
+          height: 30px;
+          background: rgba(255, 77, 77, 0.7);  /* Semi-transparent background */
+          border-radius: 15px;  /* Pill shape */
+          box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+          transition: all 0.3s ease;
         }
 
-        .arrow-circle svg {
-          color: white;  /* White arrow icon */
+        .arrow-pill:hover {
+          transform: scale(1.1);  /* Slightly enlarge the button on hover */
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);  /* Increased shadow on hover */
         }
 
-        .left-arrow .arrow-circle {
-          clip-path: polygon(50% 0%, 0% 25%, 50% 50%, 100% 25%, 50% 0%);  /* Left broken heart */
+        .arrow-pill svg {
+          color: white;
+          transition: color 0.3s ease;
         }
 
-        .right-arrow .arrow-circle {
-          clip-path: polygon(0% 25%, 50% 0%, 100% 25%, 50% 50%, 0% 25%);  /* Right broken heart */
+        /* Mobile-specific styling */
+        @media (max-width: 768px) {
+          .left-arrow {
+            left: 20px;  /* Move further to the left */
+            background: transparent; /* Remove background on mobile */
+          }
+
+          .right-arrow {
+            right: 20px;  /* Move further to the right */
+            background: transparent; /* Remove background on mobile */
+          }
+
+          .arrow-pill {
+            background: transparent; /* Remove background for the arrows on mobile */
+            box-shadow: none; /* Remove shadow for the arrows on mobile */
+          }
         }
       `}</style>
     </Paper>

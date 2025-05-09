@@ -8,85 +8,111 @@ import {
   Text,
   Divider,
   rem,
+  Image
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { GoogleSignInButton } from '../GoogleSignin/GoogleSignInButton';
-import { FacebookSignInButton } from '../Facebook/FacebookSignInButton';
 import { ResendSignIn } from '../Resend/Resend';
-import { MicrosoftSignInButton } from '../Microsoft/MicrosoftSigninButton';
 
 export default function Options() {
   const isMobile = useMediaQuery('(max-width: 600px)');
 
+  const sharedBoxStyles = {
+    border: '1px solid #ccc',
+    borderRadius: isMobile ? 0 : 5,
+    width: '100%',
+    maxWidth: 500,
+    padding: isMobile ? rem(12) : rem(24),
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.05)',
+  };
+
   return (
-    <Box
+    <Flex
+      direction={isMobile ? 'column' : 'row'}
+      justify="center"
+      align="stretch"
       style={{
-        backgroundColor: 'white',
-        border: '1px solid #ccc',
-        borderRadius: 16,
-        width: '90%',
-        maxWidth: 500,
-        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.05)',
-        padding: isMobile ? rem(12) : rem(24),
+        width: '100%',
+        maxWidth: '1000px',
         margin: '0 auto',
+        borderRadius: isMobile ? 0 : 5,
+        overflow: 'hidden',
+        height: isMobile ? 'auto' : '500px', 
       }}
     >
-      <Flex direction="column" align="center" justify="center">
-        {/* Header Section */}
-        <Stack gap={isMobile ? 6 : 10} align="center" mb="md">
-          <Title
-            order={2}
-            style={{
-              color: '#FF4D4D',
-              fontWeight: 700,
-              fontSize: isMobile ? rem(20) : rem(26),
-              textAlign: 'center',
-            }}
-          >
-            BLOODPULSE: LOGO
-          </Title>
-          <Text
-            style={{
-              fontSize: isMobile ? rem(18) : rem(25),
-              color: 'black',
-              textAlign: 'center',
-            }}
-          >
-            Sign Up or Log In
-          </Text>
-        </Stack>
-
-        {/* Sign-in Buttons */}
-        <Stack
-          gap="md"
-          align="center"
+      {/* Left Box Container (just the image now) */}
+      <Box
+        style={{
+          ...sharedBoxStyles,
+          width: '100%',  // Half the width on desktop to align with the right box
+          height: '100%',  // Ensure it takes up 100% of the height of the container
+          overflow: 'hidden',
+          padding: 0,
+          borderRadius: isMobile ? 0 : 5,
+        }}
+      >
+        <Image
+          src="/IntroductionImage1.svg"
+          alt="Hero Banner"
           style={{
             width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block',
+            borderRadius: 0, // No border-radius needed here
           }}
-        >
-          <GoogleSignInButton />
-          {/* <FacebookSignInButton /> */}
-          <MicrosoftSignInButton />
-          <Divider
-            label={
-              <span
-                style={{
-                  fontWeight: 600,
-                  color: '#444',
-                  fontSize: isMobile ? rem(12) : rem(14),
-                }}
-              >
-                OR
-              </span>
-            }
-            labelPosition="center"
-            my="xs"
-            color="dark"
-            size="sm"
-          />
-          <ResendSignIn />
-        </Stack>
-      </Flex>
-    </Box>
+        />
+      </Box>
+
+      {/* Right Box Container */}
+      <Box style={{ ...sharedBoxStyles, backgroundColor: 'white', height: '100%' }}>
+        <Flex direction="column" align="center" justify="center" style={{ height: '100%' }}>
+          <Stack gap={isMobile ? 6 : 10} align="center" mb="md">
+            <Title
+              order={2}
+              style={{
+                color: '#FF4D4D',
+                fontWeight: 700,
+                fontSize: isMobile ? rem(20) : rem(26),
+                textAlign: 'center',
+              }}
+            >
+              BLOODPULSE: LOGO
+            </Title>
+            <Text
+              style={{
+                fontSize: isMobile ? rem(18) : rem(25),
+                color: 'black',
+                textAlign: 'center',
+              }}
+            >
+              Sign Up or Log In
+            </Text>
+          </Stack>
+
+          <Stack gap="md" align="center" style={{ width: '100%' }}>
+            <GoogleSignInButton />
+            <Divider
+              label={
+                <span
+                  style={{
+                    fontWeight: 600,
+                    color: '#444',
+                    fontSize: isMobile ? rem(12) : rem(14),
+                  }}
+                >
+                  OR
+                </span>
+              }
+              labelPosition="center"
+              my="xs"
+              color="dark"
+              size="sm"
+            />
+            <ResendSignIn />
+          </Stack>
+        </Flex>
+      </Box>
+    </Flex>
   );
 }
