@@ -117,8 +117,17 @@ const Services = () => {
               >
                 {service.title}
               </Text>
-              <Text size="sm" c="dimmed" style={{ textAlign: 'center', lineHeight: 1.5 }}>
+              <Text size="sm" c="dimmed" style={{ textAlign: 'center', lineHeight: 1.5, marginBottom: 12 }}>
                 {service.description}
+              </Text>
+              <Text
+                size="xs"
+                c="#FF4D4D"
+                ta="center"
+                fw={500}
+                style={{ fontStyle: 'italic' }}
+              >
+                Click to learn more 
               </Text>
             </Box>
           </Card>
