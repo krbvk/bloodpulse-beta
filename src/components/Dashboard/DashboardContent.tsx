@@ -44,7 +44,7 @@ const DashboardContent = ({ session }: Props) => {
 
       {!sdkLoaded && sdkFailed && (
         <Alert title="Content Not Available" color="red">
-          It seems like you're using a browser that blocks Facebook content (e.g., Brave). 
+          It seems like you&apos;re using a browser that blocks Facebook content (e.g., Brave Browser). 
           Please try a different browser or adjust your browser settings to view the content.
         </Alert>
       )}
