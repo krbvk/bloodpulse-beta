@@ -1,6 +1,7 @@
-import { Box, Title, Alert } from '@mantine/core';
+import { Box, Title, Alert, Text } from '@mantine/core';
 import type { Session } from 'next-auth';
 import { useSdkContext } from '@/components/Dashboard/SdkContext'
+import { useMediaQuery } from '@mantine/hooks';
 
 type Props = {
   session: Session | null;
@@ -8,8 +9,10 @@ type Props = {
 
 const DashboardContent = ({ session }: Props) => {
   const { sdkLoaded, sdkFailed } = useSdkContext();
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   if (!session) return null;
+  const { name } = session.user ?? {};
 
   return (
     <Box
@@ -21,7 +24,14 @@ const DashboardContent = ({ session }: Props) => {
         width: 800,
         maxWidth: '100%',
       }}
-    >
+    > 
+
+      {isMobile && name && (
+        <Text size="lg" fw={500} mb="md">
+          Welcome back, {name}
+        </Text>
+      )}
+      
       <Title order={2} mb="md">
         Announcements
       </Title>
