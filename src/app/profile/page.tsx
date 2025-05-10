@@ -1,24 +1,22 @@
 "use client";
 
+import React, { useState } from "react";
+import { Box, Center, Flex, Loader } from "@mantine/core";
 import { useSession } from "next-auth/react";
-import DashboardContent from "@/components/Dashboard/DashboardContent";
 import DashboardNavbar from "@/components/Dashboard/DashboardNavbar";
 import DashboardSidebar from "@/components/Dashboard/DashboardSidebar";
-import { Box, Flex, Loader, Center } from "@mantine/core";
-import { useState } from "react";
+import ProfileLayout from "@/components/Profile/ProfileLayout";
 
-export default function Dashboard() {
+const Page = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const { data: session, status } = useSession();
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
 
-  const toggleSidebar = () => {
-    setSidebarOpen((prev) => !prev);
-  };
+  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
   if (status === "loading") {
     return (
       <Center h="100vh">
-        <Loader />
+        <Loader size="lg" />
       </Center>
     );
   }
@@ -32,21 +30,25 @@ export default function Dashboard() {
 
       {/* Main content area below navbar */}
       <Flex style={{ flex: 1, overflow: "hidden" }}>
-        <DashboardSidebar isOpen={isSidebarOpen} session={session} />
+        {/* Sidebar */}
+        <DashboardSidebar isOpen={sidebarOpen} session={session} />
 
+        {/* Profile content */}
         <Box
           style={{
             flex: 1,
-            marginLeft: isSidebarOpen ? 250 : 0,
+            marginLeft: sidebarOpen ? 250 : 0,
             transition: "margin-left 0.3s ease-in-out",
             overflowY: "auto",
             height: "calc(100vh - 60px)",
             padding: "20px",
           }}
         >
-          <DashboardContent session={session} />
+          <ProfileLayout />
         </Box>
       </Flex>
     </Box>
   );
-}
+};
+
+export default Page;
