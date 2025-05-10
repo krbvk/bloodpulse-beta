@@ -17,6 +17,7 @@ import {
 } from '@tabler/icons-react';
 import Head from 'next/head';
 import { useMediaQuery } from '@mantine/hooks';
+import { InstallPrompt } from '../InstallPrompt/InstallPrompt';
 
 export default function Introduction() {
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -127,7 +128,15 @@ export default function Introduction() {
               &ldquo;Every drop counts. Be the reason someone gets a second
               chance at life. Step up and be a real-life hero.&rdquo;
             </Text>
-
+              <Box
+                style={{
+                  display: 'flex',
+                  flexDirection: isMobile ? 'column' : 'row',
+                  gap: '1rem',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
             <Button
               component={Link}
               href="/login"
@@ -143,6 +152,8 @@ export default function Introduction() {
             >
               JOIN US NOW
             </Button>
+            <InstallPrompt />
+            </Box>
           </Stack>
 
           {/* Right side */}

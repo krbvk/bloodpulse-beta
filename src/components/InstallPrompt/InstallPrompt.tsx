@@ -1,43 +1,64 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Button, Text, Title, Paper } from "@mantine/core";
+import { useState, useEffect } from 'react';
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => void;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+}
+import { Button, Group, Image } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
+import { IconDownload } from '@tabler/icons-react';
 
 export function InstallPrompt() {
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   useEffect(() => {
-    setIsIOS(
-      /iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window)
-    );
-
+    setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window));
     setIsStandalone(window.matchMedia("(display-mode: standalone)").matches);
+
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
-  if (isStandalone) return null;
+  if (isStandalone || isIOS) return null;
+
+  const handleInstall = () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.finally(() => setDeferredPrompt(null));
+    }
+  };
 
   return (
-    <Paper
-      shadow="sm"
+    <Button
+      onClick={handleInstall}
+      size={isMobile ? 'md' : 'lg'}
       radius="md"
-      p="md"
-      withBorder
+      color="red"
       mt="md"
+      style={{
+        width: isMobile ? '100%' : 'fit-content',
+        alignSelf: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1rem',
+        justifyContent: 'center'
+      }}
+      leftSection={
+        <Image src="/favicon.ico" alt="App Icon" width={24} height={24} />
+      }
+      rightSection={<IconDownload size={18} />}
     >
-      <Title order={3} size="h3">
-        Install App
-      </Title>
-
-      <Button mt="md" fullWidth>
-        Add to Home Screen
-      </Button>
-
-      {isIOS && (
-        <Text color="dimmed" mt="sm">
-          To install this app on your iOS device, tap the share button ⎋ and then &quot;Add to Home Screen&quot; ➕.
-        </Text>
-      )}
-    </Paper>
+      Install App
+    </Button>
   );
 }
