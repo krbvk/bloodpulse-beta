@@ -52,7 +52,7 @@ const DashboardContent = ({ session }: Props) => {
       {sdkLoaded && !sdkFailed && (
         <div
           className="fb-page"
-          data-href="https://www.facebook.com/earthshakerph"
+          data-href="https://www.facebook.com/olfurcyval"
           data-tabs="timeline"
           data-width="800"
           data-height="600"

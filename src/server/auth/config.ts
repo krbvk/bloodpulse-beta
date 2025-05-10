@@ -35,16 +35,13 @@ declare module "next-auth" {
 export const authConfig = {
   providers: [
     Google({
-      allowDangerousEmailAccountLinking: true,
     }),
     Facebook({
-      allowDangerousEmailAccountLinking: true,
     }),
     Resend({
       from: process.env.RESEND_FROM_EMAIL,
     }),
     Microsoft({
-      allowDangerousEmailAccountLinking: true,
     })
     /**
      * ...add more providers here.
