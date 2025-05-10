@@ -1,12 +1,10 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => void;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
 }
-import { Button, Group, Image } from '@mantine/core';
+import { Button, Image } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconDownload } from '@tabler/icons-react';
 
@@ -20,9 +18,10 @@ export function InstallPrompt() {
     setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window));
     setIsStandalone(window.matchMedia("(display-mode: standalone)").matches);
 
-    const handler = (e: any) => {
+    const handler = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e);
+      const promptEvent = e as BeforeInstallPromptEvent; // Type cast here
+      setDeferredPrompt(promptEvent);
     };
 
     window.addEventListener('beforeinstallprompt', handler);
