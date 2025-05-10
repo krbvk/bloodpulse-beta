@@ -1,29 +1,13 @@
-import { Box, Title, Text, Alert } from '@mantine/core';
+import { Box, Title, Alert } from '@mantine/core';
 import type { Session } from 'next-auth';
-import { useState, useEffect } from 'react';
+import { useSdkContext } from '@/components/Dashboard/SdkContext'
 
 type Props = {
   session: Session | null;
 };
 
 const DashboardContent = ({ session }: Props) => {
-  const [sdkLoaded, setSdkLoaded] = useState(false);
-  const [sdkFailed, setSdkFailed] = useState(false);
-
-  useEffect(() => {
-    if (document.getElementById('facebook-jssdk')) return;
-
-    const script = document.createElement('script');
-    script.id = 'facebook-jssdk';
-    script.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v18.0';
-    script.async = true;
-    script.defer = true;
-
-    script.onload = () => setSdkLoaded(true);
-    script.onerror = () => setSdkFailed(true);
-
-    document.body.appendChild(script);
-  }, []);
+  const { sdkLoaded, sdkFailed } = useSdkContext();
 
   if (!session) return null;
 
