@@ -57,35 +57,35 @@ const DashboardSidebar = ({ isOpen, session }: SidebarProps) => {
         <UnstyledButton onClick={() => router.push("/dashboard")}>
           <Flex align="center" gap="xs">
             <IconHome size={20} color="white" />
-            <Text size="sm" color="white">Dashboard</Text>
+            <Text size="sm" c="white">Dashboard</Text>
           </Flex>
         </UnstyledButton>
 
         <UnstyledButton onClick={() => router.push("/profile")}>
           <Flex align="center" gap="xs">
             <IconUser size={20} color="white" />
-            <Text size="sm" color="white">Profile</Text>
+            <Text size="sm" c="white">Profile</Text>
           </Flex>
         </UnstyledButton>
 
         <UnstyledButton onClick={() => router.push("/donors")}>
           <Flex align="center" gap="xs">
             <IconListCheck size={20} color="white" />
-            <Text size="sm" color="white">Donor List</Text>
+            <Text size="sm" c="white">Donor List</Text>
           </Flex>
         </UnstyledButton>
 
         <UnstyledButton onClick={() => router.push("/appointments")}>
           <Flex align="center" gap="xs">
             <IconCalendarPlus size={20} color="white" />
-            <Text size="sm" color="white">Book Appointment</Text>
+            <Text size="sm" c="white">Book Appointment</Text>
           </Flex>
         </UnstyledButton>
 
         <UnstyledButton onClick={handleSignOut}>
           <Flex align="center" gap="xs">
             <IconLogout size={20} color="white" />
-            <Text size="sm" color="white">Sign Out</Text>
+            <Text size="sm" c="white">Sign Out</Text>
           </Flex>
         </UnstyledButton>
       </Flex>
