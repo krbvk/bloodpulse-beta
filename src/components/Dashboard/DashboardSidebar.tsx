@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import {
   IconLogout,
   IconHome,
-  IconSettings,
   IconUser,
+  IconListCheck,
+  IconCalendarPlus,
 } from "@tabler/icons-react";
 
 type SidebarProps = {
@@ -58,7 +59,7 @@ const DashboardSidebar = ({ isOpen }: SidebarProps) => {
         </Text>
       </Flex>
 
-      <Flex direction="column" gap="sm" align="flex-start">
+      <Flex direction="column" gap={30} align="flex-start">
         <UnstyledButton onClick={() => router.push("/dashboard")}>
           <Flex align="center" gap="xs">
             <IconHome size={20} color="white" />
@@ -73,10 +74,17 @@ const DashboardSidebar = ({ isOpen }: SidebarProps) => {
           </Flex>
         </UnstyledButton>
 
-        <UnstyledButton onClick={() => router.push("/settings")}>
+        <UnstyledButton onClick={() => router.push("/donors")}>
           <Flex align="center" gap="xs">
-            <IconSettings size={20} color="white" />
-            <Text size="sm" color="white">Settings</Text>
+            <IconListCheck size={20} color="white" />
+            <Text size="sm" color="white">Donor List</Text>
+          </Flex>
+        </UnstyledButton>
+
+        <UnstyledButton onClick={() => router.push("/appointments")}>
+          <Flex align="center" gap="xs">
+            <IconCalendarPlus size={20} color="white" />
+            <Text size="sm" color="white">Book Appointment</Text>
           </Flex>
         </UnstyledButton>
 

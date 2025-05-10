@@ -8,7 +8,9 @@ import {
   Group,
   Menu,
   UnstyledButton,
-  Burger
+  Burger,
+  Paper,
+  Divider,
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { IconLogout, IconUser, IconBell } from "@tabler/icons-react";
@@ -25,10 +27,11 @@ const getInitials = (name: string) => {
   return nameParts.map((n) => n[0]?.toUpperCase()).join("").slice(0, 2);
 };
 
-const DashboardNavbar = ({toggleSidebar}: Props) => {
+const DashboardNavbar = ({ toggleSidebar }: Props) => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [burgerOpened, setBurgerOpened] = useState(false);
 
   if (status === "loading") return null;
   if (!session) return null;
@@ -46,11 +49,27 @@ const DashboardNavbar = ({toggleSidebar}: Props) => {
   };
 
   return (
-    <Box bg="red.7" py="sm" px="md" style={{ boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}>
+    <Box
+      bg="red.7"
+      py="sm"
+      px="md"
+      style={{
+        boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+        position: "relative",
+        zIndex: 1000,
+      }}
+    >
       <Container size="lg">
-        <Flex justify="flex-start" align="center">
-          <Group gap="sm" style={{ marginRight: 'auto' }}>
-            <Burger opened={false} onClick={toggleSidebar} color="white" />
+        <Flex justify="space-between" align="center">
+          <Group gap="sm">
+            <Burger
+              opened={burgerOpened}
+              onClick={() => {
+                setBurgerOpened((o) => !o);
+                toggleSidebar();
+              }}
+              color="white"
+            />
             <Link href="/dashboard" style={{ textDecoration: "none" }}>
               <Text fw={700} size="lg" color="white">
                 BLOODPULSE: LOGO
@@ -126,30 +145,29 @@ const DashboardNavbar = ({toggleSidebar}: Props) => {
             </UnstyledButton>
 
             {notificationsOpen && (
-              <Box
+              <Paper
+                shadow="md"
+                p="sm"
                 style={{
                   position: "absolute",
                   top: 60,
                   right: 10,
-                  width: 250,
+                  width: 260,
                   backgroundColor: "white",
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-                  padding: "10px",
-                  borderRadius: "8px",
+                  borderRadius: 8,
+                  zIndex: 1001,
                 }}
               >
-                <Text size="sm" color="gray">
+                <Text size="sm" fw={600} mb="xs">
                   Notifications
                 </Text>
-                <Box>
-                  <Text size="sm">You have 3 new notifications</Text>
-                  <ul>
-                    <li>Notification 1</li>
-                    <li>Notification 2</li>
-                    <li>Notification 3</li>
-                  </ul>
+                <Divider my="xs" />
+                <Box component="ul" style={{ margin: 0, paddingLeft: 20 }}>
+                  <li>You have 3 new notifications</li>
+                  <li>New donor request</li>
+                  <li>Appointment confirmed</li>
                 </Box>
-              </Box>
+              </Paper>
             )}
           </Group>
         </Flex>
