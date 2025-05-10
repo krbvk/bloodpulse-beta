@@ -1,7 +1,6 @@
-import { Box, Title } from '@mantine/core';
+import { Box, Title, Text, Alert } from '@mantine/core';
 import type { Session } from 'next-auth';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 type Props = {
   session: Session | null;
@@ -9,8 +8,8 @@ type Props = {
 
 const DashboardContent = ({ session }: Props) => {
   const [sdkLoaded, setSdkLoaded] = useState(false);
+  const [sdkFailed, setSdkFailed] = useState(false);
 
-  // Load Facebook SDK
   useEffect(() => {
     if (document.getElementById('facebook-jssdk')) return;
 
@@ -19,7 +18,10 @@ const DashboardContent = ({ session }: Props) => {
     script.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v18.0';
     script.async = true;
     script.defer = true;
+
     script.onload = () => setSdkLoaded(true);
+    script.onerror = () => setSdkFailed(true);
+
     document.body.appendChild(script);
   }, []);
 
@@ -40,7 +42,14 @@ const DashboardContent = ({ session }: Props) => {
         Announcements
       </Title>
 
-      {sdkLoaded && (
+      {!sdkLoaded && sdkFailed && (
+        <Alert title="Content Not Available" color="red">
+          It seems like you're using a browser that blocks Facebook content (e.g., Brave). 
+          Please try a different browser or adjust your browser settings to view the content.
+        </Alert>
+      )}
+
+      {sdkLoaded && !sdkFailed && (
         <div
           className="fb-page"
           data-href="https://www.facebook.com/earthshakerph"

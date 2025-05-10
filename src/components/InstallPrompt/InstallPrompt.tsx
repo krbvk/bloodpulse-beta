@@ -20,7 +20,7 @@ export function InstallPrompt() {
 
     const handler = (e: Event) => {
       e.preventDefault();
-      const promptEvent = e as BeforeInstallPromptEvent; // Type cast here
+      const promptEvent = e as BeforeInstallPromptEvent;
       setDeferredPrompt(promptEvent);
     };
 
@@ -30,10 +30,10 @@ export function InstallPrompt() {
 
   if (isStandalone || isIOS) return null;
 
-  const handleInstall = () => {
+  const handleInstall = async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
-      deferredPrompt.userChoice.finally(() => setDeferredPrompt(null));
+      await deferredPrompt.userChoice.finally(() => setDeferredPrompt(null));
     }
   };
 
