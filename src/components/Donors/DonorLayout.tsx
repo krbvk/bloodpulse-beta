@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Title, Input, Group, Text, Grid, Paper, Flex } from "@mantine/core";
+import { Box, Title, Input, Group, Text, Grid, Paper, Flex, Loader } from "@mantine/core";
 import { useSession } from "next-auth/react";
 import { useState, useMemo } from "react";
 import { api } from "@/trpc/react";
@@ -19,8 +19,33 @@ export default function DonorLayout() {
     );
   }, [donors, searchQuery]);
 
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n.charAt(0).toUpperCase())
+      .join("");
+  };
+
+  const maskEmail = (email: string) => {
+    const [username, domain] = email.split("@");
+    const maskedUsername = username?.slice(0, 2) + "*".repeat(Math.max(username?.length ?? 0 - 2, 0));
+    return `${maskedUsername}@${domain}`;
+  };
+
   if (status === "loading" || isLoading) {
-    return <Text>Loading...</Text>;
+    return (
+      <Box
+        style={{
+          position: "relative",
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Loader size="xl" />
+      </Box>
+    );
   }
 
   if (!session?.user) {
@@ -38,14 +63,18 @@ export default function DonorLayout() {
           <Group align="center" justify="center" mb="lg" style={{ display: "flex", gap: "8px" }}>
             <Input
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)} 
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Enter blood type (e.g., O+)"
               style={{ width: 250 }}
               radius="xl"
-              leftSection={<IconSearch />} 
+              leftSection={<IconSearch />}
             />
           </Group>
         </Box>
+
+        <Text size="sm" mb="md" style={{ textAlign: "center" }}>
+          Found {filteredDonors.length} donor{filteredDonors.length !== 1 ? "s" : ""}
+        </Text>
 
         {filteredDonors.length === 0 ? (
           <Text style={{ textAlign: "center" }} c="dimmed">
@@ -58,10 +87,10 @@ export default function DonorLayout() {
                 <Box mb="sm" p="md" style={{ border: "1px solid #ddd", borderRadius: "8px" }}>
                   <Flex align="center" direction="column" mb="md">
                     <Text fw={700} size="lg" style={{ textAlign: "center" }}>
-                      {donor.name}
+                      {getInitials(donor.name)}
                     </Text>
                     <Text size="sm" c="dimmed" style={{ textAlign: "center" }}>
-                      {donor.email}
+                      {maskEmail(donor.email)}
                     </Text>
                     <Text size="md" mt="sm" style={{ textAlign: "center" }}>
                       Blood Type: {donor.bloodType}
