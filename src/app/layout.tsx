@@ -5,6 +5,7 @@ import { SessionProviders } from "@/components/SessionProviders";
 import { MantineProvider, ColorSchemeScript, createTheme, mantineHtmlProps } from "@mantine/core";
 import '@mantine/core/styles.css';
 import '@mantine/carousel/styles.css';
+import { SdkProvider } from "@/components/Dashboard/SdkContext";
 export const metadata: Metadata = {
   title: "Bloodpulse",
   description: "Bloodpulse beta application",
@@ -29,7 +30,11 @@ export default function RootLayout({
       </head>
       <body className={geist.className}>
         <MantineProvider theme={theme}>
-          <SessionProviders>{children}</SessionProviders>
+          <SessionProviders>
+            <SdkProvider>
+            {children}
+            </SdkProvider>
+          </SessionProviders>
         </MantineProvider>
       </body>
     </html>
