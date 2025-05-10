@@ -45,7 +45,7 @@ export default function ProfileLayout() {
         {/* Profile Header */}
         <Flex direction="column" align="center" mb="xl">
           <Avatar
-            src={image || "/placeholder-avatar.png"}
+            src={image ?? "/placeholder-avatar.png"}
             size={120}
             radius="xl"
             alt={name ?? "User Avatar"}
@@ -66,14 +66,14 @@ export default function ProfileLayout() {
             <Text size="xs" color="dimmed" fw={500} mb={4}>
               Full Name
             </Text>
-            <Text fw={500}>{name || "—"}</Text>
+            <Text fw={500}>{name ?? "—"}</Text>
           </Grid.Col>
 
           <Grid.Col span={{ base: 12, sm: 6 }}>
             <Text size="xs" color="dimmed" fw={500} mb={4}>
               Email Address
             </Text>
-            <Text fw={500}>{email || "—"}</Text>
+            <Text fw={500}>{email ?? "—"}</Text>
           </Grid.Col>
         </Grid>
       </Paper>

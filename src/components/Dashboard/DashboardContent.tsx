@@ -12,7 +12,7 @@ const DashboardContent = ({ session }: Props) => {
       py="lg"
       style={{
         overflowY: 'hidden',
-        maxHeight: '100%',  
+        maxHeight: '100%',
       }}
     >
       {/* Display user info */}
@@ -56,7 +56,7 @@ const DashboardContent = ({ session }: Props) => {
           New Donor Registration System
         </Text>
         <Text size="sm" c="dimmed">
-          We’ve revamped the donor registration process to make it faster and easier. Sign up today!
+          We&rsquo;ve revamped the donor registration process to make it faster and easier. Sign up today!
         </Text>
       </Paper>
 
@@ -68,7 +68,7 @@ const DashboardContent = ({ session }: Props) => {
           Blood Donation Statistics
         </Text>
         <Text size="sm" c="dimmed">
-          We've seen a 25% increase in donations this quarter! Thank you for your support!
+          We&apos;ve seen a 25% increase in donations this quarter! Thank you for your support!
         </Text>
       </Paper>
     </Box>
