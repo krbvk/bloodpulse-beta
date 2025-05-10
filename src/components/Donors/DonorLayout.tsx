@@ -89,7 +89,17 @@ export default function DonorLayout() {
                     <Text fw={700} size="lg" style={{ textAlign: "center" }}>
                       {getInitials(donor.name)}
                     </Text>
-                    <Text size="sm" c="dimmed" style={{ textAlign: "center" }}>
+                    <Text
+                      size="sm"
+                      c="dimmed"
+                      style={{
+                        textAlign: "center",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        maxWidth: "100%",
+                      }}
+                    >
                       {maskEmail(donor.email)}
                     </Text>
                     <Text size="md" mt="sm" style={{ textAlign: "center" }}>
