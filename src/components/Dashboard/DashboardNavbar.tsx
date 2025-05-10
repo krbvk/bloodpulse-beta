@@ -9,11 +9,10 @@ import {
   Menu,
   UnstyledButton,
   Burger,
-  Paper,
-  Divider,
 } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import { useRouter } from "next/navigation";
-import { IconLogout, IconUser, IconBell } from "@tabler/icons-react";
+import { IconLogout, IconUser } from "@tabler/icons-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
@@ -31,8 +30,8 @@ const getInitials = (name: string) => {
 
 const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
   const router = useRouter();
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [burgerOpened, setBurgerOpened] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   if (!session) return null;
 
@@ -42,10 +41,6 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
   const handleSignOut = async () => {
     await signOut({ redirect: false });
     router.push("/");
-  };
-
-  const toggleNotifications = () => {
-    setNotificationsOpen((prev) => !prev);
   };
 
   return (
@@ -60,8 +55,9 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
       }}
     >
       <Container size="lg">
-        <Flex justify="space-between" align="center">
-          <Group gap="sm">
+        <Flex justify="space-between" align="center" wrap="wrap">
+          {/* Left: Logo & Burger */}
+          <Group gap="sm" align="center">
             <Burger
               opened={burgerOpened}
               onClick={() => {
@@ -69,18 +65,22 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
                 toggleSidebar();
               }}
               color="white"
+              size="sm"
             />
             <Link href="/dashboard" style={{ textDecoration: "none" }}>
-              <Text fw={700} size="lg" color="white">
+              <Text fw={700} size="lg" c="white">
                 BLOODPULSE: LOGO
               </Text>
             </Link>
           </Group>
 
-          <Group gap="sm">
-            <Text size="sm" fw={600} color="white">
-              Welcome, {name}
-            </Text>
+          {/* Right: User Info */}
+          <Group gap="xs" align="center" wrap="wrap" justify="flex-end">
+            {!isMobile && (
+              <Text size="sm" fw={600} c="white">
+                Welcome, {name}
+              </Text>
+            )}
 
             <Menu shadow="md" width={220} position="bottom-end" withArrow>
               <Menu.Target>
@@ -126,49 +126,6 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
-
-            <UnstyledButton onClick={toggleNotifications}>
-              <Box
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: "50%",
-                  backgroundColor: "#fff2f2",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                }}
-              >
-                <IconBell size={20} color="#c92a2a" />
-              </Box>
-            </UnstyledButton>
-
-            {notificationsOpen && (
-              <Paper
-                shadow="md"
-                p="sm"
-                style={{
-                  position: "absolute",
-                  top: 60,
-                  right: 10,
-                  width: 260,
-                  backgroundColor: "white",
-                  borderRadius: 8,
-                  zIndex: 1001,
-                }}
-              >
-                <Text size="sm" fw={600} mb="xs">
-                  Notifications
-                </Text>
-                <Divider my="xs" />
-                <Box component="ul" style={{ margin: 0, paddingLeft: 20 }}>
-                  <li>You have 3 new notifications</li>
-                  <li>New donor request</li>
-                  <li>Appointment confirmed</li>
-                </Box>
-              </Paper>
-            )}
           </Group>
         </Flex>
       </Container>

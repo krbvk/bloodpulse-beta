@@ -53,12 +53,6 @@ const DashboardSidebar = ({ isOpen, session }: SidebarProps) => {
         </Text>
       </Flex>
 
-      <Flex justify="center" mb="xl">
-        <Text size="sm" color="white">
-          Welcome, {name}
-        </Text>
-      </Flex>
-
       <Flex direction="column" gap={30} align="flex-start">
         <UnstyledButton onClick={() => router.push("/dashboard")}>
           <Flex align="center" gap="xs">
