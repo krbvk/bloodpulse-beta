@@ -1,6 +1,7 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
+import type { Session } from "next-auth";
 import { Text, Box, Flex, UnstyledButton } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import {
@@ -13,13 +14,12 @@ import {
 
 type SidebarProps = {
   isOpen: boolean;
+  session: Session | null;
 };
 
-const DashboardSidebar = ({ isOpen }: SidebarProps) => {
-  const { data: session, status } = useSession();
+const DashboardSidebar = ({ isOpen, session }: SidebarProps) => {
   const router = useRouter();
 
-  if (status === "loading") return null;
   if (!session) return null;
 
   const { name } = session.user ?? {};

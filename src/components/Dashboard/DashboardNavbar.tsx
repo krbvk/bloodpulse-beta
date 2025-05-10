@@ -17,9 +17,11 @@ import { IconLogout, IconUser, IconBell } from "@tabler/icons-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import type { DefaultSession } from "next-auth";
 
 type Props = {
   toggleSidebar: () => void;
+  session: DefaultSession | null;
 };
 
 const getInitials = (name: string) => {
@@ -27,13 +29,11 @@ const getInitials = (name: string) => {
   return nameParts.map((n) => n[0]?.toUpperCase()).join("").slice(0, 2);
 };
 
-const DashboardNavbar = ({ toggleSidebar }: Props) => {
-  const { data: session, status } = useSession();
+const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
   const router = useRouter();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [burgerOpened, setBurgerOpened] = useState(false);
 
-  if (status === "loading") return null;
   if (!session) return null;
 
   const { name, email, image } = session.user ?? {};

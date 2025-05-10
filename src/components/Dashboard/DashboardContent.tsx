@@ -1,6 +1,11 @@
 import { Box, Text, Card, Grid, Paper, Title } from '@mantine/core';
+import type { Session } from 'next-auth';
 
-const DashboardContent = () => {
+type Props = {
+  session: Session | null;
+};
+
+const DashboardContent = ({ session }: Props) => {
   return (
     <Box
       px="md"
@@ -10,6 +15,13 @@ const DashboardContent = () => {
         maxHeight: '100%',  
       }}
     >
+      {/* Display user info */}
+      {session?.user && (
+        <Text fw={500} size="lg" mb="md">
+          Welcome back, {session.user.name}!
+        </Text>
+      )}
+
       <Title order={2} mb="md">
         Latest News
       </Title>
