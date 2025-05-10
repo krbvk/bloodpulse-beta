@@ -36,12 +36,13 @@ export default function Introduction() {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
+          backgroundColor: 'black',
           position: 'relative',
           minHeight: isMobile ? '100vh' : '100vh',
           height: isMobile ? 'calc(100dvh - 56px)' : '100vh',
           width: '100vw',
           boxSizing: 'border-box',
-          overflow: 'auto',
+          overflow: 'hidden',
         }}
       >
         <Overlay
