@@ -6,6 +6,7 @@ type Props = {
 };
 
 const DashboardContent = ({ session }: Props) => {
+  if (!session) return null;
   return (
     <Box
       px="md"
@@ -15,13 +16,6 @@ const DashboardContent = ({ session }: Props) => {
         maxHeight: '100%',
       }}
     >
-      {/* Display user info */}
-      {session?.user && (
-        <Text fw={500} size="lg" mb="md">
-          Welcome back, {session.user.name}!
-        </Text>
-      )}
-
       <Title order={2} mb="md">
         Latest News
       </Title>
