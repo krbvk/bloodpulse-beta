@@ -37,7 +37,7 @@ export default function AppointmentLayout() {
 
   const convertTo24Hour = (timeStr: string) => {
     const [time, period] = timeStr.split(" ");
-    const [hourStr, minuteStr] = time?.split(":") || ["0", "0"];
+    const [hourStr, minuteStr] = time?.split(":") ?? ["0", "0"];
     let hour = Number(hourStr);
     const minute = Number(minuteStr);
 
