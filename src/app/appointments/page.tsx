@@ -5,8 +5,8 @@ import { Box, Center, Flex } from "@mantine/core";
 import { useSession } from "next-auth/react";
 import DashboardNavbar from "@/components/Dashboard/DashboardNavbar";
 import DashboardSidebar from "@/components/Dashboard/DashboardSidebar";
-import DonorLayout from "@/components/Donors/DonorLayout";
 import CustomLoader from "@/components/Loader/CustomLoader";
+import AppointmentLayout from "@/components/Appointments/AppointmentLayout";
 
 const Page = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -21,7 +21,6 @@ const Page = () => {
       </Center>
     );
   }
-
   return (
     <Box style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Navbar */}
@@ -34,7 +33,7 @@ const Page = () => {
         {/* Sidebar */}
         <DashboardSidebar isOpen={sidebarOpen} session={session} />
 
-        {/* Donor content */}
+        {/* Appointment content */}
         <Box
           style={{
             flex: 1,
@@ -45,7 +44,7 @@ const Page = () => {
             padding: "20px",
           }}
         >
-          <DonorLayout />
+          <AppointmentLayout />
         </Box>
       </Flex>
     </Box>
