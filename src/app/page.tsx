@@ -2,16 +2,18 @@
 
 import HomePageCarousel from "@/components/Carousel/Homepage";
 import Navbar from "@/components/Navbar/Homepage";
-import { Box, Loader } from "@mantine/core";
+import { Box } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import CustomLoader from "@/components/Loader/CustomLoader";
 
 export default function Page() {
   const [splashes, setSplashes] = useState<{ id: number; x: number; y: number }[]>([]);
   const { data: session, status } = useSession();
   const [isMounted, setIsMounted] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true); 
   const router = useRouter();
 
   useEffect(() => {
@@ -30,12 +32,26 @@ export default function Page() {
     }
   }, [isAuthenticated, isMounted, router]);
 
-  if (status === "loading") {
-    return (
-      <Box style={{ position: "relative", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <Loader size="xl" />
-      </Box>
-    );
+  useEffect(() => {
+    if (status === "loading") {
+      setLoading(true); 
+    } else {
+      setLoading(false); 
+    }
+  }, [status]);
+
+  useEffect(() => {
+    const handlePageLoad = () => {
+      setTimeout(() => {
+        setLoading(false); 
+      }, 5000); 
+    };
+
+    handlePageLoad();
+  }, []); 
+
+  if (loading) {
+    return <CustomLoader />;
   }
 
   if (status === "unauthenticated") {
