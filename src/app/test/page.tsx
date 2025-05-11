@@ -7,9 +7,12 @@ const Page = () => {
   const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
+    setLoading(false)
   }, []);
 
-  return <CustomLoader />;
+  return loading ? <CustomLoader /> : <div>
+    Page content
+  </div>;
 };
 
 export default Page;
