@@ -64,7 +64,7 @@ export default function DonorLayout() {
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Enter blood type (e.g., O+)"
+              placeholder="Enter blood type (e.g., O)"
               style={{ width: 250 }}
               radius="xl"
               leftSection={<IconSearch />}
