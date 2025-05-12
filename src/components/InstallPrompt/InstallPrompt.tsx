@@ -68,7 +68,7 @@ export function InstallPrompt() {
           onClose={() => setShowiOSInstruction(false)}
           style={{ width: '100%', marginTop: '1rem' }}
         >
-          To install the app, click the share button, scroll down, and then click "Add to Home Screen."
+          To install the app, click the share button, scroll down, and then click &ldquo;Add to Home Screen.&rdquo;
         </Notification>
       )}
     </>
