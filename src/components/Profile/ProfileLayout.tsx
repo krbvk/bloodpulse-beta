@@ -8,32 +8,28 @@ import {
   Paper,
   Text,
   Title,
-  Loader,
-  Center,
   Grid,
   Divider,
 } from "@mantine/core";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import CustomLoader from "@/components/Loader/CustomLoader"
 
 export default function ProfileLayout() {
   const { data: session, status } = useSession();
+  const router = useRouter();
 
-  if (status === "loading") {
-    return (
-      <Center h="100vh">
-        <Loader size="xl" />
-      </Center>
-    );
-  }
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/");
+    }
+  }, [status, router]);
 
-  if (!session?.user) {
-    return (
-      <Center h="100vh" px="md">
-        <Text size="md" style={{textAlign: "center"}}>
-          User not logged in
-        </Text>
-      </Center>
-    );
-  }
+  if (status === "loading") return <CustomLoader />;
+
+  if (status === "unauthenticated") return null;
+
+  if (!session?.user) return null;
 
   const { name, email, image } = session.user;
 

@@ -15,9 +15,26 @@ import {
 } from "@mantine/core";
 import { DatePickerInput, TimeInput } from "@mantine/dates";
 import dayjs from "dayjs";
+import CustomLoader from "@/components/Loader/CustomLoader";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function AppointmentLayout() {
   const { data: session, status } = useSession();
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/");
+    }
+  }, [status, router]);
+
+  if (status === "loading") return <CustomLoader />;
+
+  if (status === "unauthenticated") return null;
+
+  if (!session?.user) return null;
 
   const [appointmentDate, setAppointmentDate] = useState<Date | null>(null);
   const [appointmentTime, setAppointmentTime] = useState<Date | null>(null);
@@ -80,9 +97,6 @@ export default function AppointmentLayout() {
       setAppointmentTime(null);
     }
   };
-
-  if (status === "loading") return <Text>Loading session...</Text>;
-  if (!session?.user) return <Text>User not logged in</Text>;
 
   return (
     <Box

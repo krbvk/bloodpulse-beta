@@ -17,6 +17,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import type { DefaultSession } from "next-auth";
+import CustomLoader from "@/components/Loader/CustomLoader";
 
 type Props = {
   toggleSidebar: () => void;
@@ -32,6 +33,7 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
   const router = useRouter();
   const [burgerOpened, setBurgerOpened] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const [loading, setLoading] = useState(false);
 
   if (!session) return null;
 
@@ -39,9 +41,14 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
   const initials = name ? getInitials(name) : "";
 
   const handleSignOut = async () => {
+    setLoading(true);
     await signOut({ redirect: false });
     router.push("/");
   };
+
+  if (loading) {
+    return <CustomLoader />
+  }
 
   return (
     <Box

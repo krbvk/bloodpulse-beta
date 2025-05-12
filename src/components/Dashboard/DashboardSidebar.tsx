@@ -11,6 +11,8 @@ import {
   IconListCheck,
   IconCalendarPlus,
 } from "@tabler/icons-react";
+import { useState } from "react";
+import CustomLoader from "@/components/Loader/CustomLoader";
 
 type SidebarProps = {
   isOpen: boolean;
@@ -19,15 +21,21 @@ type SidebarProps = {
 
 const DashboardSidebar = ({ isOpen, session }: SidebarProps) => {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   if (!session) return null;
 
   const { name } = session.user ?? {};
 
   const handleSignOut = async () => {
+    setLoading(true);
     await signOut({ redirect: false });
     router.push("/");
   };
+
+  if (loading) {
+    return <CustomLoader />
+  }
 
   return (
     <Box
