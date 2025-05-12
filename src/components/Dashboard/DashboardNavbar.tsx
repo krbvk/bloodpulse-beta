@@ -37,7 +37,7 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
 
   if (!session || !session.user) return null;
 
-  const { name, email, image } = session.user ?? {};
+  const { name, email, image } = session.user;
   const initials = name ? getInitials(name) : "";
 
   const handleSignOut = async () => {
