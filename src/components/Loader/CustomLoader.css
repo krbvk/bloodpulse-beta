@@ -1,70 +1,47 @@
-body {
-  margin: 0;
-}
-
 #loader {
-  width: 100%;
+  position: fixed;         /* Cover entire screen */
+  top: 0;
+  left: 0;
+  width: 100vw;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: fixed; /* Make sure it covers the whole viewport */
-  top: 0;
-  left: 0;
+  background-color: white; /* Optional: white backdrop */
+  z-index: 9999;
 }
 
-.loading-element .loading-element-wrapper {
-  --loading-element-width: 72vmin;
-  --loading-element-height: calc(var(--loading-element-width) / 8);
-  --loading-element-bar-color: #f5f5f5;
-  --loading-element-progress-color: #666666;
-  --loading-element-img-top: var(--loading-element-width);
-  --loading-element-shadow-offset: calc(var(--loading-element-img-top) * -1);
-  --loading-element-progress: 0%;
-  position: relative;
-  width: var(--loading-element-width);
-  height: var(--loading-element-height);
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
-.loading-element .loading-element-img {
-  position: absolute;
-  top: var(--loading-element-img-top);
-  left: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  filter: drop-shadow(
-    0 var(--loading-element-shadow-offset) 0 var(--loading-element-bar-color)
-  );
-  transform: rotateZ(0);
+.blood {
+  width: 15px;
+  height: 15px;
+  border: 1px solid black;
+  border-radius: 0% 100% 100% 100%;
+  transform: rotate(45deg);
+  animation: blink 1s infinite;
 }
 
-.loading-element .loading-element-wrapper::before {
-  position: absolute;
-  content: "";
-  z-index: 1;
-  top: var(--loading-element-img-top);
-  left: 0;
-  width: var(--loading-element-progress);
-  height: 100%;
-  filter: drop-shadow(
-    0 var(--loading-element-shadow-offset) 0
-      var(--loading-element-progress-color)
-  );
-  transform: rotateZ(0);
-  background: url("https://s2.loli.net/2023/10/13/O4Qtrmocbn2a3yh.png")
-    no-repeat left 100%;
-  background-size: var(--loading-element-width) var(--loading-element-height);
-  background-position-x: 0;
-  animation: loading-element 3.5s infinite forwards;
+.blood:nth-child(1) {
+  animation-delay: -0.2s;
+}
+.blood:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.blood:nth-child(3) {
+  animation-delay: 0.5s;
 }
 
-@keyframes loading-element {
+@keyframes blink {
   0% {
-    width: 0;
+    background-color: transparent;
   }
-
-  100% {
-    width: 94.4%;
+  50% {
+    background-color: red;
   }
 }

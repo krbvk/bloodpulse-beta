@@ -2,12 +2,15 @@
 
 import { Box, Title, Input, Group, Text, Grid, Paper, Flex, Loader } from "@mantine/core";
 import { useSession } from "next-auth/react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { api } from "@/trpc/react";
 import { IconSearch } from "@tabler/icons-react";
+import CustomLoader from "../Loader/CustomLoader";
+import { useRouter } from "next/navigation";
 
 export default function DonorLayout() {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const { data: donors = [], isLoading } = api.donor.getAll.useQuery();
 
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -32,6 +35,12 @@ export default function DonorLayout() {
     return `${maskedUsername}@${domain}`;
   };
 
+    useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/");
+    }
+  }, [status, router]);
+
   if (status === "loading" || isLoading) {
     return (
       <Box
@@ -43,13 +52,13 @@ export default function DonorLayout() {
           alignItems: "center",
         }}
       >
-        <Loader size="xl" />
+        <CustomLoader />
       </Box>
     );
   }
 
   if (!session?.user) {
-    return <Text>User not logged in</Text>;
+    return null;
   }
 
   return (

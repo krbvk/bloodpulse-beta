@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { api } from "@/trpc/react";
-import { IconCheck, IconMail, IconX } from "@tabler/icons-react";
+import { IconCheck, IconClock, IconMail, IconX } from "@tabler/icons-react";
 import {
   Box,
   Title,
@@ -11,23 +11,43 @@ import {
   Text,
   Notification,
   Stack,
+  ActionIcon,
 } from "@mantine/core";
 import { DatePickerInput, TimeInput } from "@mantine/dates";
 import dayjs from "dayjs";
+import CustomLoader from "@/components/Loader/CustomLoader";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function AppointmentLayout() {
   const { data: session, status } = useSession();
 
+  const router = useRouter();
+
   const [appointmentDate, setAppointmentDate] = useState<Date | null>(null);
-  const [appointmentTime, setAppointmentTime] = useState<string>("");
+  const [appointmentTime, setAppointmentTime] = useState<Date | null>(null);
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
+
+  const timeInputRef = useRef<HTMLInputElement | null>(null);
+
+    useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/");
+    }
+  }, [status, router]);
+
+  if (status === "loading") return <CustomLoader />;
+
+  if (status === "unauthenticated") return null;
+
+  if (!session?.user) return null;
 
   const createAppointment = api.appointment.create.useMutation({
     onSuccess: () => {
       setSuccess(true);
       setAppointmentDate(null);
-      setAppointmentTime("");
+      setAppointmentTime(null);
       setMessage("");
     },
     onError: (error) => {
@@ -35,26 +55,12 @@ export default function AppointmentLayout() {
     },
   });
 
-  const convertTo24Hour = (timeStr: string) => {
-    const [time, period] = timeStr.split(" ");
-    const [hourStr, minuteStr] = time?.split(":") ?? ["0", "0"];
-    let hour = Number(hourStr);
-    const minute = Number(minuteStr);
-
-    if (period === "PM" && hour < 12) hour += 12;
-    if (period === "AM" && hour === 12) hour = 0;
-
-    return { hour, minute };
-  };
-
   const handleSubmit = () => {
     if (!appointmentDate || !appointmentTime || !message) return;
 
-    const { hour, minute } = convertTo24Hour(appointmentTime);
-
     const datetime = dayjs(appointmentDate)
-      .set("hour", hour)
-      .set("minute", minute)
+      .set("hour", appointmentTime.getHours())
+      .set("minute", appointmentTime.getMinutes())
       .set("second", 0)
       .set("millisecond", 0)
       .toDate();
@@ -62,12 +68,35 @@ export default function AppointmentLayout() {
     createAppointment.mutate({ datetime, message });
   };
 
-  const handleTimeChange = (val: string) => {
-    if (val) setAppointmentTime(val);
+  const formatTime = (date: Date | null): string => {
+    if (!date) return "";
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
   };
 
-  if (status === "loading") return <Text>Loading session...</Text>;
-  if (!session?.user) return <Text>User not logged in</Text>;
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.currentTarget.value;
+    const [hoursStr, minutesStr] = input.split(":");
+
+    const hours = Number(hoursStr);
+    const minutes = Number(minutesStr);
+
+    if (
+      !isNaN(hours) &&
+      !isNaN(minutes) &&
+      hours >= 0 &&
+      hours <= 23 &&
+      minutes >= 0 &&
+      minutes <= 59
+    ) {
+      const newTime = new Date();
+      newTime.setHours(hours, minutes, 0, 0);
+      setAppointmentTime(newTime);
+    } else {
+      setAppointmentTime(null);
+    }
+  };
 
   return (
     <Box
@@ -107,9 +136,25 @@ export default function AppointmentLayout() {
           <TimeInput
             label="Time"
             placeholder="Select time"
-            value={appointmentTime}
-            onChange={(event) => handleTimeChange(event.currentTarget.value)}
+            value={formatTime(appointmentTime)}
+            onChange={handleTimeChange}
             withAsterisk
+            ref={timeInputRef}
+            rightSection={
+              <ActionIcon
+                variant="subtle"
+                onClick={() => {
+                  const inputEl = timeInputRef.current
+                  if (inputEl?.showPicker) {
+                    inputEl.showPicker();
+                  } else {
+                    inputEl?.focus();
+                  }
+                }}
+              >
+                <IconClock size={18} />
+              </ActionIcon>
+            }
           />
 
           <Textarea

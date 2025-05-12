@@ -37,13 +37,14 @@ export default function Introduction() {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          backgroundColor: 'black',
+          backgroundColor: 'transparent',
           position: 'relative',
           minHeight: isMobile ? '100vh' : '100vh',
           height: isMobile ? 'calc(100dvh - 56px)' : '100vh',
           width: '100vw',
           boxSizing: 'border-box',
           overflow: 'hidden',
+          transition: 'background-image 0.3s ease-in-out',
         }}
       >
         <Overlay

@@ -4,10 +4,10 @@ import '@/components/Loader/CustomLoader.css';
 const CustomLoader = () => {
   return (
     <Box id="loader">
-      <div className="loading-element">
-        <div className="loading-element-wrapper">
-          <div className="loading-element-img"></div>
-        </div>
+      <div className="loading-container">
+        <div className="blood"></div>
+        <div className="blood"></div>
+        <div className="blood"></div>
       </div>
     </Box>
   );

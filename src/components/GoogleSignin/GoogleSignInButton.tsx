@@ -5,6 +5,7 @@ import { Button, Text, Box } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { IconBrandGoogle } from '@tabler/icons-react';
+import CustomLoader from "../Loader/CustomLoader";
 
 export function GoogleSignInButton() {
   const { status } = useSession();
@@ -24,7 +25,7 @@ export function GoogleSignInButton() {
   };
 
   if (status === "loading") {
-    return <Text>Loading...</Text>;
+    return <CustomLoader />
   }
 
   return (

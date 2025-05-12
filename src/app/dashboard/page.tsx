@@ -4,8 +4,9 @@ import { useSession } from "next-auth/react";
 import DashboardContent from "@/components/Dashboard/DashboardContent";
 import DashboardNavbar from "@/components/Dashboard/DashboardNavbar";
 import DashboardSidebar from "@/components/Dashboard/DashboardSidebar";
-import { Box, Flex, Loader, Center } from "@mantine/core";
+import { Box, Flex, Center } from "@mantine/core";
 import { useState } from "react";
+import CustomLoader from "@/components/Loader/CustomLoader";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -18,7 +19,7 @@ export default function Dashboard() {
   if (status === "loading") {
     return (
       <Center h="100vh">
-        <Loader />
+        <CustomLoader />
       </Center>
     );
   }
