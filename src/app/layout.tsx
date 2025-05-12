@@ -5,6 +5,7 @@ import { SessionProviders } from "@/components/SessionProviders";
 import { MantineProvider, ColorSchemeScript, createTheme, mantineHtmlProps } from "@mantine/core";
 import '@mantine/core/styles.css';
 import '@mantine/carousel/styles.css';
+import '@mantine/dates/styles.css';
 import { SdkProvider } from "@/components/Dashboard/SdkContext";
 export const metadata: Metadata = {
   title: "Bloodpulse",
