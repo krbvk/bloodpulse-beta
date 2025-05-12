@@ -14,13 +14,6 @@ const Page = () => {
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
-  if (status === "loading") {
-    return (
-      <Center h="100vh">
-        <CustomLoader />
-      </Center>
-    );
-  }
   return (
     <Box style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Navbar */}
@@ -28,12 +21,12 @@ const Page = () => {
         <DashboardNavbar toggleSidebar={toggleSidebar} session={session} />
       </Box>
 
-      {/* Main content area below navbar */}
+      {/* Main content below navbar */}
       <Flex style={{ flex: 1, overflow: "hidden" }}>
         {/* Sidebar */}
         <DashboardSidebar isOpen={sidebarOpen} session={session} />
 
-        {/* Appointment content */}
+        {/* Appointment content area */}
         <Box
           style={{
             flex: 1,
@@ -44,7 +37,17 @@ const Page = () => {
             padding: "20px",
           }}
         >
-          <AppointmentLayout />
+          {status === "loading" ? (
+            <Center h="100%">
+              <CustomLoader />
+            </Center>
+          ) : status === "unauthenticated" ? (
+            <Center h="100%">
+              <CustomLoader />
+            </Center>
+          ) : (
+            <AppointmentLayout />
+          )}
         </Box>
       </Flex>
     </Box>

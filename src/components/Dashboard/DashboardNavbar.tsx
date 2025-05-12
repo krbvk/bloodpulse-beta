@@ -35,15 +35,21 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [loading, setLoading] = useState(false);
 
-  if (!session) return null;
+  if (!session?.user) return null;
 
-  const { name, email, image } = session.user ?? {};
+  const { name, email, image } = session.user;
   const initials = name ? getInitials(name) : "";
 
   const handleSignOut = async () => {
     setLoading(true);
-    await signOut({ redirect: false });
-    router.push("/");
+    try {
+      await signOut({ redirect: false });
+      router.push("/");
+    } catch (error) {
+      console.error("Sign out failed", error)
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
@@ -91,7 +97,7 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
 
             <Menu shadow="md" width={220} position="bottom-end" withArrow>
               <Menu.Target>
-                <UnstyledButton>
+                <UnstyledButton aria-label="User menu">
                   {image ? (
                     <Box
                       style={{

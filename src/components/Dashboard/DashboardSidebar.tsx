@@ -23,14 +23,20 @@ const DashboardSidebar = ({ isOpen, session }: SidebarProps) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  if (!session) return null;
+  if (!session || !session.user) return null;
 
   const { name } = session.user ?? {};
 
   const handleSignOut = async () => {
     setLoading(true);
-    await signOut({ redirect: false });
-    router.push("/");
+    try {
+      await signOut({ redirect: false });
+      router.push("/");
+    } catch (error) {
+      console.error("Sign out failed", error)
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
