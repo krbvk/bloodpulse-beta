@@ -24,7 +24,14 @@ export default function AppointmentLayout() {
 
   const router = useRouter();
 
-  useEffect(() => {
+  const [appointmentDate, setAppointmentDate] = useState<Date | null>(null);
+  const [appointmentTime, setAppointmentTime] = useState<Date | null>(null);
+  const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  const timeInputRef = useRef<HTMLInputElement | null>(null);
+
+    useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/");
     }
@@ -35,13 +42,6 @@ export default function AppointmentLayout() {
   if (status === "unauthenticated") return null;
 
   if (!session?.user) return null;
-
-  const [appointmentDate, setAppointmentDate] = useState<Date | null>(null);
-  const [appointmentTime, setAppointmentTime] = useState<Date | null>(null);
-  const [message, setMessage] = useState("");
-  const [success, setSuccess] = useState(false);
-
-  const timeInputRef = useRef<HTMLInputElement | null>(null);
 
   const createAppointment = api.appointment.create.useMutation({
     onSuccess: () => {
