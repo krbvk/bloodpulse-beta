@@ -41,7 +41,7 @@ export default function DonorLayout() {
     }
   }, [status, router]);
 
-  if (status === "loading" || isLoading) {
+  if (status !== "authenticated" || isLoading) {
     return (
       <Box
         style={{
@@ -55,10 +55,6 @@ export default function DonorLayout() {
         <CustomLoader />
       </Box>
     );
-  }
-
-  if (!session?.user) {
-    return null;
   }
 
   return (
