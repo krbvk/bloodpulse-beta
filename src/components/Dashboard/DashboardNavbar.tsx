@@ -35,7 +35,7 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [loading, setLoading] = useState(false);
 
-  if (!session || !session.user) return null;
+  if (!session?.user) return null;
 
   const { name, email, image } = session.user;
   const initials = name ? getInitials(name) : "";
