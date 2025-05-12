@@ -37,7 +37,7 @@ export default function Introduction() {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          backgroundColor: 'transparent',
+          backgroundColor: 'black',
           position: 'relative',
           minHeight: isMobile ? '100vh' : '100vh',
           height: isMobile ? 'calc(100dvh - 56px)' : '100vh',
@@ -146,7 +146,7 @@ export default function Introduction() {
               color="red"
               mt="md"
               style={{
-                marginTop: '2rem',
+                marginBottom: 15,
                 width: isMobile ? '100%' : 'fit-content',
                 alignSelf: 'center',
               }}
