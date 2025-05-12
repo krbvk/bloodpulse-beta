@@ -25,11 +25,9 @@ export default function ProfileLayout() {
     }
   }, [status, router]);
 
-  if (status === "loading") return <CustomLoader />;
-
-  if (status === "unauthenticated") return null;
-
-  if (!session?.user) return null;
+  if (status !== "authenticated") {
+    return <CustomLoader />;
+  }
 
   const { name, email, image } = session.user;
 
