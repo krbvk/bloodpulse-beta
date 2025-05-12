@@ -7,6 +7,8 @@ import '@mantine/core/styles.css';
 import '@mantine/carousel/styles.css';
 import '@mantine/dates/styles.css';
 import { SdkProvider } from "@/components/Dashboard/SdkContext";
+import ClientOnly from "@/components/Loader/ClientOnly";
+
 export const metadata: Metadata = {
   title: "Bloodpulse",
   description: "Bloodpulse beta application",
@@ -33,7 +35,7 @@ export default function RootLayout({
         <MantineProvider theme={theme}>
           <SessionProviders>
             <SdkProvider>
-            {children}
+            <ClientOnly>{children}</ClientOnly>
             </SdkProvider>
           </SessionProviders>
         </MantineProvider>

@@ -130,7 +130,7 @@ export default function AppointmentLayout() {
               <ActionIcon
                 variant="subtle"
                 onClick={() => {
-                  const inputEl = timeInputRef.current as HTMLInputElement | null;
+                  const inputEl = timeInputRef.current
                   if (inputEl?.showPicker) {
                     inputEl.showPicker();
                   } else {
