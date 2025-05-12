@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { api } from "@/trpc/react";
 import { IconCheck, IconClock, IconMail, IconX } from "@tabler/icons-react";
@@ -8,7 +8,6 @@ import {
   Paper,
   Textarea,
   Button,
-  Text,
   Notification,
   Stack,
   ActionIcon,
@@ -17,27 +16,23 @@ import { DatePickerInput, TimeInput } from "@mantine/dates";
 import dayjs from "dayjs";
 import CustomLoader from "@/components/Loader/CustomLoader";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 export default function AppointmentLayout() {
   const { data: session, status } = useSession();
-
   const router = useRouter();
-
   const [appointmentDate, setAppointmentDate] = useState<Date | null>(null);
   const [appointmentTime, setAppointmentTime] = useState<Date | null>(null);
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
-
   const timeInputRef = useRef<HTMLInputElement | null>(null);
 
-    useEffect(() => {
+  useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/");
     }
   }, [status, router]);
 
-  if (status !== "authenticated") {
+  if (status === "loading" || status === "unauthenticated") {
     return <CustomLoader />;
   }
 
@@ -142,7 +137,7 @@ export default function AppointmentLayout() {
               <ActionIcon
                 variant="subtle"
                 onClick={() => {
-                  const inputEl = timeInputRef.current
+                  const inputEl = timeInputRef.current;
                   if (inputEl?.showPicker) {
                     inputEl.showPicker();
                   } else {

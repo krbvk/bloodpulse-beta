@@ -42,7 +42,11 @@ export const appointmentRouter = createTRPCRouter({
             from: process.env.RESEND_FROM_EMAIL ?? "noreply@example.com",
             to: userEmail,
             subject: "Appointment Confirmation",
-            text: `Your appointment is confirmed for ${input.datetime.toLocaleString()}.\n\nMessage: ${input.message}`,
+            text: `
+            Appointment request from: ${ctx.session.user.name} (${ctx.session.user.email})
+            \n\n  Your appointment is confirmed for ${input.datetime.toLocaleString()}.
+            \n\nMessage: ${input.message}
+            `,
           });
 
           // console.log("Email sent successfully:", emailResponse);
