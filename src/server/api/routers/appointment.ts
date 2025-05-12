@@ -29,7 +29,7 @@ export const appointmentRouter = createTRPCRouter({
 
       // console.log("Appointment created:", appointment);
 
-      const userEmail = "villegaskierthryan@gmail.com";
+      const userEmail = ctx.session.user.email;
       // console.log("Sending email to:", userEmail);
 
       let emailResponse = null;
@@ -47,7 +47,7 @@ export const appointmentRouter = createTRPCRouter({
 
           // console.log("Email sent successfully:", emailResponse);
         } catch (error) {
-          console.error("Error sending email:", error);
+          // console.error("Error sending email:", error);
         }
       } else {
         // console.log("Email not sent, missing userEmail or API Key.");
