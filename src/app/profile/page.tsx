@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { Box, Center, Flex, Loader } from "@mantine/core";
+import { Box, Center, Flex } from "@mantine/core";
 import { useSession } from "next-auth/react";
 import DashboardNavbar from "@/components/Dashboard/DashboardNavbar";
 import DashboardSidebar from "@/components/Dashboard/DashboardSidebar";
 import ProfileLayout from "@/components/Profile/ProfileLayout";
+import CustomLoader from "@/components/Loader/CustomLoader";
 
 const Page = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -16,7 +17,7 @@ const Page = () => {
   if (status === "loading") {
     return (
       <Center h="100vh">
-        <Loader size="lg" />
+        <CustomLoader />
       </Center>
     );
   }
