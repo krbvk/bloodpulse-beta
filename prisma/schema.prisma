@@ -92,6 +92,7 @@ model Appointment {
   requester   User     @relation("UserAppointments", fields: [requesterId], references: [id], onDelete: Cascade)
   datetime    DateTime
   message     String
+  subject   AppointmentSubject
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -101,4 +102,9 @@ model Appointment {
 enum Role {
   ADMIN @map("admin")
   USER  @map("user")
+}
+
+enum AppointmentSubject {
+  BloodDonation
+  BloodRequest
 }

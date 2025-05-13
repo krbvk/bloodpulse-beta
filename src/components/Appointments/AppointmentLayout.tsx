@@ -11,19 +11,29 @@ import {
   Notification,
   Stack,
   ActionIcon,
+  Select,
+  Text
 } from "@mantine/core";
 import { DatePickerInput, TimeInput } from "@mantine/dates";
 import dayjs from "dayjs";
 import CustomLoader from "@/components/Loader/CustomLoader";
 import { useRouter } from "next/navigation";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export default function AppointmentLayout() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [appointmentDate, setAppointmentDate] = useState<Date | null>(null);
-  const [appointmentTime, setAppointmentTime] = useState<Date | null>(null);
+  const [appointmentTime, setAppointmentTime] = useState<string>("")
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
+  const [subject, setSubject] = useState<"Blood Donation" | "Blood Request" | null>(null);
+  const [failed, setFailed] = useState(false);
+  const [timeError, setTimeError] = useState<string | null>(null);
   const timeInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -40,25 +50,32 @@ export default function AppointmentLayout() {
     onSuccess: () => {
       setSuccess(true);
       setAppointmentDate(null);
-      setAppointmentTime(null);
+      setAppointmentTime("");
       setMessage("");
     },
     onError: (error) => {
+      setFailed(true);
+      setSuccess(false);
       console.error("Error sending appointment request:", error);
     },
   });
 
   const handleSubmit = () => {
-    if (!appointmentDate || !appointmentTime || !message) return;
+    if (!appointmentDate || !appointmentTime || !message || !subject) return;
+
+    const [hoursStr, minutesStr] = appointmentTime.split(":");
+    const hours = Number(hoursStr);
+    const minutes = Number(minutesStr);
 
     const datetime = dayjs(appointmentDate)
-      .set("hour", appointmentTime.getHours())
-      .set("minute", appointmentTime.getMinutes())
+      .set("hour", hours)
+      .set("minute", minutes)
       .set("second", 0)
       .set("millisecond", 0)
+      .tz("Asia/Manila")
       .toDate();
 
-    createAppointment.mutate({ datetime, message });
+    createAppointment.mutate({ datetime, message, subject });
   };
 
   const formatTime = (date: Date | null): string => {
@@ -83,11 +100,20 @@ export default function AppointmentLayout() {
       minutes >= 0 &&
       minutes <= 59
     ) {
-      const newTime = new Date();
+      const dateToCheck = appointmentDate ?? new Date();
+      const newTime = new Date(dateToCheck);
       newTime.setHours(hours, minutes, 0, 0);
-      setAppointmentTime(newTime);
+      const now = new Date();
+      const isSameDay = newTime.toDateString() === now.toDateString();
+      if (newTime < now && isSameDay) {
+        setTimeError("Cannot set a past time for the current day.");
+        setAppointmentTime("");
+      } else {
+        setTimeError(null);
+        setAppointmentTime(input);
+      }
     } else {
-      setAppointmentTime(null);
+      setAppointmentTime("");
     }
   };
 
@@ -113,13 +139,28 @@ export default function AppointmentLayout() {
         </Notification>
       )}
 
+      {failed && (
+        <Notification
+          icon={<IconX />}
+          color="red"
+          title="Error"
+          onClose={() => setFailed(false)}
+          mb="md"
+        >
+          Failed to send appointment request. Please try again.
+        </Notification>
+      )}
+
       <Paper shadow="md" radius="lg" p="xl" withBorder>
         <Stack gap="md">
           <DatePickerInput
             label="Date"
             placeholder="Select date"
             value={appointmentDate}
-            onChange={setAppointmentDate}
+              onChange={(d) => {
+                setAppointmentDate(d);
+                setTimeError(null);
+              }}
             minDate={new Date()}
             withAsterisk
             clearable
@@ -129,7 +170,7 @@ export default function AppointmentLayout() {
           <TimeInput
             label="Time"
             placeholder="Select time"
-            value={formatTime(appointmentTime)}
+            value={appointmentTime}
             onChange={handleTimeChange}
             withAsterisk
             ref={timeInputRef}
@@ -150,6 +191,21 @@ export default function AppointmentLayout() {
             }
           />
 
+          {timeError && (
+              <Text c="red" size="sm" mt="xs">
+                {timeError}
+              </Text>
+            )}
+
+          <Select
+            label="Subject"
+            placeholder="Choose subject"
+            data={["Blood Donation", "Blood Request"]}
+            value={subject}
+            onChange={(value) => setSubject(value as "Blood Donation" | "Blood Request" | null)}
+            withAsterisk
+          />
+
           <Textarea
             label="Message"
             placeholder="Enter reason or message..."
@@ -164,21 +220,10 @@ export default function AppointmentLayout() {
             fullWidth
             onClick={handleSubmit}
             loading={createAppointment.status === "pending"}
-            disabled={!appointmentDate || !appointmentTime || !message}
+            disabled={!appointmentDate || !appointmentTime || !message || !!timeError}
           >
             Send Appointment Request
           </Button>
-
-          {createAppointment.status === "error" && (
-            <Notification
-              icon={<IconX />}
-              color="red"
-              title="Error"
-              onClose={() => createAppointment.reset()}
-            >
-              Failed to send appointment request. Please try again.
-            </Notification>
-          )}
         </Stack>
       </Paper>
     </Box>
