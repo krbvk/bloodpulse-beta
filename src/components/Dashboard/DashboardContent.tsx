@@ -24,15 +24,15 @@ const DashboardContent = ({ session }: Props) => {
   const { sdkLoaded, sdkFailed } = useSdkContext();
   const isMobile = useMediaQuery('(max-width: 768px)');
 
-  if (!session || !session.user) return null;
-  
-  const { name } = session.user;
-
   useEffect(() => {
     if (sdkLoaded && typeof window !== 'undefined' && window.FB?.XFBML) {
       window.FB.XFBML.parse();
     }
   }, [sdkLoaded]);
+
+  if (!session || !session.user) return null;
+  
+  const { name } = session.user;
 
   return (
     <Box

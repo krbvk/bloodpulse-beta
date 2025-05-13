@@ -11,7 +11,7 @@ export default function DonorProfileLayout() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const { data: donor, isLoading } = api.donor.getById.useQuery(session?.user.id || "");
+  const { data: donor, isLoading } = api.donor.getById.useQuery(session?.user.id ?? "");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -24,7 +24,7 @@ export default function DonorProfileLayout() {
   }
 
   const { name, email } = session.user;
-  const { bloodType, phoneNumber, donationCount } = donor || {};
+  const { bloodType, phoneNumber, donationCount } = donor ?? {};
 
   const isDonor = bloodType && phoneNumber && donationCount;
 
@@ -81,7 +81,7 @@ export default function DonorProfileLayout() {
               If this data is missing, it means you are not part of our donor list yet.
             </Text>
             <Text style={{ textAlign: "center" }} mt="md">
-              Want to be part of our donor list and help others? Book an appointment to donate blood, and not only will you be added to our list, but you'll also be helping those in need.
+              Want to be part of our donor list and help others? Book an appointment to donate blood, and not only will you be added to our list, but you&apos;ll also be helping those in need.
             </Text>
             <Button 
               mt="md" 
