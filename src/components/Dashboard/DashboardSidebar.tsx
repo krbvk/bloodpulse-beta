@@ -101,6 +101,14 @@ const DashboardSidebar = ({ isOpen, session }: SidebarProps) => {
             </Flex>
           </UnstyledButton>
         )}
+        {role === "USER" && (
+          <UnstyledButton onClick={() => router.push("/donors-profile")}>
+            <Flex align="center" gap="xs">
+              <IconListCheck size={20} color="white" />
+              <Text size="sm" c="white">Donation History</Text>
+            </Flex>
+          </UnstyledButton>
+        )}
 
         <UnstyledButton onClick={() => router.push("/appointments")}>
           <Flex align="center" gap="xs">

@@ -21,10 +21,11 @@ declare global {
 }
 
 const DashboardContent = ({ session }: Props) => {
-  if (!session || !session.user) return null;
   const { sdkLoaded, sdkFailed } = useSdkContext();
   const isMobile = useMediaQuery('(max-width: 768px)');
 
+  if (!session || !session.user) return null;
+  
   const { name } = session.user;
 
   useEffect(() => {
