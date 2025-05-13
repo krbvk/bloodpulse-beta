@@ -80,6 +80,8 @@ model Donor {
   name      String
   bloodType String
   email     String   @unique
+  phoneNumber String?
+  donationCount  Int?@default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

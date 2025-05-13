@@ -10,6 +10,16 @@ import React, {
 } from "react";
 import CustomLoader from "../Loader/CustomLoader";
 
+declare global {
+  interface Window {
+    FB?: {
+      XFBML: {
+        parse: () => void;
+      };
+    };
+  }
+}
+
 interface SdkContextType {
   sdkLoaded: boolean;
   sdkFailed: boolean;
@@ -34,7 +44,7 @@ export const SdkProvider: FC<SdkProviderProps> = ({ children }) => {
   const [sdkFailed, setSdkFailed] = useState(false);
 
   useEffect(() => {
-    if ((window as any).FB) {
+    if (window.FB) {
       setSdkLoaded(true);
       return;
     }
@@ -50,8 +60,8 @@ export const SdkProvider: FC<SdkProviderProps> = ({ children }) => {
 
     script.onload = () => {
       setSdkLoaded(true);
-      if ((window as any).FB?.XFBML) {
-        (window as any).FB.XFBML.parse();
+      if (window.FB?.XFBML) {
+        window.FB.XFBML.parse();
       }
     };
 

@@ -10,6 +10,16 @@ type Props = {
   session: Session | null;
 };
 
+declare global {
+  interface Window {
+    FB?: {
+      XFBML: {
+        parse: () => void;
+      };
+    };
+  }
+}
+
 const DashboardContent = ({ session }: Props) => {
   if (!session || !session.user) return null;
   const { sdkLoaded, sdkFailed } = useSdkContext();
@@ -18,8 +28,8 @@ const DashboardContent = ({ session }: Props) => {
   const { name } = session.user;
 
   useEffect(() => {
-    if (sdkLoaded && typeof window !== 'undefined' && (window as any).FB?.XFBML) {
-      (window as any).FB.XFBML.parse();
+    if (sdkLoaded && typeof window !== 'undefined' && window.FB?.XFBML) {
+      window.FB.XFBML.parse();
     }
   }, [sdkLoaded]);
 

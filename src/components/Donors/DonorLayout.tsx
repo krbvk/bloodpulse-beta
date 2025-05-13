@@ -25,30 +25,41 @@ import { IconSearch, IconPlus, IconTrash } from "@tabler/icons-react";
 import CustomLoader from "../Loader/CustomLoader";
 import { useRouter } from "next/navigation";
 
+interface Donor {
+  id: string;
+  name: string;
+  email: string;
+  bloodType: string;
+  phoneNumber: string;
+  donationCount: number;
+}
+
 export default function DonorLayout() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { data: donors = [], isLoading } = api.donor.getAll.useQuery();
+  const { data: donors = [], isLoading } = api.donor.getAll.useQuery() as { data: Donor[]; isLoading: boolean };
   const utils = api.useUtils();
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [modalOpened, setModalOpened] = useState(false);
-  const [selectedDonor, setSelectedDonor] = useState<any>(null);
-  const [addModalOpened, setAddModalOpened] = useState(false);
-  const [deleteModalOpened, setDeleteModalOpened] = useState(false);
-  const [selectedDonorsToDelete, setSelectedDonorsToDelete] = useState<any[]>([]);
-  const [newDonor, setNewDonor] = useState({
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [emailError, setEmailError] = useState<string>("");
+  const [modalOpened, setModalOpened] = useState<boolean>(false);
+  const [selectedDonor, setSelectedDonor] = useState<Donor | null>(null);
+  const [addModalOpened, setAddModalOpened] = useState<boolean>(false);
+  const [deleteModalOpened, setDeleteModalOpened] = useState<boolean>(false);
+  const [selectedDonorsToDelete, setSelectedDonorsToDelete] = useState<string[]>([]);
+  const [newDonor, setNewDonor] = useState<Omit<Donor, "id">>({
     name: "",
     email: "",
     bloodType: "",
+    phoneNumber: "",
+    donationCount: 0,
   });
 
   const addDonor = api.donor.create.useMutation({
     onSuccess: async () => {
       await utils.donor.getAll.invalidate();
       setAddModalOpened(false);
-      setNewDonor({ name: "", email: "", bloodType: "" });
+      setNewDonor({ name: "", email: "", bloodType: "", phoneNumber: "", donationCount: 0 });
     },
   });
 
@@ -81,7 +92,7 @@ export default function DonorLayout() {
   }
 
   const handleDeleteSelected = () => {
-    selectedDonorsToDelete.forEach((donorId) => {
+    selectedDonorsToDelete.forEach((donorId: string) => {
       deleteDonor.mutate(donorId);
     });
   };
@@ -160,6 +171,8 @@ export default function DonorLayout() {
           <Text><strong>Name:</strong> {selectedDonor?.name}</Text>
           <Text><strong>Email:</strong> {selectedDonor?.email}</Text>
           <Text><strong>Blood Type:</strong> {selectedDonor?.bloodType}</Text>
+          <Text><strong>Contact Number:</strong> {selectedDonor?.phoneNumber}</Text>
+          <Text><strong>Number of times donated:</strong> {selectedDonor?.donationCount}</Text>
         </Stack>
       </Modal>
 
@@ -199,9 +212,35 @@ export default function DonorLayout() {
             placeholder="Select"
             data={["A", "B", "AB", "O"]}
             value={newDonor.bloodType}
-            onChange={(val) => setNewDonor({ ...newDonor, bloodType: val || "" })}
+            onChange={(val) => setNewDonor({ ...newDonor, bloodType: val ?? "" })}
           />
-          <Button onClick={() => addDonor.mutate(newDonor)} loading={addDonor.status === "pending"} fullWidth disabled={!newDonor.email || !!emailError}>
+          <TextInput
+            label="Phone Number"
+            placeholder="09123456789"
+            value={newDonor.phoneNumber}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, "");
+                if (value.length <= 11) {
+                  setNewDonor({ ...newDonor, phoneNumber: value });
+                }
+            }}
+              maxLength={11}
+              error={newDonor.phoneNumber.length !==11 ? "Phone number must be 11 digits" : ""}
+          />
+          <TextInput
+            label="Donation Count"
+            placeholder="0"
+            type="number"
+            min={0}
+            value={newDonor.donationCount.toString()}
+            onChange={(e) => setNewDonor({ ...newDonor, donationCount: Number(e.target.value) })}
+          />
+          <Button
+            onClick={() => addDonor.mutate({ ...newDonor })}
+            loading={addDonor.status === "pending"}
+            fullWidth
+            disabled={!newDonor.email || !!emailError}
+          >
             Submit
           </Button>
         </Stack>
@@ -219,7 +258,6 @@ export default function DonorLayout() {
           <Text size="sm" c="dimmed">
             Select the donor(s) you want to delete. This action cannot be undone.
           </Text>
-
           <Box
             style={{
               maxHeight: "300px",
@@ -240,7 +278,7 @@ export default function DonorLayout() {
                     key={donor.id}
                     label={
                       <Text size="sm">
-                        <strong>{donor.name}</strong> &mdash; Blood Type: {donor.bloodType}
+                        Name: {donor.name} &mdash; Email: {donor.email}
                       </Text>
                     }
                     checked={selectedDonorsToDelete.includes(donor.id)}
@@ -258,18 +296,13 @@ export default function DonorLayout() {
               )}
             </Stack>
           </Box>
-
           <Divider />
-
           <Flex justify="space-between" align="center">
             <Text size="xs" c="dimmed">
               Selected: {selectedDonorsToDelete.length}
             </Text>
             <Flex gap="sm">
-              <Button
-                variant="outline"
-                onClick={() => setDeleteModalOpened(false)}
-              >
+              <Button variant="outline" onClick={() => setDeleteModalOpened(false)}>
                 Cancel
               </Button>
               <Button

@@ -45,7 +45,7 @@ export const authConfig = {
         user: {
           ...session.user,
           id: user.id,
-          role: userWithRole?.role || Role.USER,
+          role: userWithRole?.role ?? Role.USER,
         },
       };
     },
