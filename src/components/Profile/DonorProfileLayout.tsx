@@ -1,17 +1,26 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { Box, Paper, Text, Title, Grid, Divider, Button } from "@mantine/core";
+import { Box, Paper, Text, Title, Grid, Divider, Button, Flex, Avatar } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import CustomLoader from "@/components/Loader/CustomLoader";
 import { api } from "@/trpc/react";
 
+interface Donor {
+  id: string;
+  name: string;
+  email: string;
+  bloodType: string;
+  phoneNumber: string;
+  donationCount: number;
+}
+
 export default function DonorProfileLayout() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const { data: donor, isLoading } = api.donor.getById.useQuery(session?.user.id ?? "");
+  const { data: donors = [], isLoading } = api.donor.getAll.useQuery() as { data: Donor[]; isLoading: boolean };
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -23,18 +32,41 @@ export default function DonorProfileLayout() {
     return <CustomLoader />;
   }
 
-  const { name, email } = session.user;
+  const { name, email, image } = session.user;
+
+  const donor = donors.find(d => d.email.toLowerCase() === (email ?? "").toLowerCase());
+
   const { bloodType, phoneNumber, donationCount } = donor ?? {};
 
-  const isDonor = bloodType && phoneNumber && donationCount;
+  const isDonor =
+    (bloodType ?? "").trim() !== "" &&
+    (phoneNumber ?? "").trim() !== "" &&
+    donationCount !== null && donationCount !== undefined;
 
   return (
     <Box px={{ base: "md", sm: "lg" }} py="lg" style={{ maxWidth: 900, margin: "0 auto" }}>
       <Title order={2} mb="lg" style={{ textAlign: "center" }}>
-        Donor History
+        Donor Profile
       </Title>
 
       <Paper shadow="sm" radius="md" p={{ base: "md", sm: "xl" }} withBorder>
+        <Flex direction="column" align="center" mb="xl">
+            <Avatar
+            src={image ?? "/placeholder-avatar.png"}
+            size={100}
+            radius="xl"
+            alt={name ?? "User Avatar"}
+            />
+            <Text fw={700} size="lg" mt="md" style={{textAlign: "center"}}>
+            {name}
+            </Text>
+            <Text size="sm" c="dimmed" mt={4} style={{textAlign: "center"}}>
+            {email}
+            </Text>
+        </Flex>
+        
+        <Divider my="md" />
+
         {isDonor ? (
           <>
             {/* Profile Details */}
@@ -69,7 +101,7 @@ export default function DonorProfileLayout() {
 
               <Grid.Col span={{ base: 12, sm: 6 }}>
                 <Text size="xs" c="dimmed" fw={500} mb={4}>
-                  Donation Count
+                  Number of times donated
                 </Text>
                 <Text fw={500}>{donationCount ?? "—"}</Text>
               </Grid.Col>
@@ -83,11 +115,11 @@ export default function DonorProfileLayout() {
             <Text style={{ textAlign: "center" }} mt="md">
               Want to be part of our donor list and help others? Book an appointment to donate blood, and not only will you be added to our list, but you&apos;ll also be helping those in need.
             </Text>
-            <Button 
-              mt="md" 
-              variant="filled" 
-              color="red" 
-              fullWidth 
+            <Button
+              mt="md"
+              variant="filled"
+              color="red"
+              fullWidth
               onClick={() => router.push("/appointments")}
             >
               Book an Appointment

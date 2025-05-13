@@ -5,7 +5,7 @@ import { Box, Center, Flex } from "@mantine/core";
 import { useSession } from "next-auth/react";
 import DashboardNavbar from "@/components/Dashboard/DashboardNavbar";
 import DashboardSidebar from "@/components/Dashboard/DashboardSidebar";
-import ProfileLayout from "@/components/Profile/ProfileLayout";
+import DonorProfileLayout from "@/components/Profile/DonorProfileLayout";
 import CustomLoader from "@/components/Loader/CustomLoader";
 
 const Page = () => {
@@ -45,7 +45,7 @@ const Page = () => {
             padding: "20px",
           }}
         >
-          <ProfileLayout />
+          <DonorProfileLayout />
         </Box>
       </Flex>
     </Box>
