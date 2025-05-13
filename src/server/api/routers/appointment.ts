@@ -1,6 +1,12 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { Resend } from "resend";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export const appointmentRouter = createTRPCRouter({
   getAll: protectedProcedure.query(async ({ ctx }) => {
@@ -14,6 +20,7 @@ export const appointmentRouter = createTRPCRouter({
       z.object({
         datetime: z.date(),
         message: z.string().min(1),
+        subject: z.enum(["Blood Donation", "Blood Request"]),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -23,6 +30,7 @@ export const appointmentRouter = createTRPCRouter({
         data: {
           datetime: input.datetime,
           message: input.message,
+          subject: input.subject === "Blood Donation" ? "BloodDonation" : "BloodRequest",
           requesterId: ctx.session.user.id,
         },
       });
@@ -36,16 +44,19 @@ export const appointmentRouter = createTRPCRouter({
 
       if (userEmail && process.env.AUTH_RESEND_KEY) {
         const resend = new Resend(process.env.AUTH_RESEND_KEY);
+        const formattedDate = dayjs(input.datetime)
+        .tz("Asia/Manila")
+        .format("YYYY-MM-DD hh:mm A");
 
         try {
           emailResponse = await resend.emails.send({
             from: process.env.RESEND_FROM_EMAIL ?? "noreply@example.com",
             to: userEmail,
-            subject: "Appointment Confirmation",
+            subject: `Appointment Confirmation: ${input.subject}`,
             text: `
             Appointment request from: ${ctx.session.user.name} (${ctx.session.user.email})
-            \n\n  Your appointment is confirmed for ${input.datetime.toLocaleString()}.
-            \n\nMessage: ${input.message}
+            Appointment is for ${formattedDate}
+            Message: ${input.message}
             `,
           });
 

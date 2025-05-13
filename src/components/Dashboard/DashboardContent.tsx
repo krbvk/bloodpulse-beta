@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect } from 'react';
-import { Box, Title, Alert, Text } from '@mantine/core';
+import { useEffect, useState } from 'react';
+import { Box, Title, Alert, Card } from '@mantine/core'; 
 import type { Session } from 'next-auth';
 import { useSdkContext } from '@/components/Dashboard/SdkContext';
 import { useMediaQuery } from '@mantine/hooks';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
 
 type Props = {
   session: Session | null;
@@ -23,6 +25,7 @@ declare global {
 const DashboardContent = ({ session }: Props) => {
   const { sdkLoaded, sdkFailed } = useSdkContext();
   const isMobile = useMediaQuery('(max-width: 768px)');
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   useEffect(() => {
     if (sdkLoaded && typeof window !== 'undefined' && window.FB?.XFBML) {
@@ -31,8 +34,6 @@ const DashboardContent = ({ session }: Props) => {
   }, [sdkLoaded]);
 
   if (!session || !session.user) return null;
-  
-  const { name } = session.user;
 
   return (
     <Box
@@ -40,41 +41,63 @@ const DashboardContent = ({ session }: Props) => {
       py="lg"
       style={{
         overflowY: 'hidden',
-        maxHeight: '100%',
-        width: 800,
-        maxWidth: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
+        gap: '20px',
       }}
     >
-      {isMobile && name && (
-        <Text size="lg" fw={500} mb="md">
-          Welcome back, {name}
-        </Text>
-      )}
+      <Box style={{ flex: 1 }}>
+        <Title order={2} mb="md">
+          Announcements
+        </Title>
 
-      <Title order={2} mb="md">
-        Announcements
-      </Title>
+        {!sdkLoaded && sdkFailed && (
+          <Alert title="Content Not Available" color="red">
+            It seems like you&apos;re using a browser that blocks Facebook content (e.g., Brave Browser). 
+            Please try a different browser or adjust your browser settings to view the content.
+          </Alert>
+        )}
 
-      {!sdkLoaded && sdkFailed && (
-        <Alert title="Content Not Available" color="red">
-          It seems like you&apos;re using a browser that blocks Facebook content (e.g., Brave Browser). 
-          Please try a different browser or adjust your browser settings to view the content.
-        </Alert>
-      )}
+        {sdkLoaded && !sdkFailed && (
+          <div
+            className="fb-page"
+            data-href="https://www.facebook.com/olfurcyval"
+            data-tabs="timeline"
+            data-width="800"
+            data-height="600"
+            data-small-header="false"
+            data-adapt-container-width="false"
+            data-hide-cover="false"
+            data-show-facepile="true"
+          ></div>
+        )}
+      </Box>
 
-      {sdkLoaded && !sdkFailed && (
-        <div
-          className="fb-page"
-          data-href="https://www.facebook.com/olfurcyval"
-          data-tabs="timeline"
-          data-width="800"
-          data-height="600"
-          data-small-header="false"
-          data-adapt-container-width="false"
-          data-hide-cover="false"
-          data-show-facepile="true"
-        ></div>
-      )}
+      <Box style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <Card
+          padding="lg"
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <Title order={2} mb="md">Calendar</Title>
+          <Box style={{ flex: 1, maxWidth: '500px', width: '100%' }}>
+            <FullCalendar
+              plugins={[dayGridPlugin]}
+              initialView="dayGridMonth"
+              height="100%"
+              headerToolbar={{
+                start: 'title',
+                center: '',
+                end: 'prev,next',
+              }}
+            />
+          </Box>
+        </Card>
+      </Box>
     </Box>
   );
 };
