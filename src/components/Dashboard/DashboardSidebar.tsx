@@ -11,7 +11,7 @@ import {
   IconListCheck,
   IconCalendarPlus,
 } from "@tabler/icons-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CustomLoader from "@/components/Loader/CustomLoader";
 
 type SidebarProps = {
@@ -23,9 +23,8 @@ const DashboardSidebar = ({ isOpen, session }: SidebarProps) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  if (!session || !session.user) return null;
-
-  const { name } = session.user ?? {};
+  // console.log("Session Data:", session);
+  // console.log("User Role:", role);
 
   const handleSignOut = async () => {
     setLoading(true);
@@ -33,15 +32,27 @@ const DashboardSidebar = ({ isOpen, session }: SidebarProps) => {
       await signOut({ redirect: false });
       router.push("/");
     } catch (error) {
-      console.error("Sign out failed", error)
+      console.error("Sign out failed", error);
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    if (session?.user?.role !== "ADMIN" && window.location.pathname === "/donors") {
+      router.push("/dashboard");
+    }
+  }, [session?.user?.role, router]);
+
+    if (!session || !session.user) {
+      return null;
+    }
+
   if (loading) {
-    return <CustomLoader />
+    return <CustomLoader />;
   }
+
+  const { role } = session.user;
 
   return (
     <Box
@@ -75,20 +86,24 @@ const DashboardSidebar = ({ isOpen, session }: SidebarProps) => {
           </Flex>
         </UnstyledButton>
 
-        <UnstyledButton onClick={() => router.push("/profile")}>
-          <Flex align="center" gap="xs">
-            <IconUser size={20} color="white" />
-            <Text size="sm" c="white">Profile</Text>
-          </Flex>
-        </UnstyledButton>
+        {role === "USER" && (
+          <UnstyledButton onClick={() => router.push("/profile")}>
+            <Flex align="center" gap="xs">
+              <IconUser size={20} color="white" />
+              <Text size="sm" c="white">Donor Profile</Text>
+            </Flex>
+          </UnstyledButton>
+        )}
 
-        <UnstyledButton onClick={() => router.push("/donors")}>
-          <Flex align="center" gap="xs">
-            <IconListCheck size={20} color="white" />
-            <Text size="sm" c="white">Donor List</Text>
-          </Flex>
-        </UnstyledButton>
-
+        {role === "ADMIN" && (
+          <UnstyledButton onClick={() => router.push("/donors")}>
+            <Flex align="center" gap="xs">
+              <IconListCheck size={20} color="white" />
+              <Text size="sm" c="white">Donor List</Text>
+            </Flex>
+          </UnstyledButton>
+        )}
+        
         <UnstyledButton onClick={() => router.push("/appointments")}>
           <Flex align="center" gap="xs">
             <IconCalendarPlus size={20} color="white" />

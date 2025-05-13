@@ -34,7 +34,7 @@ const Page = () => {
         {/* Sidebar */}
         <DashboardSidebar isOpen={sidebarOpen} session={session} />
 
-        {/* Profile content */}
+        {/* Donor content */}
         <Box
           style={{
             flex: 1,

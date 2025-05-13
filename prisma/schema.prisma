@@ -60,6 +60,7 @@ model User {
   email         String?       @unique
   emailVerified DateTime?
   image         String?
+  role          Role          @default(USER)
   accounts      Account[]
   sessions      Session[]
   posts         Post[]
@@ -79,6 +80,8 @@ model Donor {
   name      String
   bloodType String
   email     String   @unique
+  phoneNumber String?
+  donationCount  Int?@default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -93,4 +96,9 @@ model Appointment {
   updatedAt   DateTime @updatedAt
 
   @@index([requesterId])
+}
+
+enum Role {
+  ADMIN @map("admin")
+  USER  @map("user")
 }

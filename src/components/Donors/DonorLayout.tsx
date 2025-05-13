@@ -1,41 +1,83 @@
 "use client";
 
-import { Box, Title, Input, Group, Text, Grid, Paper, Flex, Loader } from "@mantine/core";
+import {
+  Box,
+  Title,
+  Input,
+  Flex,
+  Stack,
+  Grid,
+  Paper,
+  Modal,
+  Button,
+  TextInput,
+  Select,
+  ActionIcon,
+  Tooltip,
+  Checkbox,
+  Text,
+  Divider,
+} from "@mantine/core";
 import { useSession } from "next-auth/react";
 import { useState, useMemo, useEffect } from "react";
 import { api } from "@/trpc/react";
-import { IconSearch } from "@tabler/icons-react";
+import { IconSearch, IconPlus, IconTrash } from "@tabler/icons-react";
 import CustomLoader from "../Loader/CustomLoader";
 import { useRouter } from "next/navigation";
+
+interface Donor {
+  id: string;
+  name: string;
+  email: string;
+  bloodType: string;
+  phoneNumber: string;
+  donationCount: number;
+}
 
 export default function DonorLayout() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { data: donors = [], isLoading } = api.donor.getAll.useQuery();
+  const { data: donors = [], isLoading } = api.donor.getAll.useQuery() as { data: Donor[]; isLoading: boolean };
+  const utils = api.useUtils();
 
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [emailError, setEmailError] = useState<string>("");
+  const [modalOpened, setModalOpened] = useState<boolean>(false);
+  const [selectedDonor, setSelectedDonor] = useState<Donor | null>(null);
+  const [addModalOpened, setAddModalOpened] = useState<boolean>(false);
+  const [deleteModalOpened, setDeleteModalOpened] = useState<boolean>(false);
+  const [selectedDonorsToDelete, setSelectedDonorsToDelete] = useState<string[]>([]);
+  const [newDonor, setNewDonor] = useState<Omit<Donor, "id">>({
+    name: "",
+    email: "",
+    bloodType: "",
+    phoneNumber: "",
+    donationCount: 0,
+  });
+
+  const addDonor = api.donor.create.useMutation({
+    onSuccess: async () => {
+      await utils.donor.getAll.invalidate();
+      setAddModalOpened(false);
+      setNewDonor({ name: "", email: "", bloodType: "", phoneNumber: "", donationCount: 0 });
+    },
+  });
+
+  const deleteDonor = api.donor.delete.useMutation({
+    onSuccess: async () => {
+      await utils.donor.getAll.invalidate();
+      setDeleteModalOpened(false);
+      setSelectedDonorsToDelete([]);
+    },
+  });
 
   const filteredDonors = useMemo(() => {
-    if (!donors) return [];
     return donors.filter((donor) =>
       donor.bloodType.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [donors, searchQuery]);
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n.charAt(0).toUpperCase())
-      .join("");
-  };
-
-  const maskEmail = (email: string) => {
-    const [username, domain] = email.split("@");
-    const maskedUsername = username?.slice(0, 2) + "*".repeat(Math.max(username?.length ?? 0 - 2, 0));
-    return `${maskedUsername}@${domain}`;
-  };
-
-    useEffect(() => {
+  useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/");
     }
@@ -43,80 +85,238 @@ export default function DonorLayout() {
 
   if (status !== "authenticated" || isLoading) {
     return (
-      <Box
-        style={{
-          position: "relative",
-          height: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
+      <Flex h="100vh" justify="center" align="center">
         <CustomLoader />
-      </Box>
+      </Flex>
     );
   }
 
+  const handleDeleteSelected = () => {
+    selectedDonorsToDelete.forEach((donorId: string) => {
+      deleteDonor.mutate(donorId);
+    });
+  };
+
   return (
-    <Box px={{ base: "md", sm: "lg" }} py="lg" style={{ maxWidth: 900, margin: "0 auto" }}>
-      <Title order={2} mb="lg" style={{ textAlign: "center" }}>
+    <Box px="lg" py="lg" maw={900} mx="auto">
+      <Title order={2} ta="center" mb="lg">
         Donor List
       </Title>
 
-      <Paper shadow="sm" radius="md" p={{ base: "md", sm: "xl" }} withBorder>
-        <Box mb="lg">
-          <Group align="center" justify="center" mb="lg" style={{ display: "flex", gap: "8px" }}>
+      <Paper shadow="sm" radius="md" p="xl" withBorder>
+        <Stack align="center" gap="sm" mb="lg">
+          <Flex gap="sm" align="center">
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Enter blood type (e.g., O)"
-              style={{ width: 250 }}
+              w={250}
               radius="xl"
-              leftSection={<IconSearch />}
+              leftSection={<IconSearch size={16} />}
             />
-          </Group>
-        </Box>
+            <Tooltip label="Add Donor" withArrow>
+              <ActionIcon variant="filled" color="blue" size="lg" onClick={() => setAddModalOpened(true)}>
+                <IconPlus size={20} />
+              </ActionIcon>
+            </Tooltip>
+            <Tooltip label="Delete Donor(s)" withArrow>
+              <ActionIcon variant="filled" color="red" size="lg" onClick={() => setDeleteModalOpened(true)}>
+                <IconTrash size={20} />
+              </ActionIcon>
+            </Tooltip>
+          </Flex>
+        </Stack>
 
-        <Text size="sm" mb="md" style={{ textAlign: "center" }}>
+        <Text size="sm" ta="center" mb="sm">
           Found {filteredDonors.length} donor{filteredDonors.length !== 1 ? "s" : ""}
         </Text>
 
         {filteredDonors.length === 0 ? (
-          <Text style={{ textAlign: "center" }} c="dimmed">
+          <Text ta="center" c="dimmed">
             No donors found.
           </Text>
         ) : (
           <Grid gutter="md">
             {filteredDonors.map((donor) => (
               <Grid.Col span={{ base: 12, sm: 6, md: 4, lg: 3 }} key={donor.id}>
-                <Box mb="sm" p="md" style={{ border: "1px solid #ddd", borderRadius: "8px" }}>
-                  <Flex align="center" direction="column" mb="md">
-                    <Text fw={700} size="lg" style={{ textAlign: "center" }}>
-                      {getInitials(donor.name)}
+                <Box p="md" style={{ border: "1px solid #ddd", borderRadius: "8px" }}>
+                  <Stack align="center" gap="xs">
+                    <Text fw={700} size="lg" ta="center">
+                      {donor.name}
                     </Text>
-                    <Text
-                      size="sm"
-                      c="dimmed"
-                      style={{
-                        textAlign: "center",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        maxWidth: "100%",
-                      }}
-                    >
-                      {maskEmail(donor.email)}
-                    </Text>
-                    <Text size="md" mt="sm" style={{ textAlign: "center" }}>
+                    <Text size="sm" c="dimmed" ta="center">
                       Blood Type: {donor.bloodType}
                     </Text>
-                  </Flex>
+                    <Button
+                      size="xs"
+                      variant="light"
+                      onClick={() => {
+                        setSelectedDonor(donor);
+                        setModalOpened(true);
+                      }}
+                    >
+                      View Full Details
+                    </Button>
+                  </Stack>
                 </Box>
               </Grid.Col>
             ))}
           </Grid>
         )}
       </Paper>
+
+      {/* View Donor Modal */}
+      <Modal opened={modalOpened} onClose={() => setModalOpened(false)} title="Donor Details" centered>
+        <Stack gap="xs">
+          <Text><strong>Name:</strong> {selectedDonor?.name}</Text>
+          <Text><strong>Email:</strong> {selectedDonor?.email}</Text>
+          <Text><strong>Blood Type:</strong> {selectedDonor?.bloodType}</Text>
+          <Text><strong>Contact Number:</strong> {selectedDonor?.phoneNumber}</Text>
+          <Text><strong>Number of times donated:</strong> {selectedDonor?.donationCount}</Text>
+        </Stack>
+      </Modal>
+
+      {/* Add Donor Modal */}
+      <Modal opened={addModalOpened} onClose={() => setAddModalOpened(false)} title="Add Donor" centered>
+        <Stack>
+          <TextInput
+            label="Full Name"
+            placeholder="John Doe"
+            value={newDonor.name}
+            onChange={(e) => setNewDonor({ ...newDonor, name: e.target.value })}
+          />
+          <TextInput
+            label="Email"
+            placeholder="john@example.com"
+            value={newDonor.email}
+            error={emailError}
+            onChange={(e) => {
+              const value = e.target.value;
+              setNewDonor({ ...newDonor, email: value });
+
+              const validDomains = ["@gmail.com", "@yahoo.com", "@outlook.com", "@hotmail.com"];
+              const isValidFormat = validDomains.some((domain) => value.endsWith(domain));
+              const isEmailUsed = donors.some((donor) => donor.email.toLowerCase() === value.toLowerCase());
+
+              if (!value.includes("@") || !isValidFormat) {
+                setEmailError("Email must be from gmail.com, yahoo.com, outlook.com, or hotmail.com");
+              } else if (isEmailUsed) {
+                setEmailError("This email is already used by another donor");
+              } else {
+                setEmailError("");
+              }
+            }}
+          />
+          <Select
+            label="Blood Type"
+            placeholder="Select"
+            data={["A", "B", "AB", "O"]}
+            value={newDonor.bloodType}
+            onChange={(val) => setNewDonor({ ...newDonor, bloodType: val ?? "" })}
+          />
+          <TextInput
+            label="Phone Number"
+            placeholder="09123456789"
+            value={newDonor.phoneNumber}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, "");
+                if (value.length <= 11) {
+                  setNewDonor({ ...newDonor, phoneNumber: value });
+                }
+            }}
+              maxLength={11}
+              error={newDonor.phoneNumber.length !==11 ? "Phone number must be 11 digits" : ""}
+          />
+          <TextInput
+            label="Donation Count"
+            placeholder="0"
+            type="number"
+            min={0}
+            value={newDonor.donationCount.toString()}
+            onChange={(e) => setNewDonor({ ...newDonor, donationCount: Number(e.target.value) })}
+          />
+          <Button
+            onClick={() => addDonor.mutate({ ...newDonor })}
+            loading={addDonor.status === "pending"}
+            fullWidth
+            disabled={!newDonor.email || !!emailError}
+          >
+            Submit
+          </Button>
+        </Stack>
+      </Modal>
+
+      {/* Delete Donors Modal */}
+      <Modal
+        opened={deleteModalOpened}
+        onClose={() => setDeleteModalOpened(false)}
+        title="Delete Donor(s)"
+        centered
+        size="lg"
+      >
+        <Stack gap="sm">
+          <Text size="sm" c="dimmed">
+            Select the donor(s) you want to delete. This action cannot be undone.
+          </Text>
+          <Box
+            style={{
+              maxHeight: "300px",
+              overflowY: "auto",
+              border: "1px solid #eee",
+              borderRadius: "8px",
+              padding: "0.5rem",
+            }}
+          >
+            <Stack gap="xs">
+              {filteredDonors.length === 0 ? (
+                <Text ta="center" c="dimmed">
+                  No donors available to delete.
+                </Text>
+              ) : (
+                filteredDonors.map((donor) => (
+                  <Checkbox
+                    key={donor.id}
+                    label={
+                      <Text size="sm">
+                        Name: {donor.name} &mdash; Email: {donor.email}
+                      </Text>
+                    }
+                    checked={selectedDonorsToDelete.includes(donor.id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedDonorsToDelete((prev) => [...prev, donor.id]);
+                      } else {
+                        setSelectedDonorsToDelete((prev) =>
+                          prev.filter((id) => id !== donor.id)
+                        );
+                      }
+                    }}
+                  />
+                ))
+              )}
+            </Stack>
+          </Box>
+          <Divider />
+          <Flex justify="space-between" align="center">
+            <Text size="xs" c="dimmed">
+              Selected: {selectedDonorsToDelete.length}
+            </Text>
+            <Flex gap="sm">
+              <Button variant="outline" onClick={() => setDeleteModalOpened(false)}>
+                Cancel
+              </Button>
+              <Button
+                color="red"
+                onClick={handleDeleteSelected}
+                disabled={selectedDonorsToDelete.length === 0}
+                loading={deleteDonor.status === "pending"}
+              >
+                Delete Selected
+              </Button>
+            </Flex>
+          </Flex>
+        </Stack>
+      </Modal>
     </Box>
   );
 }

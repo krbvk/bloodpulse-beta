@@ -7,15 +7,19 @@ import {
   Stack,
   Paper,
   TextInput,
+  Notification,
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
+import { IconMail } from "@tabler/icons-react";
+import CustomLoader from "../Loader/CustomLoader";
 
 export function ResendSignIn() {
   const { status } = useSession();
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -23,7 +27,10 @@ export function ResendSignIn() {
     }
   }, [status, router]);
 
-  const resendAction = async (formData: FormData) => {
+  const resendAction = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const formData = new FormData(formRef.current!);
     const email = formData.get("email");
 
     if (typeof email !== "string") {
@@ -41,12 +48,24 @@ export function ResendSignIn() {
     setLoading(false);
 
     if (res?.ok) {
-      router.push("/resend-email"); 
+      setShowNotification(true);
+      setTimeout(() => setShowNotification(false), 5000);
     }
   };
 
   if (status === "loading" || loading) {
-    return <Text>Loading...</Text>;
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <CustomLoader />
+      </div>
+    );
   }
 
   return (
@@ -59,9 +78,9 @@ export function ResendSignIn() {
       withBorder
       style={{ maxWidth: 400, width: "100%", backgroundColor: "white" }}
     >
-      <form action={resendAction} ref={formRef} style={{ width: "100%" }}>
+      <form ref={formRef} onSubmit={resendAction} style={{ width: "100%" }}>
         <Stack gap="lg">
-          <Text style={{ textAlign: "center"}} size="md" c="black">
+          <Text style={{ textAlign: "center" }} size="md" c="black">
             Continue with Email
           </Text>
           <TextInput
@@ -76,6 +95,27 @@ export function ResendSignIn() {
           </Button>
         </Stack>
       </form>
+
+      {showNotification && (
+        <Notification
+          icon={<IconMail size={18} />}
+          title="Check your email!"
+          color="green"
+          onClose={() => setShowNotification(false)}
+          style={{
+            marginTop: "20px",
+            position: "fixed",
+            top: "20px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 1000,
+            width: "600px",
+            maxWidth: "90vw"
+          }}
+        >
+          Check your email for the sign-in link&excl; If you can&apos;t find the email, be sure to check your spam or junk folder.
+        </Notification>
+      )}
     </Paper>
   );
 }
