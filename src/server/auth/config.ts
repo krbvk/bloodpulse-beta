@@ -37,7 +37,7 @@ export const authConfig = {
     session: async ({ session, user }) => {
       const userWithRole = await db.user.findUnique({
         where: { id: user.id },
-        select: { role: true }, 
+        select: { role: true, email: true }, 
       });
 
       return {
@@ -46,8 +46,27 @@ export const authConfig = {
           ...session.user,
           id: user.id,
           role: userWithRole?.role ?? Role.USER,
+          email: userWithRole?.email ?? session.user.email
         },
       };
+    },
+        signIn: async ({ user, account }) => {
+      if (account && account.provider === 'google') {
+        const existingUser = await db.user.findUnique({
+          where: { id: user.id },
+          select: { email: true },
+        });
+
+        if (existingUser && !existingUser.email) {
+          await db.user.update({
+            where: { id: user.id },
+            data: {
+              email: user.email, 
+            },
+          });
+        }
+      }
+      return true; 
     },
   },
 } satisfies NextAuthConfig;
