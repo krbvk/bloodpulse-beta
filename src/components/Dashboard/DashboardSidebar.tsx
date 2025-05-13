@@ -23,12 +23,8 @@ const DashboardSidebar = ({ isOpen, session }: SidebarProps) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  console.log("Session Data:", session);
-
-  if (!session || !session.user) return null;
-
-  const { role, name } = session.user ?? {};
-  console.log("User Role:", role);
+  // console.log("Session Data:", session);
+  // console.log("User Role:", role);
 
   const handleSignOut = async () => {
     setLoading(true);
@@ -43,14 +39,20 @@ const DashboardSidebar = ({ isOpen, session }: SidebarProps) => {
   };
 
   useEffect(() => {
-    if (role !== "ADMIN" && window.location.pathname === "/donors") {
+    if (session?.user?.role !== "ADMIN" && window.location.pathname === "/donors") {
       router.push("/dashboard");
     }
-  }, [role, router]);
+  }, [session?.user?.role, router]);
+
+    if (!session || !session.user) {
+      return null;
+    }
 
   if (loading) {
     return <CustomLoader />;
   }
+
+  const { role } = session.user;
 
   return (
     <Box
