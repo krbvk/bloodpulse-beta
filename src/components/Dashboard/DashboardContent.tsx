@@ -1,6 +1,9 @@
+"use client";
+
+import { useEffect } from 'react';
 import { Box, Title, Alert, Text } from '@mantine/core';
 import type { Session } from 'next-auth';
-import { useSdkContext } from '@/components/Dashboard/SdkContext'
+import { useSdkContext } from '@/components/Dashboard/SdkContext';
 import { useMediaQuery } from '@mantine/hooks';
 
 type Props = {
@@ -8,11 +11,17 @@ type Props = {
 };
 
 const DashboardContent = ({ session }: Props) => {
+  if (!session || !session.user) return null;
   const { sdkLoaded, sdkFailed } = useSdkContext();
   const isMobile = useMediaQuery('(max-width: 768px)');
 
-  if (!session || !session.user) return null;
-  const { name } = session.user ?? {};
+  const { name } = session.user;
+
+  useEffect(() => {
+    if (sdkLoaded && typeof window !== 'undefined' && (window as any).FB?.XFBML) {
+      (window as any).FB.XFBML.parse();
+    }
+  }, [sdkLoaded]);
 
   return (
     <Box
@@ -24,14 +33,13 @@ const DashboardContent = ({ session }: Props) => {
         width: 800,
         maxWidth: '100%',
       }}
-    > 
-
+    >
       {isMobile && name && (
         <Text size="lg" fw={500} mb="md">
           Welcome back, {name}
         </Text>
       )}
-      
+
       <Title order={2} mb="md">
         Announcements
       </Title>
