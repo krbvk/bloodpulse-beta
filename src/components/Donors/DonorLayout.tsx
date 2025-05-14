@@ -21,7 +21,7 @@ import {
 import { useSession } from "next-auth/react";
 import { useState, useMemo, useEffect } from "react";
 import { api } from "@/trpc/react";
-import { IconSearch, IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconSearch, IconPlus, IconTrash, IconEdit } from "@tabler/icons-react";
 import CustomLoader from "../Loader/CustomLoader";
 import { useRouter } from "next/navigation";
 
@@ -47,6 +47,8 @@ export default function DonorLayout() {
   const [addModalOpened, setAddModalOpened] = useState<boolean>(false);
   const [deleteModalOpened, setDeleteModalOpened] = useState<boolean>(false);
   const [selectedDonorsToDelete, setSelectedDonorsToDelete] = useState<string[]>([]);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [editableDonor, setEditableDonor] = useState<Donor | null>(null);
   const [newDonor, setNewDonor] = useState<Omit<Donor, "id">>({
     name: "",
     email: "",
@@ -68,6 +70,14 @@ export default function DonorLayout() {
       await utils.donor.getAll.invalidate();
       setDeleteModalOpened(false);
       setSelectedDonorsToDelete([]);
+    },
+  });
+
+  const updateDonor = api.donor.update.useMutation({
+    onSuccess: async () => {
+      await utils.donor.getAll.invalidate();
+      setIsEditing(false);
+      setModalOpened(false);
     },
   });
 
@@ -166,14 +176,64 @@ export default function DonorLayout() {
       </Paper>
 
       {/* View Donor Modal */}
-      <Modal opened={modalOpened} onClose={() => setModalOpened(false)} title="Donor Details" centered>
-        <Stack gap="xs">
-          <Text><strong>Name:</strong> {selectedDonor?.name}</Text>
-          <Text><strong>Email:</strong> {selectedDonor?.email}</Text>
-          <Text><strong>Blood Type:</strong> {selectedDonor?.bloodType}</Text>
-          <Text><strong>Contact Number:</strong> {selectedDonor?.contactEmail}</Text>
-          <Text><strong>Number of times donated:</strong> {selectedDonor?.donationCount}</Text>
-        </Stack>
+      <Modal opened={modalOpened} onClose={() => { setModalOpened(false); setIsEditing(false); }} title="Donor Details" centered closeButtonProps={{"aria-label": "Close", onClick: () => {
+        setModalOpened(false);
+        setIsEditing(false);
+      }}}>
+        {!isEditing ? (
+          <Stack gap="xs">
+            <Text><strong>Name:</strong> {selectedDonor?.name}</Text>
+            <Text><strong>Email:</strong> {selectedDonor?.email}</Text>
+            <Text><strong>Blood Type:</strong> {selectedDonor?.bloodType}</Text>
+            <Text><strong>Contact Email:</strong> {selectedDonor?.contactEmail}</Text>
+            <Text><strong>Number of times donated:</strong> {selectedDonor?.donationCount}</Text>
+            <ActionIcon onClick={() => { setIsEditing(true); setEditableDonor(selectedDonor); }}>
+              <IconEdit size={18} />
+            </ActionIcon>
+          </Stack>
+        ) : (
+          <Stack>
+            <TextInput
+              label="Name"
+              value={editableDonor?.name || ""}
+              onChange={(e) => setEditableDonor({ ...editableDonor!, name: e.target.value })}
+            />
+            <TextInput
+              label="Email"
+              value={editableDonor?.email || ""}
+              onChange={(e) => setEditableDonor({ ...editableDonor!, email: e.target.value })}
+            />
+            <Select
+              label="Blood Type"
+              data={["A", "B", "AB", "O"]}
+              value={editableDonor?.bloodType || ""}
+              onChange={(val) => setEditableDonor({ ...editableDonor!, bloodType: val || "" })}
+            />
+            <TextInput
+              label="Contact Email"
+              value={editableDonor?.contactEmail || ""}
+              onChange={(e) => setEditableDonor({ ...editableDonor!, contactEmail: e.target.value })}
+            />
+            <TextInput
+              label="Donation Count"
+              type="number"
+              value={editableDonor?.donationCount.toString() || "0"}
+              onChange={(e) => setEditableDonor({ ...editableDonor!, donationCount: Number(e.target.value) })}
+            />
+            <Flex justify="end" gap="sm" mt="md">
+              <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
+              <Button
+                color="green"
+                onClick={() => {
+                  if (editableDonor) updateDonor.mutate(editableDonor);
+                }}
+                loading={updateDonor.status === "pending"}
+              >
+                Save Changes
+              </Button>
+            </Flex>
+          </Stack>
+        )}
       </Modal>
 
       {/* Add Donor Modal */}
