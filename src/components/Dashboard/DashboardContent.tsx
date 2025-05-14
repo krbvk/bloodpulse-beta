@@ -33,7 +33,7 @@ const DashboardContent = ({ session }: Props) => {
     if (sdkLoaded && typeof window !== 'undefined' && window.FB?.XFBML) {
       window.FB.XFBML.parse();
     }
-  }, [sdkLoaded]);
+  }, [sdkLoaded, isMobile]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -72,11 +72,12 @@ const DashboardContent = ({ session }: Props) => {
 
         {sdkLoaded && !sdkFailed && (
           <div
+            key={isMobile ? "fb-mobile" : "fb-desktop"}
             className="fb-page"
             data-href="https://www.facebook.com/olfurcyval"
             data-tabs="timeline"
-            data-width="800"
-            data-height="600"
+            data-width={isMobile ? "320" : "800"}
+            data-height={isMobile ? "400" : "600"}
             data-small-header="false"
             data-adapt-container-width="false"
             data-hide-cover="false"
@@ -95,7 +96,7 @@ const DashboardContent = ({ session }: Props) => {
             flexDirection: 'column',
           }}
         >
-          <Title order={2} mb="md" style={{marginTop: -15}}>Calendar</Title>
+          <Title order={2} mb="md" style={{marginTop: 0}}>Calendar</Title>
           <Box 
             style={{ 
               flex: 1, 
