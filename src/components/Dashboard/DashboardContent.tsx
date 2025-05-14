@@ -7,6 +7,7 @@ import { useSdkContext } from '@/components/Dashboard/SdkContext';
 import { useMediaQuery } from '@mantine/hooks';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
+import type { CalendarApi } from '@fullcalendar/core';
 
 type Props = {
   session: Session | null;
@@ -26,7 +27,7 @@ const DashboardContent = ({ session }: Props) => {
   const { sdkLoaded, sdkFailed } = useSdkContext();
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [currentDate, setCurrentDate] = useState(new Date());
-  const calendarRef = useRef<any>(null);
+  const calendarRef = useRef<FullCalendar | null>(null);
 
   useEffect(() => {
     if (sdkLoaded && typeof window !== 'undefined' && window.FB?.XFBML) {
@@ -36,7 +37,8 @@ const DashboardContent = ({ session }: Props) => {
 
   useEffect(() => {
     setTimeout(() => {
-      calendarRef.current?.getApi().updateSize();
+      const calendarApi: CalendarApi | undefined = calendarRef.current?.getApi();
+      calendarApi?.updateSize();
     }, 100);
   }, [isMobile]);
 
@@ -115,7 +117,7 @@ const DashboardContent = ({ session }: Props) => {
           <style jsx global>{`
             .fc-day-today {
               background-color:rgb(178, 233, 255) !important;
-              border: 1px solidrgb(132, 0, 255) !important;
+              border: 1px solid rgb(132, 0, 255) !important;
               color: #000 !important;
             }
           `}</style>
