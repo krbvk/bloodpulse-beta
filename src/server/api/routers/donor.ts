@@ -76,4 +76,59 @@ export const donorRouter = createTRPCRouter({
         where: { id: input },
       });
     }),
+
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string().min(1),
+        bloodType: z.string().min(1),
+        email: z
+          .string()
+          .email()
+          .refine(
+            (val) =>
+              /@(gmail|yahoo|outlook|hotmail)\.com$/i.test(val),
+            {
+              message:
+                "Email must be from gmail.com, yahoo.com, outlook.com, or hotmail.com",
+            }
+          ),
+        contactEmail: z.string().email().optional(),
+        donationCount: z.number().min(0).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const donor = await ctx.db.donor.findUnique({
+        where: { id: input.id },
+      });
+
+      if (!donor) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Donor not found" });
+      }
+
+      if (input.email.toLowerCase() !== donor.email.toLowerCase()) {
+        const existing = await ctx.db.donor.findUnique({
+          where: { email: input.email.toLowerCase() },
+        });
+
+        if (existing) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Another donor already uses this email.",
+          });
+        }
+      }
+
+      return await ctx.db.donor.update({
+        where: { id: input.id },
+        data: {
+          name: input.name,
+          bloodType: input.bloodType,
+          email: input.email.toLowerCase(),
+          contactEmail: input.contactEmail,
+          donationCount: input.donationCount,
+        },
+      });
+    }),
 });
