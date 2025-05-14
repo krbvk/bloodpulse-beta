@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
+import { authProcedure, createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 
 export const donorRouter = createTRPCRouter({
@@ -77,7 +77,7 @@ export const donorRouter = createTRPCRouter({
       });
     }),
 
-  update: protectedProcedure
+  update: authProcedure
     .input(
       z.object({
         id: z.string(),
