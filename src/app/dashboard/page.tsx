@@ -7,16 +7,20 @@ import DashboardSidebar from "@/components/Dashboard/DashboardSidebar";
 import { Box, Flex, Center } from "@mantine/core";
 import { useState } from "react";
 import CustomLoader from "@/components/Loader/CustomLoader";
+import { api } from "@/trpc/react";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const { data: isUserDonor, isLoading: donorStatusLoading } = api.donor.getIsUserDonor.useQuery(undefined, {
+    enabled: !!session?.user?.email,
+  });
 
   const toggleSidebar = () => {
     setSidebarOpen((prev) => !prev);
   };
 
-  if (status === "loading") {
+  if (status === "loading" || donorStatusLoading) {
     return (
       <Center h="100vh">
         <CustomLoader />
@@ -33,7 +37,7 @@ export default function Dashboard() {
 
       {/* Main content area below navbar */}
       <Flex style={{ flex: 1, overflow: "hidden" }}>
-        <DashboardSidebar isOpen={isSidebarOpen} session={session} />
+        <DashboardSidebar isOpen={isSidebarOpen} session={session} isUserDonor={isUserDonor}/>
 
         <Box
           style={{

@@ -18,6 +18,7 @@ import { api } from "@/trpc/react";
 type SidebarProps = {
   isOpen: boolean;
   session: Session | null;
+  isUserDonor: boolean | undefined;
 };
 
 const DashboardSidebar = ({ isOpen, session }: SidebarProps) => {
