@@ -27,6 +27,7 @@
     "@emotion/styled": "^11.14.0",
     "@fullcalendar/core": "^6.1.17",
     "@fullcalendar/daygrid": "^6.1.17",
+    "@fullcalendar/interaction": "^6.1.17",
     "@fullcalendar/react": "^6.1.17",
     "@mantine/carousel": "^7.17.5",
     "@mantine/charts": "^7.17.5",

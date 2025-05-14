@@ -33,7 +33,7 @@ const DashboardContent = ({ session }: Props) => {
     if (sdkLoaded && typeof window !== 'undefined' && window.FB?.XFBML) {
       window.FB.XFBML.parse();
     }
-  }, [sdkLoaded]);
+  }, [sdkLoaded, isMobile]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -49,6 +49,7 @@ const DashboardContent = ({ session }: Props) => {
       px="md"
       py="lg"
       style={{
+        overflowX: 'hidden',
         overflowY: 'hidden',
         height: '100%',
         display: 'flex',
@@ -71,11 +72,12 @@ const DashboardContent = ({ session }: Props) => {
 
         {sdkLoaded && !sdkFailed && (
           <div
+            key={isMobile ? "fb-mobile" : "fb-desktop"}
             className="fb-page"
             data-href="https://www.facebook.com/olfurcyval"
             data-tabs="timeline"
-            data-width="800"
-            data-height="600"
+            data-width={isMobile ? "320" : "800"}
+            data-height={isMobile ? "400" : "600"}
             data-small-header="false"
             data-adapt-container-width="false"
             data-hide-cover="false"
@@ -83,7 +85,7 @@ const DashboardContent = ({ session }: Props) => {
           ></div>
         )}
       </Box>
-
+      {!isMobile && (
       <Box style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Card
           padding="md"
@@ -94,7 +96,7 @@ const DashboardContent = ({ session }: Props) => {
             flexDirection: 'column',
           }}
         >
-          <Title order={2} mb="md" style={{marginTop: -15}}>Calendar</Title>
+          <Title order={2} mb="md" style={{marginTop: 0}}>Calendar</Title>
           <Box 
             style={{ 
               flex: 1, 
@@ -117,12 +119,13 @@ const DashboardContent = ({ session }: Props) => {
           <style jsx global>{`
             .fc-day-today {
               background-color:rgb(178, 233, 255) !important;
-              border: 1px solid rgb(132, 0, 255) !important;
+              border: 1px solid rgba(252, 252, 252, 0) !important;
               color: #000 !important;
             }
           `}</style>
         </Card>
       </Box>
+      )}
     </Box>
   );
 };

@@ -114,9 +114,8 @@ export function ResendSignIn() {
           }}
         >
           Check your email for the sign-in link! 
-          <br>
+          <br />
           If you can&apos;t find the email, be sure to check your spam or junk folder.
-          </br>
         </Notification>
       )}
     </Paper>
