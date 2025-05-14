@@ -24,7 +24,7 @@ export const donorRouter = createTRPCRouter({
             }
           ),
           contactEmail: z.string().email().optional(),
-          donationCount: z.number().min(0).optional(),
+          donationCount: z.number().min(0).default(0).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -131,4 +131,13 @@ export const donorRouter = createTRPCRouter({
         },
       });
     }),
+
+  getIsUserDonor: protectedProcedure
+    .query(async ({ ctx }) => {
+      const userEmail = ctx.session.user.email;
+      const donor = await ctx.db.donor.findUnique({
+        where: { email: userEmail ?? "" },
+    });
+    return !!donor && (donor.donationCount ?? 0) > 0;
+  }),
 });

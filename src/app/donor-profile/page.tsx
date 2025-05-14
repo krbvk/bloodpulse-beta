@@ -1,20 +1,45 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Center, Flex } from "@mantine/core";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import DashboardNavbar from "@/components/Dashboard/DashboardNavbar";
 import DashboardSidebar from "@/components/Dashboard/DashboardSidebar";
 import DonorProfileLayout from "@/components/Profile/DonorProfileLayout";
 import CustomLoader from "@/components/Loader/CustomLoader";
+import { api } from "@/trpc/react"; 
 
 const Page = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { data: session, status } = useSession();
+  const router = useRouter();
+
+  const {
+    data: isUserDonor,
+    isLoading: isUserDonorLoading,
+  } = api.donor.getIsUserDonor.useQuery(undefined, {
+    enabled: status === "authenticated",
+  });
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
-  if (status === "loading") {
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/");
+    }
+
+    if (status === "authenticated" && !isUserDonorLoading) {
+      const role = session?.user?.role;
+      const allowed = role === "ADMIN" || isUserDonor;
+
+      if (!allowed) {
+        router.replace("/dashboard");
+      }
+    }
+  }, [status, isUserDonorLoading, isUserDonor, session?.user?.role, router]);
+
+  if (status === "loading" || isUserDonorLoading) {
     return (
       <Center h="100vh">
         <CustomLoader />
@@ -34,7 +59,7 @@ const Page = () => {
         {/* Sidebar */}
         <DashboardSidebar isOpen={sidebarOpen} session={session} />
 
-        {/* Donor content */}
+        {/* Profile content */}
         <Box
           style={{
             flex: 1,
