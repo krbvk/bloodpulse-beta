@@ -86,7 +86,7 @@ const DashboardSidebar = ({ isOpen, session }: SidebarProps) => {
           </Flex>
         </UnstyledButton>
 
-        {role === "USER" && (
+        {(role === "USER" || role === "ADMIN") && (
           <UnstyledButton onClick={() => router.push("/profile")}>
             <Flex align="center" gap="xs">
               <IconUser size={20} color="white" />
