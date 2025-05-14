@@ -18,7 +18,7 @@ const Page = () => {
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
-  if (status === "loading") {
+  if (status === "loading" || donorStatusLoading) {
     return (
       <Center h="100vh">
         <CustomLoader />

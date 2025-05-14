@@ -41,7 +41,7 @@ const Page = () => {
             padding: "20px",
           }}
         >
-          {status === "loading" ? (
+          {status === "loading" || donorStatusLoading ? (
             <Center h="100%">
               <CustomLoader />
             </Center>
