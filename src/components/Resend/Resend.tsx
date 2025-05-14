@@ -113,7 +113,10 @@ export function ResendSignIn() {
             maxWidth: "90vw"
           }}
         >
-          Check your email for the sign-in link! If you can&apos;t find the email, be sure to check your spam or junk folder.
+          Check your email for the sign-in link! 
+          <br>
+          If you can&apos;t find the email, be sure to check your spam or junk folder.
+          </br>
         </Notification>
       )}
     </Paper>
