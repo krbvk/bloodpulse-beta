@@ -252,7 +252,7 @@ export default function DonorLayout() {
               const value = e.target.value;
               setNewDonor({ ...newDonor, email: value });
 
-              const validDomains = ["@gmail.com", "@yahoo.com", "@outlook.com", "@hotmail.com"];
+              const validDomains = ["@gmail.com", "@yahoo.com", "@outlook.com", "@hotmail.com", "@student.fatima.edu.ph"];
               const isValidFormat = validDomains.some((domain) => value.endsWith(domain));
               const isEmailUsed = donors.some((donor) => donor.email.toLowerCase() === value.toLowerCase());
 

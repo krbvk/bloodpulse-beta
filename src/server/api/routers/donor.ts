@@ -17,10 +17,10 @@ export const donorRouter = createTRPCRouter({
           .email()
           .refine(
             (val) =>
-              /@(gmail|yahoo|outlook|hotmail)\.com$/i.test(val),
+              /@(gmail|yahoo|outlook|hotmail)\.com$/i.test(val) || /@student\.fatima\.edu\.ph$/i.test(val),
             {
               message:
-                "Email must be from gmail.com, yahoo.com, outlook.com, or hotmail.com",
+                "Email must be from gmail.com, fatima email, yahoo.com, outlook.com, or hotmail.com",
             }
           ),
           contactEmail: z.string().email().optional(),
