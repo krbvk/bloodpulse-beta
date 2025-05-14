@@ -252,12 +252,12 @@ export default function DonorLayout() {
               const value = e.target.value;
               setNewDonor({ ...newDonor, email: value });
 
-              const validDomains = ["@gmail.com", "@yahoo.com", "@outlook.com", "@hotmail.com"];
+              const validDomains = ["@gmail.com", "@yahoo.com", "@outlook.com", "@hotmail.com", "@student.fatima.edu.ph"];
               const isValidFormat = validDomains.some((domain) => value.endsWith(domain));
               const isEmailUsed = donors.some((donor) => donor.email.toLowerCase() === value.toLowerCase());
 
               if (!value.includes("@") || !isValidFormat) {
-                setEmailError("Email must be from gmail.com, yahoo.com, outlook.com, or hotmail.com");
+                setEmailError("Email must be from gmail.com, fatima email, yahoo.com, outlook.com, or hotmail.com");
               } else if (isEmailUsed) {
                 setEmailError("This email is already used by another donor");
               } else {
