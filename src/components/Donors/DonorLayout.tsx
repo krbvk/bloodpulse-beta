@@ -115,7 +115,7 @@ export default function DonorLayout() {
 
       <Paper shadow="sm" radius="md" p="xl" withBorder>
         <Stack align="center" gap="sm" mb="lg">
-          <Flex gap="sm" align="center">
+          <Flex gap="sm" align="center" wrap="wrap">
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -125,12 +125,12 @@ export default function DonorLayout() {
               leftSection={<IconSearch size={16} />}
             />
             <Tooltip label="Add Donor" withArrow>
-              <ActionIcon variant="filled" color="blue" size="lg" onClick={() => setAddModalOpened(true)}>
+              <ActionIcon variant="filled" color="blue" size="md" onClick={() => setAddModalOpened(true)}>
                 <IconPlus size={20} />
               </ActionIcon>
             </Tooltip>
             <Tooltip label="Delete Donor(s)" withArrow>
-              <ActionIcon variant="filled" color="red" size="lg" onClick={() => setDeleteModalOpened(true)}>
+              <ActionIcon variant="filled" color="red" size="md" onClick={() => setDeleteModalOpened(true)}>
                 <IconTrash size={20} />
               </ActionIcon>
             </Tooltip>
@@ -175,7 +175,6 @@ export default function DonorLayout() {
         )}
       </Paper>
 
-      {/* View Donor Modal */}
       <Modal opened={modalOpened} onClose={() => { setModalOpened(false); setIsEditing(false); }} title="Donor Details" centered closeButtonProps={{"aria-label": "Close", onClick: () => {
         setModalOpened(false);
         setIsEditing(false);
@@ -236,7 +235,6 @@ export default function DonorLayout() {
         )}
       </Modal>
 
-      {/* Add Donor Modal */}
       <Modal opened={addModalOpened} onClose={() => setAddModalOpened(false)} title="Add Donor" centered>
         <Stack>
           <TextInput
@@ -299,7 +297,6 @@ export default function DonorLayout() {
         </Stack>
       </Modal>
 
-      {/* Delete Donors Modal */}
       <Modal
         opened={deleteModalOpened}
         onClose={() => setDeleteModalOpened(false)}
