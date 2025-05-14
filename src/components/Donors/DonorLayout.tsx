@@ -257,7 +257,7 @@ export default function DonorLayout() {
               const isEmailUsed = donors.some((donor) => donor.email.toLowerCase() === value.toLowerCase());
 
               if (!value.includes("@") || !isValidFormat) {
-                setEmailError("Email must be from gmail.com, yahoo.com, outlook.com, or hotmail.com");
+                setEmailError("Email must be from gmail.com, fatima email, yahoo.com, outlook.com, or hotmail.com");
               } else if (isEmailUsed) {
                 setEmailError("This email is already used by another donor");
               } else {
