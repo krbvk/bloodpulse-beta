@@ -44,8 +44,8 @@ export default function DonorProfileLayout() {
     donationCount !== null && donationCount !== undefined;
 
   return (
-    <Box px={{ base: "md", sm: "lg" }} py="lg" style={{ maxWidth: 900, margin: "0 auto" }}>
-      <Title order={2} mb="lg" style={{ textAlign: "center" }}>
+    <Box px={{ base: "md", sm: "lg" }} py="lg" style={{ maxWidth: 900, margin: "0 auto"}}>
+      <Title order={2} mb="lg" style={{ textAlign: "center",}}>
         Donor Profile
       </Title>
 
@@ -66,25 +66,24 @@ export default function DonorProfileLayout() {
         </Flex>
         
         <Divider my="md" />
-
+        <Grid gutter="md">
+        <Grid.Col span={{ base: 12, sm: 6 }}>
+          <Text size="xs" c="dimmed" fw={500} mb={4}>
+            Full Name
+          </Text>
+          <Text fw={500}>{name ?? "—"}</Text>
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, sm: 6 }}>
+          <Text size="xs" c="dimmed" fw={500} mb={4}>
+            Email Address
+          </Text>
+          <Text fw={500}>{email ?? "—"}</Text>
+        </Grid.Col>
+        </Grid>
         {isDonor ? (
           <>
             {/* Profile Details */}
             <Grid gutter="md">
-              <Grid.Col span={{ base: 12, sm: 6 }}>
-                <Text size="xs" c="dimmed" fw={500} mb={4}>
-                  Full Name
-                </Text>
-                <Text fw={500}>{name ?? "—"}</Text>
-              </Grid.Col>
-
-              <Grid.Col span={{ base: 12, sm: 6 }}>
-                <Text size="xs" c="dimmed" fw={500} mb={4}>
-                  Email Address
-                </Text>
-                <Text fw={500}>{email ?? "—"}</Text>
-              </Grid.Col>
-
               <Grid.Col span={{ base: 12, sm: 6 }}>
                 <Text size="xs" c="dimmed" fw={500} mb={4}>
                   Blood Type
@@ -109,10 +108,11 @@ export default function DonorProfileLayout() {
           </>
         ) : (
           <>
-            <Text style={{ textAlign: "center" }} c="red" fw={600}>
-              If this data is missing, it means you are not part of our donor list yet.
+            <Divider my="md" />
+            <Text style={{ textAlign: "left" }} c="red" fw={600}>
+              If some data are missing like blood type, contact, etc. It means you are not part of our donor list yet.
             </Text>
-            <Text style={{ textAlign: "center" }} mt="md">
+            <Text style={{ textAlign: "left" }} mt="md">
               Want to be part of our donor list and help others? Book an appointment to donate blood, and not only will you be added to our list, but you&apos;ll also be helping those in need.
             </Text>
             <Button
