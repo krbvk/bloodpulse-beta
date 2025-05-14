@@ -215,7 +215,7 @@ export default function DonorLayout() {
             onChange={(val) => setNewDonor({ ...newDonor, bloodType: val ?? "" })}
           />
           <TextInput
-            label="Phone Number"
+            label="Contact Email"
             placeholder="donoremail@example.com"
             value={newDonor.contactEmail}
             onChange={(e) => setNewDonor({ ...newDonor, contactEmail: e.target.value })}
