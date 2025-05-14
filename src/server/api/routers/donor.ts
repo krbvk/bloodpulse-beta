@@ -23,7 +23,7 @@ export const donorRouter = createTRPCRouter({
                 "Email must be from gmail.com, yahoo.com, outlook.com, or hotmail.com",
             }
           ),
-          phoneNumber: z.string().min(10).max(15).optional(),
+          contactEmail: z.string().email().optional(),
           donationCount: z.number().min(0).optional(),
       })
     )
@@ -46,7 +46,7 @@ export const donorRouter = createTRPCRouter({
           name: input.name,
           bloodType: input.bloodType,
           email,
-          phoneNumber: input.phoneNumber,
+          contactEmail: input.contactEmail,
           donationCount: input.donationCount,
         },
       });

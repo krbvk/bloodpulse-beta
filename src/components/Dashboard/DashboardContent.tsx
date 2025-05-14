@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Box, Title, Alert, Card } from '@mantine/core'; 
 import type { Session } from 'next-auth';
 import { useSdkContext } from '@/components/Dashboard/SdkContext';
 import { useMediaQuery } from '@mantine/hooks';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
+import type { CalendarApi } from '@fullcalendar/core';
 
 type Props = {
   session: Session | null;
@@ -26,12 +27,20 @@ const DashboardContent = ({ session }: Props) => {
   const { sdkLoaded, sdkFailed } = useSdkContext();
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [currentDate, setCurrentDate] = useState(new Date());
+  const calendarRef = useRef<FullCalendar | null>(null);
 
   useEffect(() => {
     if (sdkLoaded && typeof window !== 'undefined' && window.FB?.XFBML) {
       window.FB.XFBML.parse();
     }
   }, [sdkLoaded]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      const calendarApi: CalendarApi | undefined = calendarRef.current?.getApi();
+      calendarApi?.updateSize();
+    }, 100);
+  }, [isMobile]);
 
   if (!session || !session.user) return null;
 
@@ -55,7 +64,8 @@ const DashboardContent = ({ session }: Props) => {
         {!sdkLoaded && sdkFailed && (
           <Alert title="Content Not Available" color="red">
             It seems like you&apos;re using a browser that blocks Facebook content (e.g., Brave Browser). 
-            Please try a different browser or adjust your browser settings to view the content.
+            Please try a different browser or adjust your browser settings to view the content and refresh your page.
+            after adjusting.
           </Alert>
         )}
 
@@ -76,16 +86,24 @@ const DashboardContent = ({ session }: Props) => {
 
       <Box style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Card
-          padding="lg"
+          padding="md"
+          shadow='md'
           style={{
             flex: 1,
             display: 'flex',
             flexDirection: 'column',
           }}
         >
-          <Title order={2} mb="md">Calendar</Title>
-          <Box style={{ flex: 1, maxWidth: '500px', width: '100%' }}>
+          <Title order={2} mb="md" style={{marginTop: -15}}>Calendar</Title>
+          <Box 
+            style={{ 
+              flex: 1, 
+              height: isMobile ? '500px' : '500px',
+              width: isMobile ? '100%' : '500px',
+              }}
+            >
             <FullCalendar
+              ref={calendarRef}
               plugins={[dayGridPlugin]}
               initialView="dayGridMonth"
               height="100%"
@@ -96,6 +114,13 @@ const DashboardContent = ({ session }: Props) => {
               }}
             />
           </Box>
+          <style jsx global>{`
+            .fc-day-today {
+              background-color:rgb(178, 233, 255) !important;
+              border: 1px solid rgb(132, 0, 255) !important;
+              color: #000 !important;
+            }
+          `}</style>
         </Card>
       </Box>
     </Box>
