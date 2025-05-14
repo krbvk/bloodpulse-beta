@@ -30,7 +30,7 @@ interface Donor {
   name: string;
   email: string;
   bloodType: string;
-  phoneNumber: string;
+  contactEmail: string;
   donationCount: number;
 }
 
@@ -51,7 +51,7 @@ export default function DonorLayout() {
     name: "",
     email: "",
     bloodType: "",
-    phoneNumber: "",
+    contactEmail: "",
     donationCount: 0,
   });
 
@@ -59,7 +59,7 @@ export default function DonorLayout() {
     onSuccess: async () => {
       await utils.donor.getAll.invalidate();
       setAddModalOpened(false);
-      setNewDonor({ name: "", email: "", bloodType: "", phoneNumber: "", donationCount: 0 });
+      setNewDonor({ name: "", email: "", bloodType: "", contactEmail: "", donationCount: 0 });
     },
   });
 
@@ -171,7 +171,7 @@ export default function DonorLayout() {
           <Text><strong>Name:</strong> {selectedDonor?.name}</Text>
           <Text><strong>Email:</strong> {selectedDonor?.email}</Text>
           <Text><strong>Blood Type:</strong> {selectedDonor?.bloodType}</Text>
-          <Text><strong>Contact Number:</strong> {selectedDonor?.phoneNumber}</Text>
+          <Text><strong>Contact Number:</strong> {selectedDonor?.contactEmail}</Text>
           <Text><strong>Number of times donated:</strong> {selectedDonor?.donationCount}</Text>
         </Stack>
       </Modal>
@@ -216,16 +216,9 @@ export default function DonorLayout() {
           />
           <TextInput
             label="Phone Number"
-            placeholder="09123456789"
-            value={newDonor.phoneNumber}
-            onChange={(e) => {
-              const value = e.target.value.replace(/\D/g, "");
-                if (value.length <= 11) {
-                  setNewDonor({ ...newDonor, phoneNumber: value });
-                }
-            }}
-              maxLength={11}
-              error={newDonor.phoneNumber.length !==11 ? "Phone number must be 11 digits" : ""}
+            placeholder="donoremail@example.com"
+            value={newDonor.contactEmail}
+            onChange={(e) => setNewDonor({ ...newDonor, contactEmail: e.target.value })}
           />
           <TextInput
             label="Donation Count"

@@ -12,7 +12,7 @@ interface Donor {
   name: string;
   email: string;
   bloodType: string;
-  phoneNumber: string;
+  contactEmail: string;
   donationCount: number;
 }
 
@@ -36,11 +36,11 @@ export default function DonorProfileLayout() {
 
   const donor = donors.find(d => d.email.toLowerCase() === (email ?? "").toLowerCase());
 
-  const { bloodType, phoneNumber, donationCount } = donor ?? {};
+  const { bloodType, contactEmail, donationCount } = donor ?? {};
 
   const isDonor =
     (bloodType ?? "").trim() !== "" &&
-    (phoneNumber ?? "").trim() !== "" &&
+    (contactEmail ?? "").trim() !== "" &&
     donationCount !== null && donationCount !== undefined;
 
   return (
@@ -93,9 +93,9 @@ export default function DonorProfileLayout() {
 
               <Grid.Col span={{ base: 12, sm: 6 }}>
                 <Text size="xs" c="dimmed" fw={500} mb={4}>
-                  Phone Number
+                  Contact Email
                 </Text>
-                <Text fw={500}>{phoneNumber ?? "—"}</Text>
+                <Text fw={500}>{contactEmail ?? "—"}</Text>
               </Grid.Col>
 
               <Grid.Col span={{ base: 12, sm: 6 }}>
