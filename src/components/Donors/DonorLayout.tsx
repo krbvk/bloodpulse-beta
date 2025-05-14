@@ -82,6 +82,9 @@ export default function DonorLayout() {
   });
 
   const filteredDonors = useMemo(() => {
+    if (!searchQuery) {
+      return donors;
+    }
     return donors.filter((donor) =>
       donor.bloodType.toLowerCase() === (searchQuery.toLowerCase())
     );
