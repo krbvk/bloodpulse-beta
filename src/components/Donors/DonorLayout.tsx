@@ -195,29 +195,29 @@ export default function DonorLayout() {
           <Stack>
             <TextInput
               label="Name"
-              value={editableDonor?.name || ""}
+              value={editableDonor?.name ?? ""}
               onChange={(e) => setEditableDonor({ ...editableDonor!, name: e.target.value })}
             />
             <TextInput
               label="Email"
-              value={editableDonor?.email || ""}
+              value={editableDonor?.email ?? ""}
               onChange={(e) => setEditableDonor({ ...editableDonor!, email: e.target.value })}
             />
             <Select
               label="Blood Type"
               data={["A", "B", "AB", "O"]}
-              value={editableDonor?.bloodType || ""}
+              value={editableDonor?.bloodType ?? ""}
               onChange={(val) => setEditableDonor({ ...editableDonor!, bloodType: val || "" })}
             />
             <TextInput
               label="Contact Email"
-              value={editableDonor?.contactEmail || ""}
+              value={editableDonor?.contactEmail ?? ""}
               onChange={(e) => setEditableDonor({ ...editableDonor!, contactEmail: e.target.value })}
             />
             <TextInput
               label="Donation Count"
               type="number"
-              value={editableDonor?.donationCount.toString() || "0"}
+              value={editableDonor?.donationCount.toString() ?? "0"}
               onChange={(e) => setEditableDonor({ ...editableDonor!, donationCount: Number(e.target.value) })}
             />
             <Flex justify="end" gap="sm" mt="md">
