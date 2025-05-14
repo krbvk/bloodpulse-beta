@@ -18,18 +18,19 @@ import { api } from "@/trpc/react";
 type SidebarProps = {
   isOpen: boolean;
   session: Session | null;
+  isUserDonor: boolean | undefined;
 };
 
-const DashboardSidebar = ({ isOpen, session }: SidebarProps) => {
+const DashboardSidebar = ({ isOpen, session, isUserDonor }: SidebarProps) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   // console.log("Session Data:", session);
   // console.log("User Role:", role);
 
-  const { data: isUserDonor, isLoading: donorStatusLoading } = api.donor.getIsUserDonor.useQuery(undefined, {
-    enabled: !!session?.user?.email,
-  });
+  // const { data: isUserDonor, isLoading: donorStatusLoading } = api.donor.getIsUserDonor.useQuery(undefined, {
+  //   enabled: !!session?.user?.email,
+  // });
 
   const handleSignOut = async () => {
     setLoading(true);
@@ -91,6 +92,8 @@ const DashboardSidebar = ({ isOpen, session }: SidebarProps) => {
           </Flex>
         </UnstyledButton>
 
+        {typeof isUserDonor === "boolean" && (
+          <>
         {!isUserDonor && (role === "USER" || role === "ADMIN") && (
         <UnstyledButton onClick={() => router.push("/profile")}>
           <Flex align="center" gap="xs">
@@ -107,6 +110,8 @@ const DashboardSidebar = ({ isOpen, session }: SidebarProps) => {
               <Text size="sm" c="white">Donor Profile</Text>
             </Flex>
           </UnstyledButton>
+        )}
+        </>
         )}
 
         {role === "ADMIN" && (

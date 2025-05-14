@@ -57,7 +57,7 @@ const Page = () => {
       {/* Main content area below navbar */}
       <Flex style={{ flex: 1, overflow: "hidden" }}>
         {/* Sidebar */}
-        <DashboardSidebar isOpen={sidebarOpen} session={session} />
+        <DashboardSidebar isOpen={sidebarOpen} session={session} isUserDonor={isUserDonor}/>
 
         {/* Profile content */}
         <Box

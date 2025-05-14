@@ -7,14 +7,18 @@ import DashboardNavbar from "@/components/Dashboard/DashboardNavbar";
 import DashboardSidebar from "@/components/Dashboard/DashboardSidebar";
 import DonorLayout from "@/components/Donors/DonorLayout";
 import CustomLoader from "@/components/Loader/CustomLoader";
+import { api } from "@/trpc/react";
 
 const Page = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { data: session, status } = useSession();
+  const { data: isUserDonor, isLoading: donorStatusLoading } = api.donor.getIsUserDonor.useQuery(undefined, {
+        enabled: !!session?.user?.email,
+  });
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
-  if (status === "loading") {
+  if (status === "loading" || donorStatusLoading) {
     return (
       <Center h="100vh">
         <CustomLoader />
@@ -32,7 +36,7 @@ const Page = () => {
       {/* Main content area below navbar */}
       <Flex style={{ flex: 1, overflow: "hidden" }}>
         {/* Sidebar */}
-        <DashboardSidebar isOpen={sidebarOpen} session={session} />
+        <DashboardSidebar isOpen={sidebarOpen} session={session} isUserDonor={isUserDonor}/>
 
         {/* Donor content */}
         <Box
