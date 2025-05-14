@@ -13,6 +13,7 @@ import {
 } from "@tabler/icons-react";
 import { useState, useEffect } from "react";
 import CustomLoader from "@/components/Loader/CustomLoader";
+import { api } from "@/trpc/react";
 
 type SidebarProps = {
   isOpen: boolean;
@@ -25,6 +26,10 @@ const DashboardSidebar = ({ isOpen, session }: SidebarProps) => {
 
   // console.log("Session Data:", session);
   // console.log("User Role:", role);
+
+  const { data: isUserDonor, isLoading: donorStatusLoading } = api.donor.getIsUserDonor.useQuery(undefined, {
+    enabled: !!session?.user?.email,
+  });
 
   const handleSignOut = async () => {
     setLoading(true);
@@ -86,8 +91,17 @@ const DashboardSidebar = ({ isOpen, session }: SidebarProps) => {
           </Flex>
         </UnstyledButton>
 
-        {(role === "USER" || role === "ADMIN") && (
-          <UnstyledButton onClick={() => router.push("/profile")}>
+        {!isUserDonor && (role === "USER" || role === "ADMIN") && (
+        <UnstyledButton onClick={() => router.push("/profile")}>
+          <Flex align="center" gap="xs">
+            <IconUser size={20} color="white" />
+            <Text size="sm" c="white">User Profile</Text>
+          </Flex>
+        </UnstyledButton>
+        )}
+
+        {isUserDonor && (role === "ADMIN" || role === "USER") && (
+          <UnstyledButton onClick={() => router.push("/donor-profile")}>
             <Flex align="center" gap="xs">
               <IconUser size={20} color="white" />
               <Text size="sm" c="white">Donor Profile</Text>
