@@ -49,6 +49,7 @@ const DashboardContent = ({ session }: Props) => {
       px="md"
       py="lg"
       style={{
+        overflowX: 'hidden',
         overflowY: 'hidden',
         height: '100%',
         display: 'flex',
@@ -83,7 +84,7 @@ const DashboardContent = ({ session }: Props) => {
           ></div>
         )}
       </Box>
-
+      {!isMobile && (
       <Box style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Card
           padding="md"
@@ -117,12 +118,13 @@ const DashboardContent = ({ session }: Props) => {
           <style jsx global>{`
             .fc-day-today {
               background-color:rgb(178, 233, 255) !important;
-              border: 1px solid rgb(132, 0, 255) !important;
+              border: 1px solid rgba(252, 252, 252, 0) !important;
               color: #000 !important;
             }
           `}</style>
         </Card>
       </Box>
+      )}
     </Box>
   );
 };
