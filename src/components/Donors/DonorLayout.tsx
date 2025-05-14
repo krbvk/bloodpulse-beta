@@ -207,7 +207,7 @@ export default function DonorLayout() {
               label="Blood Type"
               data={["A", "B", "AB", "O"]}
               value={editableDonor?.bloodType ?? ""}
-              onChange={(val) => setEditableDonor({ ...editableDonor!, bloodType: val || "" })}
+              onChange={(val) => setEditableDonor({ ...editableDonor!, bloodType: val ?? "" })}
             />
             <TextInput
               label="Contact Email"
