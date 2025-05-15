@@ -9,15 +9,20 @@ import {
   Menu,
   UnstyledButton,
   Burger,
+  Popover,
+  ActionIcon,
+  CloseButton,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { useRouter } from "next/navigation";
-import { IconLogout, IconUser } from "@tabler/icons-react";
+import { IconLogout, IconUser, IconCalendarEvent } from "@tabler/icons-react";
+import { Calendar } from "@mantine/dates";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import type { DefaultSession } from "next-auth";
 import CustomLoader from "@/components/Loader/CustomLoader";
+import dayjs from "dayjs";
 
 type Props = {
   toggleSidebar: () => void;
@@ -34,6 +39,7 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
   const [burgerOpened, setBurgerOpened] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [loading, setLoading] = useState(false);
+  const [calendarOpened, setCalendarOpened] = useState(false);
 
   if (!session?.user) return null;
 
@@ -46,14 +52,14 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
       await signOut({ redirect: false });
       router.push("/");
     } catch (error) {
-      console.error("Sign out failed", error)
+      console.error("Sign out failed", error);
     } finally {
       setLoading(false);
     }
   };
 
   if (loading) {
-    return <CustomLoader />
+    return <CustomLoader />;
   }
 
   return (
@@ -139,6 +145,57 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
+
+            {/* Mobile Only: Calendar Icon + Popover */}
+            {isMobile && (
+              <Popover
+                width={260}
+                position="bottom-end"
+                shadow="md"
+                withArrow
+                opened={calendarOpened}
+                onChange={setCalendarOpened}
+              >
+                <Popover.Target>
+                  <ActionIcon
+                    onClick={() => setCalendarOpened((o) => !o)}
+                    variant="light"
+                    color="white"
+                    aria-label="Calendar"
+                  >
+                    <IconCalendarEvent size={22} />
+                  </ActionIcon>
+                </Popover.Target>
+                <Popover.Dropdown>
+                  <Flex justify="flex-end">
+                    <CloseButton
+                      onClick={() => setCalendarOpened(false)}
+                      size="sm"
+                      aria-label="Close calendar"
+                    />
+                  </Flex>
+                  <Box mt="sm">
+                  <Calendar
+                    size="sm"
+                    static
+                    getDayProps={(date) => {
+                      const isToday = dayjs(date).isSame(new Date(), 'day');
+                      return {
+                        style: isToday
+                          ? {
+                              backgroundColor: '#fa5252',
+                              color: 'white',
+                              borderRadius: 4,
+                            }
+                          : undefined,
+                      };
+                    }}
+                    style={{ width: '100%' }}
+                  />
+                  </Box>
+                </Popover.Dropdown>
+              </Popover>
+            )}
           </Group>
         </Flex>
       </Container>
