@@ -39,7 +39,7 @@ export function InstallPrompt() {
   };
 
   return (
-    <Stack gap="xs">
+    <div>
       {!isIOS ? (
         <Button
           onClick={handleInstall}
@@ -47,7 +47,7 @@ export function InstallPrompt() {
           radius="md"
           color="red"
           style={{
-            width: isMobile ? '320px' : 'fit-content',
+            width: isMobile ? '250px' : 'fit-content',
             alignSelf: 'center',
             display: 'flex',
             alignItems: 'center',
@@ -67,7 +67,7 @@ export function InstallPrompt() {
             radius="md"
             color="blue"
             style={{
-              width: isMobile ? '320px' : 'fit-content',
+              width: isMobile ? '250px' : 'fit-content',
               alignSelf: 'center',
               display: 'flex',
               alignItems: 'center',
@@ -92,6 +92,6 @@ export function InstallPrompt() {
           )}
         </>
       )}
-    </Stack>
+    </div>
   );
 }

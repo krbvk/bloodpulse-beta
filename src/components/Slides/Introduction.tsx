@@ -147,7 +147,7 @@ export default function Introduction() {
               mt="md"
               style={{
                 marginBottom: 15,
-                width: isMobile ? '100%' : 'fit-content',
+                width: isMobile ? '250px' : 'fit-content',
                 alignSelf: 'center',
               }}
             >
