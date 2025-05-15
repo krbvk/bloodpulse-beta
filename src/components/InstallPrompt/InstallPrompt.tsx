@@ -85,7 +85,14 @@ export function InstallPrompt() {
               title="Add to Home Screen"
               color="blue"
               onClose={() => setShowiOSInstruction(false)}
-              style={{ width: '100%', marginTop: '1rem' }}
+              style={{ 
+                width: isMobile ? '100%' : '250px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                zIndex: 9999, 
+                position: 'fixed',
+                top: '4rem'
+              }}
             >
               To install the app, tap the <strong>Share</strong> button in Safari, scroll down, and tap <strong>“Add to Home Screen”</strong>.
             </Notification>
