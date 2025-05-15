@@ -14,8 +14,8 @@ If you are not familiar with the different technologies used in this project, pl
 - [NextAuth.js](https://next-auth.js.org)
 - [Prisma](https://prisma.io)
 - [tRPC](https://trpc.io)
-- [PostgreSQL][https://postgresql.org]
-- [MantineUI][https://mantine.dev]
+- [PostgreSQL](https://postgresql.org)
+- [MantineUI](https://mantine.dev)
 
 ## Learn More
 
