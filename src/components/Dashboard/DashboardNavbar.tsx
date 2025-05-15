@@ -9,9 +9,8 @@ import {
   Menu,
   UnstyledButton,
   Burger,
-  Popover,
+  Modal,
   ActionIcon,
-  CloseButton,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { useRouter } from "next/navigation";
@@ -39,7 +38,7 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
   const [burgerOpened, setBurgerOpened] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [loading, setLoading] = useState(false);
-  const [calendarOpened, setCalendarOpened] = useState(false);
+  const [calendarModalOpen, setCalendarModalOpen] = useState(false);
 
   if (!session?.user) return null;
 
@@ -75,7 +74,6 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
     >
       <Container size="lg">
         <Flex justify="space-between" align="center" wrap="wrap">
-          {/* Left: Logo & Burger */}
           <Group gap="sm" align="center">
             <Burger
               opened={burgerOpened}
@@ -93,7 +91,6 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
             </Link>
           </Group>
 
-          {/* Right: User Info */}
           <Group gap="xs" align="center" wrap="wrap" justify="flex-end">
             {!isMobile && (
               <Text size="sm" fw={600} c="white">
@@ -146,55 +143,43 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
               </Menu.Dropdown>
             </Menu>
 
-            {/* Mobile Only: Calendar Icon + Popover */}
             {isMobile && (
-              <Popover
-                width={260}
-                position="bottom-end"
-                shadow="md"
-                withArrow
-                opened={calendarOpened}
-                onChange={setCalendarOpened}
-              >
-                <Popover.Target>
-                  <ActionIcon
-                    onClick={() => setCalendarOpened((o) => !o)}
-                    variant="light"
-                    color="white"
-                    aria-label="Calendar"
-                  >
-                    <IconCalendarEvent size={22} />
-                  </ActionIcon>
-                </Popover.Target>
-                <Popover.Dropdown>
-                  <Flex justify="flex-end">
-                    <CloseButton
-                      onClick={() => setCalendarOpened(false)}
-                      size="sm"
-                      aria-label="Close calendar"
-                    />
-                  </Flex>
-                  <Box mt="sm">
+              <>
+                <ActionIcon
+                  onClick={() => setCalendarModalOpen(true)}
+                  variant="light"
+                  color="white"
+                  aria-label="Calendar"
+                >
+                  <IconCalendarEvent size={22} />
+                </ActionIcon>
+
+                <Modal
+                  opened={calendarModalOpen}
+                  onClose={() => setCalendarModalOpen(false)}
+                  title="Calendar"
+                  size="xs"
+                  centered
+                  overlayProps={{ blur: 2 }}
+                >
                   <Calendar
-                    size="sm"
-                    static
+                    size="md"
                     getDayProps={(date) => {
-                      const isToday = dayjs(date).isSame(new Date(), 'day');
+                      const isToday = dayjs(date).isSame(new Date(), "day");
                       return {
                         style: isToday
                           ? {
-                              backgroundColor: '#fa5252',
-                              color: 'white',
+                              backgroundColor: "#fa5252",
+                              color: "white",
                               borderRadius: 4,
                             }
                           : undefined,
                       };
                     }}
-                    style={{ width: '100%' }}
+                    style={{ width: "100%" }}
                   />
-                  </Box>
-                </Popover.Dropdown>
-              </Popover>
+                </Modal>
+              </>
             )}
           </Group>
         </Flex>
