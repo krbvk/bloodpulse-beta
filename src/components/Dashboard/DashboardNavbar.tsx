@@ -15,7 +15,7 @@ import {
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { useRouter } from "next/navigation";
-import { IconLogout, IconUser, IconCalendarEvent } from "@tabler/icons-react";
+import { IconLogout, IconSettings, IconCalendarEvent } from "@tabler/icons-react";
 import { Calendar } from "@mantine/dates";
 import Link from "next/link";
 import Image from "next/image";
@@ -131,10 +131,10 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
               </Menu.Target>
               <Menu.Dropdown>
                 <Menu.Label>{email}</Menu.Label>
-                <Menu.Item onClick={() => router.push("/profile")}>
+                <Menu.Item onClick={() => router.push("/settings")}>
                   <Group gap="xs">
-                    <IconUser size={16} />
-                    Profile
+                    <IconSettings size={16} />
+                    Settings
                   </Group>
                 </Menu.Item>
                 <Menu.Item onClick={handleSignOut} color="red">
