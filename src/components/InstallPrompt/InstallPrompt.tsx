@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button, Image, Notification } from '@mantine/core';
+import { Button, Image, Notification, Stack } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconDownload } from '@tabler/icons-react';
 
@@ -29,7 +29,7 @@ export function InstallPrompt() {
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
-  if (isStandalone || isIOS) return null;
+  if (isStandalone) return null;
 
   const handleInstall = async () => {
     if (deferredPrompt) {
@@ -39,7 +39,7 @@ export function InstallPrompt() {
   };
 
   return (
-    <>
+    <Stack gap="xs">
       {!isIOS ? (
         <Button
           onClick={handleInstall}
@@ -47,30 +47,51 @@ export function InstallPrompt() {
           radius="md"
           color="red"
           style={{
-            width: isMobile ? '100%' : 'fit-content',
+            width: isMobile ? '320px' : 'fit-content',
             alignSelf: 'center',
             display: 'flex',
             alignItems: 'center',
             gap: '1rem',
-            justifyContent: 'center'
+            justifyContent: 'center',
           }}
-          leftSection={
-            <Image src="/favicon.ico" alt="App Icon" width={24} height={24} />
-          }
+          leftSection={<Image src="/favicon.ico" alt="App Icon" width={24} height={24} />}
           rightSection={<IconDownload size={18} />}
         >
           Install App
         </Button>
       ) : (
-        <Notification
-          title="Add to Home Screen"
-          color="blue"
-          onClose={() => setShowiOSInstruction(false)}
-          style={{ width: '100%', marginTop: '1rem' }}
-        >
-          To install the app, click the share button, scroll down, and then click &ldquo;Add to Home Screen.&rdquo;
-        </Notification>
+        <>
+          <Button
+            onClick={() => setShowiOSInstruction(true)}
+            size={isMobile ? 'md' : 'lg'}
+            radius="md"
+            color="blue"
+            style={{
+              width: isMobile ? '320px' : 'fit-content',
+              alignSelf: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+              justifyContent: 'center',
+            }}
+            leftSection={<Image src="/favicon.ico" alt="App Icon" width={24} height={24} />}
+            rightSection={<IconDownload size={18} />}
+          >
+            Learn How to Install
+          </Button>
+
+          {showiOSInstruction && (
+            <Notification
+              title="Add to Home Screen"
+              color="blue"
+              onClose={() => setShowiOSInstruction(false)}
+              style={{ width: '100%', marginTop: '1rem' }}
+            >
+              To install the app, tap the <strong>Share</strong> button in Safari, scroll down, and tap <strong>“Add to Home Screen”</strong>.
+            </Notification>
+          )}
+        </>
       )}
-    </>
+    </Stack>
   );
 }
