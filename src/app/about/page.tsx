@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar/Homepage';
 import {
   Container,
@@ -11,13 +11,23 @@ import {
   Box,
   Flex,
   rem,
+  Center,
 } from '@mantine/core';
 import MissionCard from '@/components/Information/Mission';
 import VisionCard from '@/components/Information/Vision';
 import Services from '@/components/Information/Services';
+import CustomLoader from "@/components/Loader/CustomLoader";
 
 const AboutPage = () => {
   const [splashes, setSplashes] = useState<{ id: number; x: number; y: number }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, []);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -32,6 +42,14 @@ const AboutPage = () => {
       setSplashes((prev) => prev.filter((splash) => splash.id !== newSplash.id));
     }, 1000);
   };
+
+  if (loading) {
+    return (
+    <Center h="100vh">
+      <CustomLoader />
+    </Center>
+    )
+  }
 
   return (
     <Box

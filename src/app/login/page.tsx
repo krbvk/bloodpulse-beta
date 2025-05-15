@@ -2,11 +2,20 @@
 
 import Navbar from '@/components/Navbar/Homepage';
 import Options from '@/components/SignInOptions/Options';
-import { Box } from '@mantine/core';
-import { useState } from 'react';
+import { Box, Center } from '@mantine/core';
+import { useEffect, useState } from 'react';
+import CustomLoader from "@/components/Loader/CustomLoader";
 
 export default function LoginPage() {
   const [splashes, setSplashes] = useState<{ id: number; x: number; y: number }[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, []);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -21,6 +30,14 @@ export default function LoginPage() {
       setSplashes((prev) => prev.filter((splash) => splash.id !== newSplash.id));
     }, 1000);
   };
+
+  if (loading) {
+    return (
+    <Center h="100vh">
+      <CustomLoader />
+    </Center>
+    )
+  }
 
   return (
     <Box style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }} onClick={handleClick}>
