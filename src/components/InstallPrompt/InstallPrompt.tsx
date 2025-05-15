@@ -77,7 +77,7 @@ export function InstallPrompt() {
             leftSection={<Image src="/favicon.ico" alt="App Icon" width={24} height={24} />}
             rightSection={<IconDownload size={18} />}
           >
-            Learn How to Install
+            Install App
           </Button>
 
           {showiOSInstruction && (
