@@ -85,9 +85,17 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
               size="sm"
             />
             <Link href="/dashboard" style={{ textDecoration: "none" }}>
-              <Text fw={700} size="lg" c="white">
-                BLOODPULSE: LOGO
-              </Text>
+              <Flex align="center" gap="xs">
+                <Text fw={700} size="lg" style={{ fontFamily: "monospace", color: "white" }}>
+                  BLOODPULSE:
+                </Text>
+                <Image
+                  src="/web-app-manifest-192x192.png"
+                  alt="BloodPulse Logo"
+                  width={28}
+                  height={28}
+                />
+              </Flex>
             </Link>
           </Group>
 

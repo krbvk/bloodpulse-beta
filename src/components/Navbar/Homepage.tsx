@@ -41,18 +41,26 @@ const Navbar = () => {
               </Button>
             </Group>
           )}
-          <Text
-            size="xl"
-            fw={900}
-            style={{
-              color: "#FF4D4D",
-              letterSpacing: "1px",
-              fontFamily: "monospace",
-              userSelect: "none",
-            }}
-          >
-            BLOODPULSE: LOGO
-          </Text>
+          <Flex align="center" gap="xs">
+            <Text
+              size="xl"
+              fw={900}
+              style={{
+                color: "#FF4D4D",
+                letterSpacing: "1px",
+                fontFamily: "monospace",
+                userSelect: "none",
+              }}
+            >
+              BLOODPULSE:
+            </Text>
+            <Image
+              src="/web-app-manifest-192x192.png"
+              alt="BloodPulse Logo"
+              width={32}
+              height={32}
+            />
+          </Flex>
           {!isMobile && (
             <Group gap="sm">
               <Button component={Link} href="/login" variant="filled" color="red" size="md" radius="md" leftSection={<IconLogin size={18} />}>
