@@ -76,7 +76,6 @@ export default function LoginPage() {
       <Box
         style={{
           minHeight: '100vh',
-          paddingTop: 65,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
