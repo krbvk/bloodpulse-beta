@@ -19,11 +19,27 @@ import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { useMediaQuery } from "@mantine/hooks";
 import ServiceImageSrc from "@/components/Slides/ServiceImage1.svg";
+import React from "react";
 
 const ServiceImage = ServiceImageSrc as StaticImageData;
 
 export default function Services() {
   const isMobile = useMediaQuery("(max-width: 768px)");
+
+  // Hover / tap effect handlers
+  const handleHoverIn = (
+    e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
+  ) => {
+    e.currentTarget.style.transform = "translateY(-3px)";
+    e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,0,0,0.1)";
+  };
+
+  const handleHoverOut = (
+    e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
+  ) => {
+    e.currentTarget.style.transform = "translateY(0)";
+    e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.05)";
+  };
 
   const services = [
     {
@@ -44,19 +60,19 @@ export default function Services() {
     <Box
       w="100%"
       px="md"
-      py={isMobile ? 0 : "5rem"}
+      py={isMobile ? "2rem" : "5rem"}
       style={{
         background: "linear-gradient(135deg, #fff 0%, #fdecea 100%)",
         display: "flex",
         justifyContent: "center",
-        alignItems: isMobile ? "center" : "flex-start",
+        alignItems: "center",
         minHeight: isMobile ? "100vh" : "auto",
       }}
     >
       <Group
         justify="center"
         align="center"
-        gap={isMobile ? "1.5rem" : "4rem"}
+        gap={isMobile ? "2rem" : "4rem"}
         style={{
           flexDirection: isMobile ? "column" : "row",
           maxWidth: "1200px",
@@ -64,15 +80,27 @@ export default function Services() {
         }}
       >
         {/* Image Section */}
-        <Box ta="center" style={{ flex: 1 }}>
+        <Box
+          ta="center"
+          style={{
+            flex: 1,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: isMobile ? 0 : "2rem",
+          }}
+        >
           <Image
             src={ServiceImage}
             alt="Service illustration"
             style={{
-              width: isMobile ? "140px" : "100%",
-              maxWidth: isMobile ? "200px" : "420px",
+              width: isMobile ? "180px" : "100%",
+              maxWidth: isMobile ? "250px" : "550px",
               height: "auto",
               objectFit: "contain",
+              transform: isMobile ? "none" : "translateY(-10px)",
+              filter: "drop-shadow(0px 8px 20px rgba(0,0,0,0.1))",
+              transition: "filter 0.3s ease",
             }}
           />
         </Box>
@@ -84,7 +112,7 @@ export default function Services() {
             order={2}
             fw={800}
             style={{
-              fontSize: isMobile ? "20px" : "38px",
+              fontSize: isMobile ? "22px" : "38px",
               textAlign: "center",
               color: "#1a1a1a",
             }}
@@ -96,7 +124,7 @@ export default function Services() {
                 background: "linear-gradient(90deg, #FF4D4D, #FF6B6B)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
-                fontSize: isMobile ? "20px" : "38px",
+                fontSize: isMobile ? "22px" : "38px",
               }}
             >
               We Can Offer
@@ -109,13 +137,13 @@ export default function Services() {
             c="dimmed"
             style={{
               textAlign: "center",
-              maxWidth: isMobile ? "300px" : "500px",
+              maxWidth: isMobile ? "320px" : "500px",
               margin: "0 auto",
               lineHeight: 1.5,
             }}
           >
-            Whether you&apos;re donating blood, booking an appointment, or joining a
-            blood drive — we make the process simple and accessible.
+            Whether you&apos;re donating blood, booking an appointment, or
+            joining a blood drive — we make the process simple and accessible.
           </Text>
 
           {/* Service Cards */}
@@ -136,20 +164,10 @@ export default function Services() {
                   transition: "transform 0.2s ease, box-shadow 0.2s ease",
                   cursor: "pointer",
                 }}
-                onMouseEnter={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.transform = "translateY(-3px)";
-                    e.currentTarget.style.boxShadow =
-                      "0 6px 20px rgba(0,0,0,0.1)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isMobile) {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow =
-                      "0 4px 12px rgba(0,0,0,0.05)";
-                  }
-                }}
+                onMouseEnter={handleHoverIn}
+                onMouseLeave={handleHoverOut}
+                onTouchStart={handleHoverIn}
+                onTouchEnd={handleHoverOut}
               >
                 <Group align="center" gap="md" wrap="nowrap">
                   <Box

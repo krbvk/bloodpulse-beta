@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Title, Text, Divider } from "@mantine/core";
+import { Box, Title, Text } from "@mantine/core";
 import {
   IconHeart,
   IconHeartbeat,
@@ -11,37 +11,70 @@ import {
 import { useMediaQuery } from "@mantine/hooks";
 import Image, { type StaticImageData } from "next/image";
 import BenefitImageSrc from "@/components/Slides/BenefitImage1.svg";
+import React from "react";
 
 const BenefitImage = BenefitImageSrc as StaticImageData;
 
 export default function Benefits() {
   const isMobile = useMediaQuery("(max-width: 1024px)");
 
-  const items = [
-    { icon: IconDroplet, text: "Save Lives — Every donation has the potential to save up to three lives. You’re directly impacting people who are in urgent need." },
-    { icon: IconHeartbeat, text: "Improve Your Heart Health — Regular blood donation can lower your risk of heart disease and help regulate your iron levels, contributing to better cardiovascular health." },
-    { icon: IconStethoscope, text: "Health Snapshot — Each donation comes with a free checkup including blood pressure and hemoglobin level tests." },
-    { icon: IconHeart, text: "Regenerate New Blood Cells — Donating blood stimulates your body to create new red blood cells, keeping your circulatory system healthy and refreshed." },
-    { icon: IconClockHour8, text: "Help Ensure Blood Availability — Your donation helps maintain a steady blood supply in hospitals, making it easier to respond to emergencies and ensuring there is blood available when it’s most needed." },
-    { icon: IconHeart, text: "Support Red Cross PH — Partnering with Red Cross Philippines, your donation aids disaster relief and nationwide blood drive efforts." },
-  ];
-
-  const handleClick = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+  // Shared hover/tap handlers
+  const handleHoverIn = (
+    e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
+  ) => {
     const el = e.currentTarget;
-    if (!el) return;
-
-    el.style.transition = "transform 0.15s ease";
-    el.style.transform = "scale(0.97)";
-
-    setTimeout(() => {
-      el.style.transform = "scale(1)";
-    }, 150);
+    el.style.transition = "transform 0.15s ease, box-shadow 0.15s ease";
+    el.style.transform = "scale(1.02)";
+    el.style.boxShadow = "0 6px 16px rgba(0,0,0,0.12)";
   };
 
-  const CardItem = ({ icon: Icon, text }: { icon: React.ElementType; text: string }) => (
+  const handleHoverOut = (
+    e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
+  ) => {
+    const el = e.currentTarget;
+    el.style.transform = "scale(1)";
+    el.style.boxShadow = "0 4px 12px rgba(0,0,0,0.06)";
+  };
+
+  const items = [
+    {
+      icon: IconDroplet,
+      text: "Save Lives — Every donation has the potential to save up to three lives. You’re directly impacting people who are in urgent need.",
+    },
+    {
+      icon: IconHeartbeat,
+      text: "Improve Your Heart Health — Regular blood donation can lower your risk of heart disease and help regulate your iron levels, contributing to better cardiovascular health.",
+    },
+    {
+      icon: IconStethoscope,
+      text: "Health Snapshot — Each donation comes with a free checkup including blood pressure and hemoglobin level tests.",
+    },
+    {
+      icon: IconHeart,
+      text: "Regenerate New Blood Cells — Donating blood stimulates your body to create new red blood cells, keeping your circulatory system healthy and refreshed.",
+    },
+    {
+      icon: IconClockHour8,
+      text: "Help Ensure Blood Availability — Your donation helps maintain a steady blood supply in hospitals, making it easier to respond to emergencies and ensuring there is blood available when it’s most needed.",
+    },
+    {
+      icon: IconHeart,
+      text: "Support Red Cross PH — Partnering with Red Cross Philippines, your donation aids disaster relief and nationwide blood drive efforts.",
+    },
+  ];
+
+  const CardItem = ({
+    icon: Icon,
+    text,
+  }: {
+    icon: React.ElementType;
+    text: string;
+  }) => (
     <Box
-      onClick={handleClick}
-      onTouchStart={handleClick}
+      onMouseEnter={handleHoverIn}
+      onMouseLeave={handleHoverOut}
+      onTouchStart={handleHoverIn}
+      onTouchEnd={handleHoverOut}
       style={{
         padding: "1.35rem",
         borderRadius: "14px",
@@ -55,14 +88,6 @@ export default function Benefits() {
         overflow: "hidden",
         cursor: "pointer",
         transition: "transform 0.2s ease, box-shadow 0.2s ease",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "scale(1.02)";
-        e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.12)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "scale(1)";
-        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.06)";
       }}
     >
       <Box
@@ -80,16 +105,27 @@ export default function Benefits() {
       >
         <Icon size={24} stroke={1.8} color="#d32f2f" />
       </Box>
-      <Text size="md" style={{ lineHeight: 1.5, fontSize: "15px", color: "#333" }}>
+      <Text
+        size="md"
+        style={{ lineHeight: 1.5, fontSize: "15px", color: "#333" }}
+      >
         {text}
       </Text>
     </Box>
   );
 
-  const BenefitRow = ({ icon: Icon, text }: { icon: React.ElementType; text: string }) => (
+  const BenefitRow = ({
+    icon: Icon,
+    text,
+  }: {
+    icon: React.ElementType;
+    text: string;
+  }) => (
     <Box
-      onClick={handleClick}
-      onTouchStart={handleClick}
+      onMouseEnter={handleHoverIn}
+      onMouseLeave={handleHoverOut}
+      onTouchStart={handleHoverIn}
+      onTouchEnd={handleHoverOut}
       style={{
         display: "flex",
         alignItems: "flex-start",
@@ -114,7 +150,10 @@ export default function Benefits() {
       >
         <Icon size={12} stroke={1.8} color="#d32f2f" />
       </Box>
-      <Text size="sm" style={{ lineHeight: 1.4, fontSize: "11px", color: "#333" }}>
+      <Text
+        size="sm"
+        style={{ lineHeight: 1.4, fontSize: "11px", color: "#333" }}
+      >
         {text}
       </Text>
     </Box>
@@ -153,7 +192,8 @@ export default function Benefits() {
               color: "black",
             }}
           >
-            Benefits of <span style={{ color: "#FF4D4D" }}>Donating Blood</span>
+            Benefits of{" "}
+            <span style={{ color: "#FF4D4D" }}>Donating Blood</span>
           </Title>
           {items.map((item, idx) => (
             <Box
@@ -166,8 +206,10 @@ export default function Benefits() {
                 boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
                 transition: "transform 0.15s ease",
               }}
-              onClick={handleClick}
-              onTouchStart={handleClick}
+              onMouseEnter={handleHoverIn}
+              onMouseLeave={handleHoverOut}
+              onTouchStart={handleHoverIn}
+              onTouchEnd={handleHoverOut}
             >
               <BenefitRow icon={item.icon} text={item.text} />
             </Box>
@@ -184,7 +226,14 @@ export default function Benefits() {
             width: "100%",
           }}
         >
-          <Box style={{ display: "flex", flexDirection: "column", gap: "1.25rem", flex: 1 }}>
+          <Box
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1.25rem",
+              flex: 1,
+            }}
+          >
             {items.slice(0, 3).map((item, idx) => (
               <CardItem key={idx} icon={item.icon} text={item.text} />
             ))}
@@ -200,7 +249,8 @@ export default function Benefits() {
                 color: "black",
               }}
             >
-              Benefits of <span style={{ color: "#FF4D4D" }}>Donating Blood</span>
+              Benefits of{" "}
+              <span style={{ color: "#FF4D4D" }}>Donating Blood</span>
             </Title>
             <Image
               src={BenefitImage}
@@ -211,7 +261,14 @@ export default function Benefits() {
             />
           </Box>
 
-          <Box style={{ display: "flex", flexDirection: "column", gap: "1.25rem", flex: 1 }}>
+          <Box
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1.25rem",
+              flex: 1,
+            }}
+          >
             {items.slice(3, 6).map((item, idx) => (
               <CardItem key={idx} icon={item.icon} text={item.text} />
             ))}
