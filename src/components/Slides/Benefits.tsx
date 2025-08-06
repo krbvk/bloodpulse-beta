@@ -8,7 +8,7 @@ import {
 } from "@tabler/icons-react";
 import { useMediaQuery } from "@mantine/hooks";
 import Image from "next/image";
-import BenefitImage from "@/components/slides/BenefitImage1.svg";
+import BenefitImage from "@/components/Slides/BenefitImage1.svg";
 
 export default function Benefits() {
   const isMobile = useMediaQuery("(max-width: 1024px)");
