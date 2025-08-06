@@ -7,8 +7,10 @@ import {
   IconClockHour8,
 } from "@tabler/icons-react";
 import { useMediaQuery } from "@mantine/hooks";
-import Image from "next/image";
-import BenefitImage from "@/components/Slides/BenefitImage1.svg";
+import Image, { type StaticImageData } from "next/image";
+import BenefitImageSrc from "@/components/Slides/BenefitImage1.svg";
+
+const BenefitImage = BenefitImageSrc as StaticImageData;
 
 export default function Benefits() {
   const isMobile = useMediaQuery("(max-width: 1024px)");
