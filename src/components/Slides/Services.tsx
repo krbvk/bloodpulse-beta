@@ -13,7 +13,7 @@ import {
 import {
   IconHeart,
   IconCalendar,
-  IconSearch,
+  IconCalendarEvent,
 } from "@tabler/icons-react";
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
@@ -27,177 +27,182 @@ export default function Services() {
 
   const services = [
     {
-      icon: <IconHeart size={isMobile ? 16 : 20} />,
+      icon: <IconHeart size={isMobile ? 16 : 24} />,
       text: "Become a Donor — we can help if you want to donate blood.",
     },
     {
-      icon: <IconCalendar size={isMobile ? 16 : 20} />,
-      text: "Blood booking — we can help you book an appointment.",
+      icon: <IconCalendar size={isMobile ? 16 : 24} />,
+      text: "Blood Booking — we can help you book an appointment.",
     },
     {
-      icon: <IconSearch size={isMobile ? 16 : 20} />,
-      text: "Blood type filtering — you can browse and search the blood type you need.",
+      icon: <IconCalendarEvent size={isMobile ? 16 : 24} />,
+      text: "Blood Donation Events — join our scheduled blood drives in Valenzuela City.",
     },
   ];
 
   return (
     <Box
       w="100%"
-      h={isMobile ? "100vh" : "100vh"}
-      px="lg"
-      py={isMobile ? "lg" : "xl"}
+      px="md"
+      py={isMobile ? 0 : "5rem"}
       style={{
-        backgroundImage: "linear-gradient(135deg, #fdecea 0%, #fff 100%)",
+        background: "linear-gradient(135deg, #fff 0%, #fdecea 100%)",
         display: "flex",
         justifyContent: "center",
-        alignItems: "center",
+        alignItems: isMobile ? "center" : "flex-start",
+        minHeight: isMobile ? "100vh" : "auto",
       }}
     >
-      <Card
-        w="100%"
-        maw={1000}
-        p={isMobile ? "md" : "lg"}
-        radius="md"
-        withBorder
+      <Group
+        justify="center"
+        align="center"
+        gap={isMobile ? "1.5rem" : "4rem"}
         style={{
-          border: "1px solid #e0e0e0",
-          backgroundColor: "#fff",
-          maxHeight: isMobile ? "80vh" : "unset",
+          flexDirection: isMobile ? "column" : "row",
+          maxWidth: "1200px",
+          margin: "0 auto",
         }}
-        shadow="xl"
       >
-        <Group
-          wrap="wrap"
-          justify="center"
-          align="center"
-          gap={isMobile ? "sm" : "xl"}
-          w="100%"
-          style={{
-            flexDirection: isMobile ? "column" : "row",
-          }}
-        >
-          {/* Image */}
-          <Box
-            w={{ base: "100%", md: "40%" }}
-            ta="center"
+        {/* Image Section */}
+        <Box ta="center" style={{ flex: 1 }}>
+          <Image
+            src={ServiceImage}
+            alt="Service illustration"
             style={{
-              maxHeight: isMobile ? "100px" : "300px",
+              width: isMobile ? "140px" : "100%",
+              maxWidth: isMobile ? "200px" : "420px",
+              height: "auto",
+              objectFit: "contain",
+            }}
+          />
+        </Box>
+
+        {/* Content Section */}
+        <Stack style={{ flex: 1 }} gap={isMobile ? "sm" : "xl"} align="center">
+          {/* Title */}
+          <Title
+            order={2}
+            fw={800}
+            style={{
+              fontSize: isMobile ? "20px" : "38px",
+              textAlign: "center",
+              color: "#1a1a1a",
             }}
           >
-            <Image
-              src={ServiceImage}
-              alt="Service"
+            What{" "}
+            <Text
+              span
               style={{
-                width: isMobile ? "150px" : "100%",
-                maxWidth: "500px",
-                height: "auto",
-                objectFit: "contain",
-                marginInline: "auto",
+                background: "linear-gradient(90deg, #FF4D4D, #FF6B6B)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                fontSize: isMobile ? "20px" : "38px",
               }}
-            />
-          </Box>
+            >
+              We Can Offer
+            </Text>
+          </Title>
 
-          {/* Text Section */}
-          <Stack
-            w={{ base: "100%", md: "55%" }}
-            gap={isMobile ? 12 : "lg"}
-            align="center"
-            justify="center"
+          {/* Subtitle */}
+          <Text
+            size={isMobile ? "sm" : "md"}
+            c="dimmed"
+            style={{
+              textAlign: "center",
+              maxWidth: isMobile ? "300px" : "500px",
+              margin: "0 auto",
+              lineHeight: 1.5,
+            }}
           >
-            <Title order={2} ta="center" fw={800} fz={isMobile ? 20 : 30} mb={isMobile ? 4 : 0}>
-              What{" "}
-              <Text
-                span
-                variant="gradient"
-                gradient={{ from: "#FF4D4D", to: "#FF4D4D" }}
-                style={{ fontSize: isMobile ? 20 : 30 }}
+            Whether you&apos;re donating blood, booking an appointment, or joining a
+            blood drive — we make the process simple and accessible.
+          </Text>
+
+          {/* Service Cards */}
+          <Stack
+            gap={isMobile ? "xs" : "sm"}
+            w="100%"
+            style={{ maxWidth: isMobile ? "320px" : "100%" }}
+          >
+            {services.map((item, i) => (
+              <Card
+                key={i}
+                radius="md"
+                padding={isMobile ? "xs" : "md"}
+                style={{
+                  border: "1px solid #f4c7c3",
+                  background: "#fff",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                  transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) => {
+                  if (!isMobile) {
+                    e.currentTarget.style.transform = "translateY(-3px)";
+                    e.currentTarget.style.boxShadow =
+                      "0 6px 20px rgba(0,0,0,0.1)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isMobile) {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 12px rgba(0,0,0,0.05)";
+                  }
+                }}
               >
-                We Can Offer
-              </Text>
-            </Title>
+                <Group align="center" gap="md" wrap="nowrap">
+                  <Box
+                    w={rem(isMobile ? 24 : 40)}
+                    h={rem(isMobile ? 24 : 40)}
+                    style={{
+                      borderRadius: "50%",
+                      background: "#ffebee",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      color: "#d32f2f",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {item.icon}
+                  </Box>
+                  <Text
+                    size={isMobile ? "xs" : "md"}
+                    style={{
+                      lineHeight: 1.4,
+                      color: "#333",
+                      flex: 1,
+                    }}
+                  >
+                    {item.text}
+                  </Text>
+                </Group>
+              </Card>
+            ))}
+          </Stack>
 
-            <Stack w="100%" gap={isMobile ? 10 : "md"}>
-              {services.map((item, i) => (
-                <Card
-                  key={i}
-                  withBorder
-                  radius="md"
-                  padding={isMobile ? 8 : "md"}
-                  shadow="sm"
-                  component="div"
-                  style={{
-                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                    cursor: "pointer",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "scale(1.02)";
-                    e.currentTarget.style.boxShadow =
-                      "0 6px 16px rgba(0,0,0,0.12)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "scale(1)";
-                    e.currentTarget.style.boxShadow =
-                      "0 2px 12px rgba(0,0,0,0.1)";
-                  }}
-                >
-                  <Group align="center" gap="xs" style={{ flexWrap: "nowrap", alignItems: "center", }}>
-                    <Box
-                      w={rem(isMobile ? 22 : 36)}
-                      h={rem(isMobile ? 22 : 36)}
-                      style={{
-                        borderRadius: "50%",
-                        backgroundColor: "#FF4D4D",
-                        color: "#fff",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        flexShrink: 0,
-                      }}
-                    >
-                      {item.icon}
-                    </Box>
-                    <Text size={isMobile ? "xs" : "sm"} c="black" style={{ wordBreak: "break-word", overflowWrap: "anywhere", lineHeight: 1.4, flex: 1 }}>
-                      {item.text}
-                    </Text>
-                  </Group>
-                </Card>
-              ))}
-            </Stack>
-
+          {/* Button */}
+          <Box style={{ textAlign: "center" }}>
             <Link href="/about#services">
               <Button
-                variant="filled"
-                color="red"
                 size={isMobile ? "xs" : "md"}
-                radius="xs"
-                mt={isMobile ? 8 : 0}
+                radius="md"
                 style={{
-                  animation: "pulse 2s infinite",
-                  padding: isMobile ? "6px 10px" : undefined,
+                  background:
+                    "linear-gradient(90deg, #FF4D4D 0%, #FF6B6B 100%)",
+                  boxShadow: "0 4px 14px rgba(255, 77, 77, 0.3)",
+                  border: "none",
+                  padding: isMobile ? "4px 10px" : undefined,
                   fontSize: isMobile ? "0.75rem" : undefined,
                 }}
               >
                 Learn more about our service
               </Button>
             </Link>
-          </Stack>
-        </Group>
-
-        {/* Pulse animation keyframes */}
-        <style jsx global>{`
-          @keyframes pulse {
-            0% {
-              box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.6);
-            }
-            70% {
-              box-shadow: 0 0 0 10px rgba(255, 77, 77, 0);
-            }
-            100% {
-              box-shadow: 0 0 0 0 rgba(255, 77, 77, 0);
-            }
-          }
-        `}</style>
-      </Card>
+          </Box>
+        </Stack>
+      </Group>
     </Box>
   );
 }
