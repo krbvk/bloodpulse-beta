@@ -37,7 +37,7 @@ const Navbar = () => {
                 Home
               </Button>
               <Button component={Link} href="/about" variant="subtle" color="dark" size="md" radius="md" leftSection={<IconInfoCircle size={18} />}>
-                About
+                About Us
               </Button>
             </Group>
           )}
