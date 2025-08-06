@@ -38,9 +38,9 @@ const servicesData: Service[] = [
     imgSrc: '/IntroductionImage1.svg',
   },
   {
-    title: 'Blood Type Filtering',
+    title: 'Blood Donation Events',
     description:
-      'Looking for a specific blood type? We offer a filtering service that lets you search for the blood type you need, helping you find the right match quickly in emergencies.',
+      'Blood donation events — join our scheduled blood drives in Valenzuela City.',
     imgSrc: '/IntroductionImage1.svg',
   },
 ];
