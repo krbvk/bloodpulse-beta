@@ -114,7 +114,7 @@ export default function Services() {
               lineHeight: 1.5,
             }}
           >
-            Whether you're donating blood, booking an appointment, or joining a
+            Whether you&apos;re donating blood, booking an appointment, or joining a
             blood drive — we make the process simple and accessible.
           </Text>
 
