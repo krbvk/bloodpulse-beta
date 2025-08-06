@@ -156,11 +156,20 @@ export default function Benefits() {
             Benefits of <span style={{ color: "#FF4D4D" }}>Donating Blood</span>
           </Title>
           {items.map((item, idx) => (
-            <Box key={idx}>
+            <Box
+              key={idx}
+              style={{
+                background: "#fff",
+                border: "1px solid #f4c7c3",
+                borderRadius: "8px",
+                padding: "0.6rem",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+                transition: "transform 0.15s ease",
+              }}
+              onClick={handleClick}
+              onTouchStart={handleClick}
+            >
               <BenefitRow icon={item.icon} text={item.text} />
-              {idx !== items.length - 1 && (
-                <Divider my="xs" style={{ borderColor: "#f4c7c3" }} />
-              )}
             </Box>
           ))}
         </Box>
