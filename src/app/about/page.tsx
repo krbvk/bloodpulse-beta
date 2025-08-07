@@ -98,6 +98,8 @@ const AboutPage = () => {
 
       {/* Content */}
       <Navbar />
+      {/* Use the <Box> instead of Container if you want to fully stretch as in take the whole design maybe good or no? */}
+      {/* <Box py="xl" px="md" w="100%" style={{ marginTop: '50px' }}></Box> */}
       <Container size="lg" py="xl" style={{ marginTop: '50px' }}>
         <Flex
           direction="column"
@@ -105,9 +107,7 @@ const AboutPage = () => {
           justify="flex-start"
           style={{ textAlign: 'center' }}
         > 
-        <Box w="100%" my="xl" style={{ backgroundColor: "#fff" }}>
           <AboutCard />
-        </Box>
 
           <SimpleGrid cols={1} spacing="xl" mt="xl" w="100%">
             <MissionCard />
