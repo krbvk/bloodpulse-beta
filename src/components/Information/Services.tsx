@@ -259,17 +259,25 @@ const Services = () => {
               <Divider orientation="vertical" size="sm" color="#b0b0b0" />
             </Grid.Col>
 
-            <Grid.Col span={6}>
-              <Box px="md" style={{ display: 'flex', flexDirection: 'column' }}>
-                <Text size="lg" fw={600} mb="sm" ta="center">
-                  Your Guide
-                </Text>
-                <Divider mb="md" color="#b0b0b0" />
-                <Box style={{ textAlign: 'justify', lineHeight: 1.6 }}>
-                  {selectedService && renderDescription(selectedService.description)}
-                </Box>
-              </Box>
-            </Grid.Col>
+        <Grid.Col
+          span={6}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            maxHeight: 400,
+            overflowY: 'auto',
+          }}
+        >
+          <Box px="md" style={{ flexGrow: 1 }}>
+            <Text size="lg" fw={600} mb="sm" ta="center">
+              Your Guide
+            </Text>
+            <Divider mb="md" color="#b0b0b0" />
+            <Box style={{ textAlign: 'justify', lineHeight: 1.6 }}>
+              {selectedService && renderDescription(selectedService.description)}
+            </Box>
+          </Box>
+        </Grid.Col>
           </Grid>
         )}
       </Modal>
