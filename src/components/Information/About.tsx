@@ -10,16 +10,16 @@ import {
   rem,
   Grid,
 } from "@mantine/core";
-import { IconTarget } from "@tabler/icons-react";
+import { IconInfoCircle } from "@tabler/icons-react";
 
-const MissionCard = () => {
+const AboutCard = () => {
   const theme = useMantineTheme();
   const redColor = theme.colors.red[6];
 
   return (
     <Paper
       component="section"
-      aria-labelledby="mission-title"
+      aria-labelledby="about-title"
       shadow="lg"
       radius="md"
       p="0"
@@ -41,7 +41,7 @@ const MissionCard = () => {
       }}
     >
       <Grid align="stretch">
-        {/* Right: Icon + Title (displayed first on mobile) */}
+        {/* Right: Icon + Title (shown first on mobile) */}
         <Grid.Col
           span={{ base: 12, sm: 4 }}
           order={{ base: 1, sm: 2 }}
@@ -62,27 +62,26 @@ const MissionCard = () => {
               radius="xl"
               size={rem(40)}
             >
-              <IconTarget size={20} />
+              <IconInfoCircle size={20} />
             </ThemeIcon>
             <Title
-              id="mission-title"
+              id="about-title"
               order={4}
               style={{
                 color: "white",
                 textAlign: "center",
               }}
             >
-              What is Our Mission?
+              What is BloodPulse?
             </Title>
           </Flex>
         </Grid.Col>
 
-        {/* Left: Content (displayed second on mobile) */}
+        {/* Left: Content (shown second on mobile) */}
         <Grid.Col span={{ base: 12, sm: 8 }} order={{ base: 2, sm: 1 }}>
           <Flex h="100%" p="xl" align="center">
             <Text size="sm" c="black">
-              Our mission is to save lives by connecting generous blood donors with those in urgent
-              need, fostering a reliable and efficient blood donation network across communities.
+                BloodPulse is a progressive web application designed to support and highlight the blood donation campaigns of the Our Lady of Fatima University Red Cross Youth – Valenzuela Campus. It enables users to schedule blood donation appointments and stay updated on upcoming blood drives organized by the organization — all through a single, easy-to-use platform.
             </Text>
           </Flex>
         </Grid.Col>
@@ -91,4 +90,4 @@ const MissionCard = () => {
   );
 };
 
-export default MissionCard;
+export default AboutCard;

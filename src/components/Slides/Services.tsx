@@ -48,7 +48,7 @@ export default function Services() {
     },
     {
       icon: <IconCalendar size={isMobile ? 16 : 24} />,
-      text: "Blood Booking — we can help you book an appointment.",
+      text: "Book a Donation Appointment — we can help you schedule a blood donation appointment.",
     },
     {
       icon: <IconCalendarEvent size={isMobile ? 16 : 24} />,
