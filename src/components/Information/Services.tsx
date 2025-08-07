@@ -12,7 +12,7 @@ import {
   Group,
   Divider,
   Grid,
-  Stack
+  Stack,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { FaHeartbeat } from 'react-icons/fa';
@@ -48,7 +48,7 @@ const servicesData: Service[] = [
       'Go to the "Book Appointment" section from your dashboard.',
       'Select the subject of appointment: Blood Donation or Blood Request.',
       'Choose your preferred date and time for the appointment.',
-      'Click the "Send Appointment Request" button and wait for a confirmation email from Red Cross Youth - Our Lady of Fatima University Valenzuela Campus.'
+      'Click the "Send Appointment Request" button and wait for a confirmation email from Red Cross Youth - Our Lady of Fatima University Valenzuela Campus.',
     ],
     display: 'Schedule your donation in a few simple steps — quick, easy, and secure.',
     imgSrc: '/IntroductionImage1.svg',
@@ -181,104 +181,143 @@ const Services = () => {
             padding: isMobile ? 16 : 24,
             overflowY: isMobile ? 'auto' : 'unset',
           },
+          content: {
+            marginTop: isMobile ? 60 : 0,
+          }
         }}
       >
-        <Box
-          mb="md"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingRight: isMobile ? 32 : 0,
-            position: 'relative',
-          }}
-        >
-          <Group justify="center" align="center" gap="xs">
-            <FaHeartbeat size={28} color="#FF4D4D" />
-            <Text style={{ fontSize: 24, fontWeight: 700 }}>
-              {selectedService?.title}
-            </Text>
-          </Group>
-
-          <IconX
-            onClick={closeModal}
-            size={24}
-            style={{
-              position: 'absolute',
-              right: 0,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              cursor: 'pointer',
-              color: '#999',
-              transition: 'color 0.2s ease',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = '#FF4D4D')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = '#999')}
-          />
-        </Box>
-
         {isMobile ? (
-          <Stack gap="lg" px="xs">
+          <Stack gap="sm" px="xs">
+            {/* ✅ FIXED TITLE AND ICON ON MOBILE WITH ICON BEFORE TITLE */}
+            <Box pos="relative" mb="sm">
+              <Group justify="center" align="center" gap="xs" px="lg" wrap="nowrap">
+                <FaHeartbeat size={20} color="#FF4D4D" />
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 700,
+                    textAlign: 'center',
+                    wordBreak: 'break-word',
+                    whiteSpace: 'normal',
+                  }}
+                >
+                  {selectedService?.title}
+                </Text>
+              </Group>
+
+              <IconX
+                onClick={closeModal}
+                size={20}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  right: 8,
+                  color: '#999',
+                  cursor: 'pointer',
+                  transition: 'color 0.2s ease',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#FF4D4D')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#999')}
+              />
+            </Box>
+
             <Image
               src={selectedService?.imgSrc}
               alt={selectedService?.title}
               radius="md"
-              height={300}
+              height={200}
               fit="cover"
-              style={{ borderRadius: 12 }}
+              style={{ borderRadius: 10, marginTop: 8 }}
             />
-            <Divider color="#b0b0b0" />
+
+            <Divider color="#b0b0b0" my="sm" />
+
             <Box px="xs">
-              <Text size="xl" fw={700} mb="sm" ta="center" style={{ color: '#333' }}>
+              <Text size="md" fw={600} mb="xs" ta="center" style={{ color: '#333' }}>
                 Your Guide
               </Text>
-              <Divider mb="md" color="#b0b0b0" />
-              <Box style={{ textAlign: 'justify', lineHeight: 1.75 }}>
+              <Divider mb="sm" color="#b0b0b0" />
+              <Box style={{ textAlign: 'justify', fontSize: 14, lineHeight: 1.6 }}>
                 {selectedService && renderDescription(selectedService.description)}
               </Box>
             </Box>
           </Stack>
         ) : (
-          <Grid align="stretch">
-            <Grid.Col
-              span={5}
-              style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+          <>
+            <Box
+              mb="md"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+              }}
             >
-              <Image
-                src={selectedService?.imgSrc}
-                alt={selectedService?.title}
-                radius="md"
-                height={400}
-                width="100%"
-                fit="cover"
-                style={{ borderRadius: 12 }}
+              <Group justify="center" align="center" gap="xs">
+                <FaHeartbeat size={28} color="#FF4D4D" />
+                <Text style={{ fontSize: 24, fontWeight: 700 }}>
+                  {selectedService?.title}
+                </Text>
+              </Group>
+
+              <IconX
+                onClick={closeModal}
+                size={24}
+                style={{
+                  position: 'absolute',
+                  right: 0,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  cursor: 'pointer',
+                  color: '#999',
+                  transition: 'color 0.2s ease',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#FF4D4D')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#999')}
               />
-            </Grid.Col>
-
-            <Grid.Col span={1} style={{ display: 'flex', justifyContent: 'center' }}>
-              <Divider orientation="vertical" size="sm" color="#b0b0b0" />
-            </Grid.Col>
-
-        <Grid.Col
-          span={6}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            maxHeight: 400,
-            overflowY: 'auto',
-          }}
-        >
-          <Box px="md" style={{ flexGrow: 1 }}>
-            <Text size="lg" fw={600} mb="sm" ta="center">
-              Your Guide
-            </Text>
-            <Divider mb="md" color="#b0b0b0" />
-            <Box style={{ textAlign: 'justify', lineHeight: 1.6 }}>
-              {selectedService && renderDescription(selectedService.description)}
             </Box>
-          </Box>
-        </Grid.Col>
-          </Grid>
+
+            <Grid align="stretch">
+              <Grid.Col
+                span={5}
+                style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+              >
+                <Image
+                  src={selectedService?.imgSrc}
+                  alt={selectedService?.title}
+                  radius="md"
+                  height={400}
+                  width="100%"
+                  fit="cover"
+                  style={{ borderRadius: 12 }}
+                />
+              </Grid.Col>
+
+              <Grid.Col span={1} style={{ display: 'flex', justifyContent: 'center' }}>
+                <Divider orientation="vertical" size="sm" color="#b0b0b0" />
+              </Grid.Col>
+
+              <Grid.Col
+                span={6}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  maxHeight: 400,
+                  overflowY: 'auto',
+                }}
+              >
+                <Box px="md" style={{ flexGrow: 1 }}>
+                  <Text size="lg" fw={600} mb="sm" ta="center">
+                    Your Guide
+                  </Text>
+                  <Divider mb="md" color="#b0b0b0" />
+                  <Box style={{ textAlign: 'justify', lineHeight: 1.6 }}>
+                    {selectedService && renderDescription(selectedService.description)}
+                  </Box>
+                </Box>
+              </Grid.Col>
+            </Grid>
+          </>
         )}
       </Modal>
     </Box>
