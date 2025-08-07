@@ -20,27 +20,47 @@ import { IconX } from '@tabler/icons-react';
 
 type Service = {
   title: string;
-  description: string;
+  description: string | string[];
+  display: string;
   imgSrc: string;
 };
 
 const servicesData: Service[] = [
   {
-    title: 'Blood Donation',
-    description:
-      'Donate blood to save lives. Your small act of kindness makes a big difference.',
+    title: 'Become a Blood Donor',
+    description: [
+      'Create an account or log in to BloodPulse using your Gmail.',
+      'Book a donation appointment (see “Book a Donation Appointment Card”).',
+      "Wait for a confirmation email from Red Cross Youth - Our Lady of Fatima University, Valenzuela Campus. They will either approve your scheduled appointment or suggest a new time if you're not eligible or need to reschedule.",
+      'Arrive at the donation site at the confirmed time.',
+      'Fill out the donor form provided on-site.',
+      'Undergo screening to check your eligibility and determine your blood type.',
+      'Proceed with your blood donation.',
+      'Receive your Donor Card after a successful donation.',
+    ],
+    display: 'Step-by-step guide to start your blood donor journey.',
     imgSrc: '/IntroductionImage1.svg',
   },
   {
-    title: 'Blood Booking',
-    description:
-      'Easily book an appointment to donate blood. We help you find the nearest blood donation center and schedule your donation at a convenient time.',
+    title: 'Book a Donation Appointment',
+    description: [
+      'Create an account or log in to BloodPulse using your Gmail.',
+      'Go to the "Book Appointment" section from your dashboard.',
+      'Select the subject of appointment: Blood Donation or Blood Request.',
+      'Choose your preferred date and time for the appointment.',
+      'Click the "Send Appointment Request" button and wait for a confirmation email from Red Cross Youth - Our Lady of Fatima University Valenzuela Campus.'
+    ],
+    display: 'Schedule your donation in a few simple steps — quick, easy, and secure.',
     imgSrc: '/IntroductionImage1.svg',
   },
   {
     title: 'Blood Donation Events',
-    description:
-      'Blood donation events — join our scheduled blood drives in Valenzuela City.',
+    description: [
+      'Create an account or log in to BloodPulse using your Gmail.',
+      'Once logged in, check the "News & Announcements" section for updates on blood drives and events by Red Cross Youth - Our Lady of Fatima University, Valenzuela Campus.',
+      'You can also visit their official Facebook page for announcements and schedules.',
+    ],
+    display: 'Stay updated on upcoming blood drives and events near you.',
     imgSrc: '/IntroductionImage1.svg',
   },
 ];
@@ -60,6 +80,21 @@ const Services = () => {
   const closeModal = () => {
     setModalOpened(false);
     setSelectedService(null);
+  };
+
+  const renderDescription = (description: string | string[]) => {
+    if (Array.isArray(description)) {
+      return (
+        <ul style={{ paddingLeft: 20, lineHeight: 1.6 }}>
+          {description.map((item, index) => (
+            <li key={index} style={{ marginBottom: 8 }}>
+              {item}
+            </li>
+          ))}
+        </ul>
+      );
+    }
+    return <Text>{description}</Text>;
   };
 
   return (
@@ -118,7 +153,7 @@ const Services = () => {
                 {service.title}
               </Text>
               <Text size="sm" c="dimmed" style={{ textAlign: 'center', lineHeight: 1.5, marginBottom: 12 }}>
-                {service.description}
+                {service.display}
               </Text>
               <Text
                 size="xs"
@@ -195,12 +230,12 @@ const Services = () => {
             <Divider color="#b0b0b0" />
             <Box px="xs">
               <Text size="xl" fw={700} mb="sm" ta="center" style={{ color: '#333' }}>
-                How It Works
+                Your Guide
               </Text>
               <Divider mb="md" color="#b0b0b0" />
-              <Text size="md" style={{ textAlign: 'justify', lineHeight: 1.75}}>
-                {selectedService?.description}
-              </Text>
+              <Box style={{ textAlign: 'justify', lineHeight: 1.75 }}>
+                {selectedService && renderDescription(selectedService.description)}
+              </Box>
             </Box>
           </Stack>
         ) : (
@@ -227,12 +262,12 @@ const Services = () => {
             <Grid.Col span={6}>
               <Box px="md" style={{ display: 'flex', flexDirection: 'column' }}>
                 <Text size="lg" fw={600} mb="sm" ta="center">
-                  How It Works
+                  Your Guide
                 </Text>
                 <Divider mb="md" color="#b0b0b0" />
-                <Text size="sm" style={{ textAlign: 'justify', lineHeight: 1.6 }}>
-                  {selectedService?.description}
-                </Text>
+                <Box style={{ textAlign: 'justify', lineHeight: 1.6 }}>
+                  {selectedService && renderDescription(selectedService.description)}
+                </Box>
               </Box>
             </Grid.Col>
           </Grid>
