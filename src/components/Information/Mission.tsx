@@ -41,19 +41,10 @@ const MissionCard = () => {
       }}
     >
       <Grid align="stretch">
-        {/* Left: Content */}
-        <Grid.Col span={{ base: 12, sm: 8 }}>
-          <Flex h="100%" p="xl" align="center">
-            <Text size="sm" c="black">
-              Our mission is to save lives by connecting generous blood donors with those in urgent
-              need, fostering a reliable and efficient blood donation network across communities.
-            </Text>
-          </Flex>
-        </Grid.Col>
-
-        {/* Right: Icon + Title with full black background */}
+        {/* Right: Icon + Title (displayed first on mobile) */}
         <Grid.Col
           span={{ base: 12, sm: 4 }}
+          order={{ base: 1, sm: 2 }}
           style={{ backgroundColor: theme.black }}
         >
           <Flex
@@ -83,6 +74,16 @@ const MissionCard = () => {
             >
               What is Our Mission?
             </Title>
+          </Flex>
+        </Grid.Col>
+
+        {/* Left: Content (displayed second on mobile) */}
+        <Grid.Col span={{ base: 12, sm: 8 }} order={{ base: 2, sm: 1 }}>
+          <Flex h="100%" p="xl" align="center">
+            <Text size="sm" c="black">
+              Our mission is to save lives by connecting generous blood donors with those in urgent
+              need, fostering a reliable and efficient blood donation network across communities.
+            </Text>
           </Flex>
         </Grid.Col>
       </Grid>

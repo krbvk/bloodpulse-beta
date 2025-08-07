@@ -41,19 +41,12 @@ const AboutCard = () => {
       }}
     >
       <Grid align="stretch">
-        {/* Left: Content */}
-        <Grid.Col span={{ base: 12, sm: 8 }}>
-          <Flex h="100%" p="xl" align="center">
-            <div>
-              <Text size="md" c="black" mt="sm">
-                BloodPulse is a progressive web application dedicated to supporting and showcasing the blood donation campaigns of the Red Cross Youth of Our Lady of Fatima University Valenzuela Campus. It allows users to book blood donation appointments and stay informed about upcoming blood drive events led by the said organization in Valenzuela City, Philippines — all through one easy-to-use platform.
-              </Text>
-            </div>
-          </Flex>
-        </Grid.Col>
-
-        {/* Right: Icon + Label */}
-        <Grid.Col span={{ base: 12, sm: 4 }} style={{ backgroundColor: theme.black }}>
+        {/* Right: Icon + Title (shown first on mobile) */}
+        <Grid.Col
+          span={{ base: 12, sm: 4 }}
+          order={{ base: 1, sm: 2 }}
+          style={{ backgroundColor: theme.black }}
+        >
           <Flex
             direction="column"
             align="center"
@@ -72,6 +65,7 @@ const AboutCard = () => {
               <IconInfoCircle size={20} />
             </ThemeIcon>
             <Title
+              id="about-title"
               order={4}
               style={{
                 color: "white",
@@ -80,6 +74,15 @@ const AboutCard = () => {
             >
               What is BloodPulse?
             </Title>
+          </Flex>
+        </Grid.Col>
+
+        {/* Left: Content (shown second on mobile) */}
+        <Grid.Col span={{ base: 12, sm: 8 }} order={{ base: 2, sm: 1 }}>
+          <Flex h="100%" p="xl" align="center">
+            <Text size="sm" c="black">
+                BloodPulse is a progressive web application designed to support and highlight the blood donation campaigns of the Our Lady of Fatima University Red Cross Youth – Valenzuela Campus. It enables users to schedule blood donation appointments and stay updated on upcoming blood drives organized by the organization — all through a single, easy-to-use platform.
+            </Text>
           </Flex>
         </Grid.Col>
       </Grid>

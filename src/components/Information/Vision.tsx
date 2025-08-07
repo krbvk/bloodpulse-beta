@@ -41,20 +41,10 @@ const VisionCard = () => {
       }}
     >
       <Grid align="stretch">
-        {/* Left: Content */}
-        <Grid.Col span={{ base: 12, sm: 8 }}>
-          <Flex h="100%" p="xl" align="center">
-            <Text size="sm" c="black">
-              Our vision is to be the leading platform in providing an efficient, secure, and
-              compassionate blood donation system worldwide, ensuring that every patient receives the
-              blood they need in critical moments.
-            </Text>
-          </Flex>
-        </Grid.Col>
-
-        {/* Right: Icon + Title with full black background */}
+        {/* Right: Icon + Title (displayed first on mobile) */}
         <Grid.Col
           span={{ base: 12, sm: 4 }}
+          order={{ base: 1, sm: 2 }}
           style={{ backgroundColor: theme.black }}
         >
           <Flex
@@ -84,6 +74,17 @@ const VisionCard = () => {
             >
               What is Our Vision?
             </Title>
+          </Flex>
+        </Grid.Col>
+
+        {/* Left: Content (displayed second on mobile) */}
+        <Grid.Col span={{ base: 12, sm: 8 }} order={{ base: 2, sm: 1 }}>
+          <Flex h="100%" p="xl" align="center">
+            <Text size="sm" c="black">
+              Our vision is to be the leading platform in providing an efficient, secure, and
+              compassionate blood donation system worldwide, ensuring that every patient receives the
+              blood they need in critical moments.
+            </Text>
           </Flex>
         </Grid.Col>
       </Grid>
