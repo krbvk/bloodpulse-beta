@@ -15,6 +15,7 @@ import {
 } from '@mantine/core';
 import MissionCard from '@/components/Information/Mission';
 import VisionCard from '@/components/Information/Vision';
+import AboutCard from '@/components/Information/About';
 import Services from '@/components/Information/Services';
 import CustomLoader from "@/components/Loader/CustomLoader";
 
@@ -103,26 +104,12 @@ const AboutPage = () => {
           align="center"
           justify="flex-start"
           style={{ textAlign: 'center' }}
-        >
-          <Stack gap="md" align="center" w="100%">
-            <Title
-              order={2}
-              style={{
-                fontWeight: 800,
-                color: 'black',
-                fontSize: rem(32),
-              }}
-            >
-              About <span style={{ color: '#FF4D4D' }}>BloodPulse</span>
-            </Title>
+        > 
+        <Box w="100%" my="xl" style={{ backgroundColor: "#fff" }}>
+          <AboutCard />
+        </Box>
 
-            <Text size="md" c="dimmed" maw={600}>
-              Learn more about the mission and vision that fuel our purpose in building a
-              life-saving blood donation network.
-            </Text>
-          </Stack>
-
-          <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl" mt="xl" w="100%">
+          <SimpleGrid cols={1} spacing="xl" mt="xl" w="100%">
             <MissionCard />
             <VisionCard />
           </SimpleGrid>

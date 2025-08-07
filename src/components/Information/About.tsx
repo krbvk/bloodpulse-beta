@@ -10,16 +10,16 @@ import {
   rem,
   Grid,
 } from "@mantine/core";
-import { IconEye } from "@tabler/icons-react";
+import { IconInfoCircle } from "@tabler/icons-react";
 
-const VisionCard = () => {
+const AboutCard = () => {
   const theme = useMantineTheme();
   const redColor = theme.colors.red[6];
 
   return (
     <Paper
       component="section"
-      aria-labelledby="vision-title"
+      aria-labelledby="about-title"
       shadow="lg"
       radius="md"
       p="0"
@@ -44,19 +44,16 @@ const VisionCard = () => {
         {/* Left: Content */}
         <Grid.Col span={{ base: 12, sm: 8 }}>
           <Flex h="100%" p="xl" align="center">
-            <Text size="sm" c="black">
-              Our vision is to be the leading platform in providing an efficient, secure, and
-              compassionate blood donation system worldwide, ensuring that every patient receives the
-              blood they need in critical moments.
-            </Text>
+            <div>
+              <Text size="md" c="black" mt="sm">
+                BloodPulse is a progressive web application dedicated to supporting and showcasing the blood donation campaigns of the Red Cross Youth of Our Lady of Fatima University Valenzuela Campus. It allows users to book blood donation appointments and stay informed about upcoming blood drive events led by the said organization in Valenzuela City, Philippines — all through one easy-to-use platform.
+              </Text>
+            </div>
           </Flex>
         </Grid.Col>
 
-        {/* Right: Icon + Title with full black background */}
-        <Grid.Col
-          span={{ base: 12, sm: 4 }}
-          style={{ backgroundColor: theme.black }}
-        >
+        {/* Right: Icon + Label */}
+        <Grid.Col span={{ base: 12, sm: 4 }} style={{ backgroundColor: theme.black }}>
           <Flex
             direction="column"
             align="center"
@@ -72,17 +69,16 @@ const VisionCard = () => {
               radius="xl"
               size={rem(40)}
             >
-              <IconEye size={20} />
+              <IconInfoCircle size={20} />
             </ThemeIcon>
             <Title
-              id="vision-title"
               order={4}
               style={{
                 color: "white",
                 textAlign: "center",
               }}
             >
-              What is Our Vision?
+              What is BloodPulse?
             </Title>
           </Flex>
         </Grid.Col>
@@ -91,4 +87,4 @@ const VisionCard = () => {
   );
 };
 
-export default VisionCard;
+export default AboutCard;
