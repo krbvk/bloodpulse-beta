@@ -6,7 +6,6 @@ import {
   Box,
   Title,
   Paper,
-  Textarea,
   Button,
   Notification,
   Stack,
@@ -20,6 +19,7 @@ import CustomLoader from "@/components/Loader/CustomLoader";
 import { useRouter } from "next/navigation";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import { generateAppointmentMessage } from "@/utils/generateAppointmentMessage";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -28,8 +28,7 @@ export default function AppointmentLayout() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [appointmentDate, setAppointmentDate] = useState<Date | null>(null);
-  const [appointmentTime, setAppointmentTime] = useState<string>("")
-  const [message, setMessage] = useState("");
+  const [appointmentTime, setAppointmentTime] = useState<string>("");
   const [success, setSuccess] = useState(false);
   const [subject, setSubject] = useState<"Blood Donation" | "Blood Request" | null>(null);
   const [failed, setFailed] = useState(false);
@@ -51,7 +50,6 @@ export default function AppointmentLayout() {
       setSuccess(true);
       setAppointmentDate(null);
       setAppointmentTime("");
-      setMessage("");
     },
     onError: (error) => {
       setFailed(true);
@@ -61,7 +59,7 @@ export default function AppointmentLayout() {
   });
 
   const handleSubmit = () => {
-    if (!appointmentDate || !appointmentTime || !message || !subject) return;
+    if (!appointmentDate || !appointmentTime || !subject) return;
 
     const [hoursStr, minutesStr] = appointmentTime.split(":");
     const hours = Number(hoursStr);
@@ -75,14 +73,22 @@ export default function AppointmentLayout() {
       .tz("Asia/Manila")
       .toDate();
 
-    createAppointment.mutate({ datetime, message, subject });
-  };
+    const formattedDate = dayjs(datetime).format("MMMM D, YYYY");
+    const formattedTime = dayjs(datetime).format("hh:mm A");
+    const fullName = session?.user?.name ?? "Your Name";
 
-  const formatTime = (date: Date | null): string => {
-    if (!date) return "";
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
+    const generatedMessage = generateAppointmentMessage({
+      subject: subject ?? "Appointment",
+      formattedDate,
+      formattedTime,
+      fullName,
+    });
+
+    createAppointment.mutate({
+      datetime,
+      subject,
+      message: generatedMessage,
+    });
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,10 +163,10 @@ export default function AppointmentLayout() {
             label="Date"
             placeholder="Select date"
             value={appointmentDate}
-              onChange={(d) => {
-                setAppointmentDate(d);
-                setTimeError(null);
-              }}
+            onChange={(d) => {
+              setAppointmentDate(d);
+              setTimeError(null);
+            }}
             minDate={new Date()}
             withAsterisk
             clearable
@@ -192,26 +198,19 @@ export default function AppointmentLayout() {
           />
 
           {timeError && (
-              <Text c="red" size="sm" mt="xs">
-                {timeError}
-              </Text>
-            )}
+            <Text c="red" size="sm" mt="xs">
+              {timeError}
+            </Text>
+          )}
 
           <Select
             label="Subject"
             placeholder="Choose subject"
             data={["Blood Donation", "Blood Request"]}
             value={subject}
-            onChange={(value) => setSubject(value as "Blood Donation" | "Blood Request" | null)}
-            withAsterisk
-          />
-
-          <Textarea
-            label="Message"
-            placeholder="Enter reason or message..."
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            minRows={4}
+            onChange={(value) =>
+              setSubject(value as "Blood Donation" | "Blood Request" | null)
+            }
             withAsterisk
           />
 
@@ -220,7 +219,7 @@ export default function AppointmentLayout() {
             fullWidth
             onClick={handleSubmit}
             loading={createAppointment.status === "pending"}
-            disabled={!appointmentDate || !appointmentTime || !message || !!timeError}
+            disabled={!appointmentDate || !appointmentTime || !subject || !!timeError}
           >
             Send Appointment Request
           </Button>
