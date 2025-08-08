@@ -4,6 +4,7 @@ import { Resend } from "resend";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import { generateAppointmentMessage } from "@/utils/generateAppointmentMessage";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -53,13 +54,30 @@ export const appointmentRouter = createTRPCRouter({
             from: process.env.RESEND_FROM_EMAIL ?? "noreply@example.com",
             to: userEmail,
             subject: `Appointment Confirmation: ${input.subject}`,
-            text: `
-            Appointment request from: ${ctx.session.user.name} (${ctx.session.user.email})
-            Appointment is for ${formattedDate}
-            Message: ${input.message}
-            `,
-          });
+            text: `Appointment request from: ${ctx.session.user.name} (${ctx.session.user.email})
+            Appointment is for: ${formattedDate}
+            Message:
+            ${generateAppointmentMessage({
+              subject: input.subject,
+              formattedDate: dayjs(input.datetime).tz("Asia/Manila").format("MMMM D, YYYY"),
+              formattedTime: dayjs(input.datetime).tz("Asia/Manila").format("hh:mm A"),
+              fullName: ctx.session.user.name ?? "Unknown User",
+            })}`,
 
+            html: `
+              <div style="font-family: Arial, sans-serif; font-size: 14px; color: #000; line-height: 1.6;">
+                <p><strong>Appointment request from:</strong> ${ctx.session.user.name} (${ctx.session.user.email})</p>
+                <p><strong>Appointment is for:</strong> ${formattedDate}</p>
+                <p><strong>Message:</strong></p>
+                <p>${generateAppointmentMessage({
+                  subject: input.subject,
+                  formattedDate: dayjs(input.datetime).tz("Asia/Manila").format("MMMM D, YYYY"),
+                  formattedTime: dayjs(input.datetime).tz("Asia/Manila").format("hh:mm A"),
+                  fullName: ctx.session.user.name ?? "Unknown User",
+                }).replace(/\n/g, '<br>')}</p>
+              </div>
+            `.trim(),
+          });
           // console.log("Email sent successfully:", emailResponse);
         } catch (error) {
           // console.error("Error sending email:", error);
