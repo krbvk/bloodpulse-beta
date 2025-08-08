@@ -66,7 +66,11 @@ export const appointmentRouter = createTRPCRouter({
 
             html: `
               <div style="font-family: Arial, sans-serif; font-size: 14px; color: #000; line-height: 1.6;">
-                <p><strong>Appointment request from:</strong> ${ctx.session.user.name} (${ctx.session.user.email})</p>
+                <p>
+                  <strong>Appointment request from:</strong>
+                  ${ctx.session.user.name}
+                  (<span style="color: inherit; text-decoration: none;">${ctx.session.user.email}</span>)
+                </p>
                 <p><strong>Appointment is for:</strong> ${formattedDate}</p>
                 <p><strong>Message:</strong></p>
                 <p>${generateAppointmentMessage({
