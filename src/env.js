@@ -15,6 +15,8 @@ export const env = createEnv({
     AUTH_GOOGLE_SECRET: z.string(),
     AUTH_RESEND_KEY: z.string(),
     RESEND_FROM_EMAIL: z.string().email(),
+    EMAIL: z.string().email(),
+    SAMPLE_EMAIL: z.string().email(),
     DATABASE_URL: z.string().url(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
@@ -40,6 +42,8 @@ export const env = createEnv({
     AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
     AUTH_RESEND_KEY: process.env.AUTH_RESEND_KEY,
     RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
+    EMAIL: process.env.EMAIL,
+    SAMPLE_EMAIL: process.env.SAMPLE_EMAIL,
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
   },

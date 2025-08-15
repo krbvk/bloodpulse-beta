@@ -38,7 +38,8 @@ export const appointmentRouter = createTRPCRouter({
 
       // console.log("Appointment created:", appointment);
 
-      const userEmail = ctx.session.user.email;
+      // const userEmail = ctx.session.user.email;
+      const userEmail = process.env.TEST_EMAIL; // test
       // console.log("Sending email to:", userEmail);
 
       let emailResponse = null;
@@ -51,8 +52,9 @@ export const appointmentRouter = createTRPCRouter({
 
         try {
           emailResponse = await resend.emails.send({
-            from: process.env.RESEND_FROM_EMAIL ?? "noreply@example.com",
+            from: process.env.EMAIL ?? "noreply@example.com",
             to: userEmail,
+            replyTo: ctx.session.user.email || undefined,
             subject: `Appointment Confirmation: ${input.subject}`,
             text: `Appointment request from: ${ctx.session.user.name} (${ctx.session.user.email})
             Appointment is for: ${formattedDate}
