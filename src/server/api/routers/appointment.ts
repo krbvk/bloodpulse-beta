@@ -39,7 +39,7 @@ export const appointmentRouter = createTRPCRouter({
       // console.log("Appointment created:", appointment);
 
       // const userEmail = ctx.session.user.email;
-      const userEmail = process.env.TEST_EMAIL; // test
+      const userEmail = process.env.SAMPLE_EMAIL; // test
       // console.log("Sending email to:", userEmail);
 
       let emailResponse = null;
