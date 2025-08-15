@@ -43,6 +43,7 @@ export function ResendSignIn() {
     const res = await signIn("resend", {
       email,
       redirect: false,
+      callbackUrl: `${window.location.origin}/auth/verify`,
     });
 
     setLoading(false);

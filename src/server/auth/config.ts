@@ -33,6 +33,9 @@ export const authConfig = {
     Microsoft({}),
   ],
   adapter: PrismaAdapter(db),
+  pages: {
+    verifyRequest: "/auth/verify"
+  },
   callbacks: {
     session: async ({ session, user }) => {
       const userWithRole = await db.user.findUnique({
