@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSession, signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function SessionChecker() {
@@ -10,29 +10,30 @@ export default function SessionChecker() {
 
   useEffect(() => {
     const checkSession = async () => {
-      // fetch session again from server
       await update();
 
       if (status === "authenticated") {
-        router.push("/dashboard"); // redirect to dashboard if logged in
+        router.push("/dashboard");
       }
     };
 
-    // Check when PWA/tab gains focus
-    const handleFocus = () => checkSession();
+    // Wrap async calls with void to satisfy ESLint
+    const handleFocus = () => void checkSession();
+    const handleVisibilityChange = () => {
+      if (!document.hidden) void checkSession();
+    };
 
     window.addEventListener("focus", handleFocus);
-    document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) checkSession();
-    });
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    // optional: check on mount
-    checkSession();
+    // initial check on mount
+    void checkSession();
 
     return () => {
       window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [status, update, router]);
 
-  return null; // nothing to render
+  return null;
 }
