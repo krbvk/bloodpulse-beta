@@ -1,39 +1,39 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function SessionChecker() {
-  const { status, update } = useSession();
+  const { update } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
+  const checkedRef = useRef(false);
 
   useEffect(() => {
+    // Only run session refresh if coming back from /auth/verify
+    if (pathname !== "/auth/verify") return;
+
     const checkSession = async () => {
-      await update();
+      if (checkedRef.current) return;
+      checkedRef.current = true;
 
-      if (status === "authenticated") {
-        router.push("/dashboard");
+      const refreshedSession = await update();
+
+      if (refreshedSession) {
+        router.replace("/dashboard"); // logged in → go to dashboard
+      } else {
+        router.replace("/"); // fallback if somehow unauthenticated
       }
+
+      // allow next check after 2 seconds
+      setTimeout(() => {
+        checkedRef.current = false;
+      }, 2000);
     };
 
-    // Wrap async calls with void to satisfy ESLint
-    const handleFocus = () => void checkSession();
-    const handleVisibilityChange = () => {
-      if (!document.hidden) void checkSession();
-    };
-
-    window.addEventListener("focus", handleFocus);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    // initial check on mount
     void checkSession();
-
-    return () => {
-      window.removeEventListener("focus", handleFocus);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [status, update, router]);
+  }, [update, router, pathname]);
 
   return null;
 }
