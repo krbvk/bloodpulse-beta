@@ -135,7 +135,7 @@ export function InstallPrompt() {
                 top: "4rem",
               }}
             >
-              To install the app, tap the <strong>Share</strong> button in Safari, scroll down, and tap <strong>“Add to Home Screen”</strong>.
+              To install the app, tap the <strong>Share</strong> button in Safari, scroll down, and tap <strong>&ldquo;Add to Home Screen&rdquo;</strong>.
             </Notification>
           )}
         </>
