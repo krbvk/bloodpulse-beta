@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function VerifyPage() {
   const [countdown, setCountdown] = useState(5);
@@ -59,7 +60,7 @@ export default function VerifyPage() {
       )}
 
       {showContinue && (
-        <a
+        <Link
           href="/"
           style={{
             display: "inline-block",
@@ -72,7 +73,7 @@ export default function VerifyPage() {
           }}
         >
           Continue in App
-        </a>
+        </Link>
       )}
     </main>
   );
