@@ -80,7 +80,7 @@ export const authConfig = {
           body: JSON.stringify({
             from: provider.from,
             to: identifier,
-            subject: "Sign in to BloodPulse",
+            subject: "Sign in to bloodpulse.tech",
             html,
             text,
           }),
