@@ -8,10 +8,10 @@ export function ServiceWorkerProvider() {
       navigator.serviceWorker
         .register("/sw.js", { scope: "/" })
         .then((reg) => {
-          console.log("✅ Service worker registered:", reg);
+          // console.log("✅ Service worker registered:", reg);
 
           if (navigator.serviceWorker.controller) {
-            console.log("🔹 This page IS controlled by a service worker");
+            // console.log("🔹 This page IS controlled by a service worker");
           } else {
             console.warn("⚠️ This page is NOT controlled by a service worker yet");
           }
