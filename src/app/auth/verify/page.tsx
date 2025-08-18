@@ -11,23 +11,19 @@ export default function VerifyPage() {
     const bc = new BroadcastChannel("auth_channel");
     bc.postMessage({ type: "login-complete" });
 
-    // Detect if running inside installed app
     const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
+    const openedByScript = window.opener !== null; // ✅ detect popup vs. normal tab
 
     if (isStandalone) {
-      // ✅ Inside installed PWA → redirect immediately
+      // ✅ Installed PWA → go straight to dashboard
       window.location.href = "/dashboard";
-    } else {
-      // ✅ Browser → stay here with countdown + close tab attempt
+    } else if (openedByScript) {
+      // ✅ Popup flow → try auto-close with countdown
       const interval = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(interval);
-
-            // Try closing (only works if window was script-opened)
             window.close();
-
-            // If blocked, show manual continue button
             setShowContinue(true);
             return 0;
           }
@@ -36,9 +32,12 @@ export default function VerifyPage() {
       }, 1000);
 
       return () => clearInterval(interval);
+    } else {
+      // ✅ Normal browser tab (desktop/mobile) → do nothing, just stay here
+      setShowContinue(true);
     }
 
-    // Cleanup
+    // Cleanup broadcast channel
     const t = setTimeout(() => bc.close(), 1500);
     return () => {
       clearTimeout(t);
@@ -58,14 +57,14 @@ export default function VerifyPage() {
       <h1 style={{ marginBottom: 12 }}>You’re now signed in</h1>
       <p>You can close this tab and return to your original one.</p>
 
-      {/* Show countdown only in browser */}
-      {countdown > 0 && (
+      {/* Show countdown only in popup */}
+      {countdown > 0 && !showContinue && (
         <p style={{ marginTop: 16 }}>
-          Automatically closing in <strong>{countdown}</strong>…
+          Closing in <strong>{countdown}</strong>…
         </p>
       )}
 
-      {/* Fallback button if close blocked */}
+      {/* Fallback button if not popup OR if close blocked */}
       {showContinue && (
         <Link
           href="/"
