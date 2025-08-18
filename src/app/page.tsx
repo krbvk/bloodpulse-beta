@@ -10,7 +10,7 @@ import CustomLoader from "@/components/Loader/CustomLoader";
 
 export default function Page() {
   const [splashes, setSplashes] = useState<{ id: number; x: number; y: number }[]>([]);
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [isMounted, setIsMounted] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true); 

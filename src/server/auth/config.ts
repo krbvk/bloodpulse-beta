@@ -2,7 +2,6 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
 import Resend from "next-auth/providers/resend";
-import Email from "next-auth/providers/email"
 import { db } from "@/server/db";
 import { Role } from "@prisma/client";
 
@@ -28,7 +27,7 @@ export const authConfig = {
     Resend({
       from: process.env.RESEND_FROM_EMAIL,
       async sendVerificationRequest({ identifier, url, provider }) {
-        const loginUrl = new URL(url);
+      const loginUrl = new URL(url);
 
       const html = `
         <body style="background: #f9f9f9; padding: 20px; font-family: Arial, sans-serif;">

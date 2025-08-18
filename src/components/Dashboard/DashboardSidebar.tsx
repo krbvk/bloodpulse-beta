@@ -13,7 +13,6 @@ import {
 } from "@tabler/icons-react";
 import { useState, useEffect } from "react";
 import CustomLoader from "@/components/Loader/CustomLoader";
-import { api } from "@/trpc/react";
 
 type SidebarProps = {
   isOpen: boolean;

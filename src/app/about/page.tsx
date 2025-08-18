@@ -4,13 +4,9 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar/Homepage';
 import {
   Container,
-  Title,
-  Text,
   SimpleGrid,
-  Stack,
   Box,
   Flex,
-  rem,
   Center,
 } from '@mantine/core';
 import MissionCard from '@/components/Information/Mission';

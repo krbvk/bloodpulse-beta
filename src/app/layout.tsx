@@ -43,7 +43,7 @@ export default function RootLayout({
             <SdkProvider>
               <ClientOnly>
                 <InstallPromptProvider>
-                  <SessionChecker />
+                  {/* <SessionChecker /> */}
                   {children}
               </InstallPromptProvider>
             </ClientOnly>

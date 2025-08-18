@@ -1,7 +1,7 @@
 "use client";
 
 import { signIn, useSession } from "next-auth/react";
-import { Button, Text, Box } from "@mantine/core";
+import { Button, Box } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { IconBrandGoogle } from '@tabler/icons-react';
