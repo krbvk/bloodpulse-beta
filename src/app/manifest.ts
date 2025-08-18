@@ -5,9 +5,10 @@ export default function manifest(): MetadataRoute.Manifest {
     name: 'Bloodpulse-app-beta',
     short_name: 'BloodPulse',
     description: 'A Progressive Web App built with Next.js',
-    start_url: '/',
+    start_url: '/?source=pwa',
     display: 'standalone',
     background_color: '#ffffff',
+    id: 'https://bloodpulse.tech/',
     theme_color: '#000000',
     icons: [
       {
