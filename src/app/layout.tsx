@@ -9,6 +9,7 @@ import '@mantine/dates/styles.css';
 import { SdkProvider } from "@/components/Dashboard/SdkContext";
 import ClientOnly from "@/components/Loader/ClientOnly";
 import { ServiceWorkerProvider } from "@/components/ServiceWorkerProvider";
+import { InstallPromptProvider } from "@/components/InstallPromptProvider";
 
 export const metadata: Metadata = {
   title: "Bloodpulse",
@@ -23,6 +24,7 @@ const geist = Geist({
 const theme = createTheme({
   /** Put your mantine theme override here */
 })
+
 
 export default function RootLayout({
   children,
@@ -39,7 +41,9 @@ export default function RootLayout({
           <SessionProviders>
             <SdkProvider>
               <ClientOnly>
-              {children}
+                <InstallPromptProvider>
+                {children}
+              </InstallPromptProvider>
             </ClientOnly>
             <ServiceWorkerProvider />
             </SdkProvider>
