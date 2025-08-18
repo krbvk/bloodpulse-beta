@@ -96,7 +96,7 @@ export function InstallPrompt() {
                 top: "4rem",
               }}
             >
-              To install the app, open your browser menu and select <strong>"Add to Home Screen"</strong>.
+              To install the app, open your browser menu and select <strong>&ldquo;Add to Home Screen&rdquo;</strong>.
             </Notification>
           )}
         </>
