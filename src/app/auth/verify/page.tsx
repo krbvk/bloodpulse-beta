@@ -12,18 +12,19 @@ export default function VerifyPage() {
     bc.postMessage({ type: "login-complete" });
 
     if (window.matchMedia("(display-mode: standalone)").matches) {
-      // Inside installed app → redirect immediately
+      // ✅ Inside installed app → redirect immediately
       window.location.href = "/dashboard";
     } else {
-      // Start countdown
+      // ✅ Browser → show countdown + try closing
       const interval = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(interval);
-            // Try closing
+
+            // Try closing tab (only works if opened by script)
             window.close();
 
-            // If browser blocks it → show button
+            // If blocked, show button
             setShowContinue(true);
             return 0;
           }
