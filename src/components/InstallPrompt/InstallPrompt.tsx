@@ -23,7 +23,7 @@ export function InstallPrompt() {
   useEffect(() => {
     const nav = navigator as BraveNavigator;
     if (nav.brave?.isBrave) {
-      nav.brave.isBrave().then((result) => setIsBrave(result));
+      void nav.brave.isBrave().then((result) => setIsBrave(result));
     }
   }, []);
 
