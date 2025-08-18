@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function VerifyPage() {
-  const [countdown, setCountdown] = useState(5);
   const [showContinue, setShowContinue] = useState(false);
   // ✅ iOS detection
   const [isIOS] = useState(
@@ -21,19 +20,9 @@ export default function VerifyPage() {
     if (isStandalone) {
       window.location.href = "/dashboard";
     } else if (openedByScript) {
-      const interval = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            window.close();
-            if (isIOS) setShowContinue(true); // ✅ only show fallback on iOS
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      return () => clearInterval(interval);
+      // try immediate close
+      window.close();
+      if (isIOS) setShowContinue(true); // fallback only on iOS
     } else {
       // Normal browser tab → only iOS shows fallback
       if (isIOS) setShowContinue(true);
@@ -57,12 +46,6 @@ export default function VerifyPage() {
     >
       <h1 style={{ marginBottom: 12 }}>You’re now signed in</h1>
       <p>You can close this tab and return to your original one.</p>
-
-      {countdown > 0 && !showContinue && (
-        <p style={{ marginTop: 16 }}>
-          Closing in <strong>{countdown}</strong>…
-        </p>
-      )}
 
       {/* ✅ Fallback button only on iOS */}
       {showContinue && isIOS && (
