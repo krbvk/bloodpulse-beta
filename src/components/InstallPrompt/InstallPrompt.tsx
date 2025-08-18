@@ -13,6 +13,7 @@ export function InstallPrompt() {
   const [isStandalone, setIsStandalone] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showiOSInstruction, setShowiOSInstruction] = useState(false);
+  const [isReadyForInstall, setIsReadyForInstall] = useState(false);
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   useEffect(() => {
@@ -23,6 +24,7 @@ export function InstallPrompt() {
       e.preventDefault();
       const promptEvent = e as BeforeInstallPromptEvent;
       setDeferredPrompt(promptEvent);
+      setIsReadyForInstall(true);
     };
 
     window.addEventListener('beforeinstallprompt', handler);
@@ -35,6 +37,7 @@ export function InstallPrompt() {
     if (deferredPrompt) {
       deferredPrompt.prompt();
       await deferredPrompt.userChoice.finally(() => setDeferredPrompt(null));
+      setIsReadyForInstall(false);
     }
   };
 
@@ -43,6 +46,7 @@ export function InstallPrompt() {
       {!isIOS ? (
         <Button
           onClick={handleInstall}
+          disabled={!isReadyForInstall}
           size={isMobile ? 'md' : 'lg'}
           radius="md"
           color="red"
