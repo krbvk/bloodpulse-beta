@@ -17,10 +17,13 @@ export function InstallPrompt() {
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   useEffect(() => {
+    console.log("Standalone?", window.matchMedia("(display-mode: standalone)").matches);
+    console.log("Controller:", navigator.serviceWorker.controller);
     setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window));
     setIsStandalone(window.matchMedia("(display-mode: standalone)").matches);
 
     const handler = (e: Event) => {
+      console.log("📦 beforeinstallprompt fired!");
       e.preventDefault();
       const promptEvent = e as BeforeInstallPromptEvent;
       setDeferredPrompt(promptEvent);

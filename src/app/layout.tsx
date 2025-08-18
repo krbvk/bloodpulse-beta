@@ -8,6 +8,7 @@ import '@mantine/carousel/styles.css';
 import '@mantine/dates/styles.css';
 import { SdkProvider } from "@/components/Dashboard/SdkContext";
 import ClientOnly from "@/components/Loader/ClientOnly";
+import { ServiceWorkerProvider } from "@/components/ServiceWorkerProvider";
 
 export const metadata: Metadata = {
   title: "Bloodpulse",
@@ -30,6 +31,8 @@ export default function RootLayout({
     <html lang="en" {...mantineHtmlProps}>
       <head>
         <ColorSchemeScript />
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <meta name="theme-color" content="#000000" />
       </head>
       <body className={geist.className}>
         <MantineProvider theme={theme}>
@@ -38,6 +41,7 @@ export default function RootLayout({
               <ClientOnly>
               {children}
             </ClientOnly>
+            <ServiceWorkerProvider />
             </SdkProvider>
           </SessionProviders>
         </MantineProvider>
