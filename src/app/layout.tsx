@@ -10,6 +10,7 @@ import { SdkProvider } from "@/components/Dashboard/SdkContext";
 import ClientOnly from "@/components/Loader/ClientOnly";
 import { ServiceWorkerProvider } from "@/components/ServiceWorkerProvider";
 import { InstallPromptProvider } from "@/components/InstallPromptProvider";
+import SessionChecker from "@/components/SessionChecker";
 
 export const metadata: Metadata = {
   title: "Bloodpulse",
@@ -42,7 +43,8 @@ export default function RootLayout({
             <SdkProvider>
               <ClientOnly>
                 <InstallPromptProvider>
-                {children}
+                  <SessionChecker />
+                  {children}
               </InstallPromptProvider>
             </ClientOnly>
             <ServiceWorkerProvider />
