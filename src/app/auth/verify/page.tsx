@@ -11,20 +11,23 @@ export default function VerifyPage() {
     const bc = new BroadcastChannel("auth_channel");
     bc.postMessage({ type: "login-complete" });
 
-    if (window.matchMedia("(display-mode: standalone)").matches) {
-      // ✅ Inside installed app → redirect immediately
+    // Detect if running inside installed app
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
+
+    if (isStandalone) {
+      // ✅ Inside installed PWA → redirect immediately
       window.location.href = "/dashboard";
     } else {
-      // ✅ Browser → show countdown + try closing
+      // ✅ Browser → stay here with countdown + close tab attempt
       const interval = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(interval);
 
-            // Try closing tab (only works if opened by script)
+            // Try closing (only works if window was script-opened)
             window.close();
 
-            // If blocked, show button
+            // If blocked, show manual continue button
             setShowContinue(true);
             return 0;
           }
@@ -35,6 +38,7 @@ export default function VerifyPage() {
       return () => clearInterval(interval);
     }
 
+    // Cleanup
     const t = setTimeout(() => bc.close(), 1500);
     return () => {
       clearTimeout(t);
@@ -54,12 +58,14 @@ export default function VerifyPage() {
       <h1 style={{ marginBottom: 12 }}>You’re now signed in</h1>
       <p>You can close this tab and return to your original one.</p>
 
+      {/* Show countdown only in browser */}
       {countdown > 0 && (
         <p style={{ marginTop: 16 }}>
           Automatically closing in <strong>{countdown}</strong>…
         </p>
       )}
 
+      {/* Fallback button if close blocked */}
       {showContinue && (
         <Link
           href="/"
