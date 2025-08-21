@@ -92,6 +92,7 @@ model Appointment {
   requester   User     @relation("UserAppointments", fields: [requesterId], references: [id], onDelete: Cascade)
   datetime    DateTime
   message     String
+  displaySubject String
   subject   AppointmentSubject @default(BloodDonation)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

@@ -20,6 +20,7 @@ export const appointmentRouter = createTRPCRouter({
     .input(
       z.object({
         datetime: z.date(),
+        displaySubject: z.string(),
         message: z.string().min(1),
         subject: z.enum(["Blood Donation", "Blood Request"]),
       })
@@ -32,6 +33,7 @@ export const appointmentRouter = createTRPCRouter({
           datetime: input.datetime,
           message: input.message,
           subject: input.subject === "Blood Donation" ? "BloodDonation" : "BloodRequest",
+          displaySubject: input.displaySubject,
           requesterId: ctx.session.user.id,
         },
       });
@@ -55,12 +57,12 @@ export const appointmentRouter = createTRPCRouter({
             from: process.env.EMAIL ?? "noreply@example.com",
             to: userEmail,
             replyTo: ctx.session.user.email ?? undefined,
-            subject: `Appointment Confirmation: ${input.subject}`,
+            subject: input.displaySubject,
             text: `Appointment request from: ${ctx.session.user.name} (${ctx.session.user.email})
             Appointment is for: ${formattedDate}
             Message:
             ${generateAppointmentMessage({
-              subject: input.subject,
+              subject: input.displaySubject,
               formattedDate: dayjs(input.datetime).tz("Asia/Manila").format("MMMM D, YYYY"),
               formattedTime: dayjs(input.datetime).tz("Asia/Manila").format("hh:mm A"),
               fullName: ctx.session.user.name ?? "Unknown User",
@@ -76,7 +78,7 @@ export const appointmentRouter = createTRPCRouter({
                 <p><strong>Appointment is for:</strong> ${formattedDate}</p>
                 <p><strong>Message:</strong></p>
                 <p>${generateAppointmentMessage({
-                  subject: input.subject,
+                  subject: input.displaySubject,
                   formattedDate: dayjs(input.datetime).tz("Asia/Manila").format("MMMM D, YYYY"),
                   formattedTime: dayjs(input.datetime).tz("Asia/Manila").format("hh:mm A"),
                   fullName: ctx.session.user.name ?? "Unknown User",
