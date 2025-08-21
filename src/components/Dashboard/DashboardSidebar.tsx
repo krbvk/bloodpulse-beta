@@ -10,6 +10,7 @@ import {
   IconUser,
   IconListCheck,
   IconCalendarPlus,
+  IconChartInfographic ,
 } from "@tabler/icons-react";
 import { useState, useEffect } from "react";
 import CustomLoader from "@/components/Loader/CustomLoader";
@@ -123,6 +124,14 @@ const DashboardSidebar = ({ isOpen, session, isUserDonor }: SidebarProps) => {
           </UnstyledButton>
         )}
         
+        
+        <UnstyledButton onClick={() => router.push("/statistic")}>
+          <Flex align="center" gap="xs">
+            <IconChartInfographic  size={20} color="white" />
+            <Text size="sm" c="white">Statistic</Text>
+          </Flex>
+        </UnstyledButton>
+
         <UnstyledButton onClick={() => router.push("/appointments")}>
           <Flex align="center" gap="xs">
             <IconCalendarPlus size={20} color="white" />

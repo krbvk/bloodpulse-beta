@@ -1,123 +1,85 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import {
-  Button,
-  Text,
-  Stack,
-  Paper,
-  TextInput,
-  Notification,
+  Button, Text, Stack, Paper, TextInput, Notification,
 } from "@mantine/core";
-import { useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { IconMail } from "@tabler/icons-react";
-import CustomLoader from "../Loader/CustomLoader";
 
 export function ResendSignIn() {
-  const { status } = useSession();
-  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+  const [showOtp, setShowOtp] = useState(false);
+  const [email, setEmail] = useState("");
+  const [notification, setNotification] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showNotification, setShowNotification] = useState(false);
 
-  useEffect(() => {
-    if (status === "authenticated") {
-      router.push("/dashboard");
-    }
-  }, [status, router]);
-
-  const resendAction = async (event: React.FormEvent) => {
+  const requestOtp = async (event: React.FormEvent) => {
     event.preventDefault();
-
     const formData = new FormData(formRef.current!);
-    const email = formData.get("email");
-
-    if (typeof email !== "string") {
-      console.error("Email must be a string");
-      return;
-    }
+    const emailInput = formData.get("email") as string;
+    setEmail(emailInput);
 
     setLoading(true);
-
-    const res = await signIn("resend", {
-      email,
-      redirect: false,
+    const res = await fetch("/api/request-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: emailInput }),
     });
-
-    setLoading(false);
-
-    if (res?.ok) {
-      setShowNotification(true);
-      setTimeout(() => setShowNotification(false), 5000);
+    if (res.ok) {
+      setNotification("OTP sent to your email!");
+      setShowOtp(true);
+    } else {
+      setNotification("Failed to send OTP");
     }
   };
 
-  if (status === "loading" || loading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <CustomLoader />
-      </div>
-    );
-  }
+  const verifyOtp = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const formData = new FormData(formRef.current!);
+    const otp = formData.get("otp") as string;
+
+    setLoading(true);
+    const res = await signIn("credentials", {
+      email,
+      otp,
+      redirect: false,
+      callbackUrl: "/dashboard",
+    });
+    if (res?.url) {
+      window.location.href = res.url;
+    }
+  };
 
   return (
-    <Paper
-      shadow="md"
-      radius="lg"
-      p="xl"
-      mt="md"
-      mx="auto"
-      withBorder
-      style={{ maxWidth: 400, width: "100%", backgroundColor: "white" }}
-    >
-      <form ref={formRef} onSubmit={resendAction} style={{ width: "100%" }}>
+    <Paper shadow="md" radius="lg" p="xl" mt="md" mx="auto" withBorder style={{ maxWidth: 400, width: "100%" }}>
+      <form ref={formRef} onSubmit={showOtp ? verifyOtp : requestOtp}>
         <Stack gap="lg">
-          <Text style={{ textAlign: "center" }} size="md" c="black">
-            Continue with Email
-          </Text>
-          <TextInput
-            label="Email"
-            placeholder="your@email.com"
-            name="email"
-            type="email"
-            required
-          />
+          <Text ta="center" size="md">Login with Email OTP</Text>
+
+          {!showOtp ? (
+            <TextInput label="Email" name="email" type="email" required />
+          ) : (
+            <TextInput label="Enter OTP" name="otp" required />
+          )}
+
           <Button type="submit" size="lg" color="blue" fullWidth>
-            Send login link
+            {showOtp ? "Verify OTP" : "Send OTP"}
           </Button>
         </Stack>
       </form>
 
-      {showNotification && (
+      {notification && (
         <Notification
           icon={<IconMail size={18} />}
-          title="Check your email!"
           color="green"
-          onClose={() => setShowNotification(false)}
-          style={{
-            marginTop: "20px",
-            position: "fixed",
-            top: "20px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: 1000,
-            width: "600px",
-            maxWidth: "90vw"
-          }}
+          onClose={() => setNotification("")}
+          style={{ marginTop: "20px" }}
         >
-          Check your email for the sign-in link! 
-          <br />
-          If you can&apos;t find the email, be sure to check your spam or junk folder.
+          {notification}
         </Notification>
       )}
     </Paper>
   );
 }
+

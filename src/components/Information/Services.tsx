@@ -39,7 +39,7 @@ const servicesData: Service[] = [
       'Receive your Donor Card after a successful donation.',
     ],
     display: 'Step-by-step guide to start your blood donor journey.',
-    imgSrc: '/IntroductionImage1.svg',
+    imgSrc: '/donation.svg',
   },
   {
     title: 'Book a Donation Appointment',
@@ -51,7 +51,7 @@ const servicesData: Service[] = [
       'Click the "Send Appointment Request" button and wait for a confirmation email from Red Cross Youth - Our Lady of Fatima University Valenzuela Campus.',
     ],
     display: 'Schedule your donation in a few simple steps — quick, easy, and secure.',
-    imgSrc: '/IntroductionImage1.svg',
+    imgSrc: '/booking.svg',
   },
   {
     title: 'Blood Donation Events',
@@ -61,7 +61,7 @@ const servicesData: Service[] = [
       'You can also visit their official Facebook page for announcements and schedules.',
     ],
     display: 'Stay updated on upcoming blood drives and events near you.',
-    imgSrc: '/IntroductionImage1.svg',
+    imgSrc: '/event.svg',
   },
 ];
 
