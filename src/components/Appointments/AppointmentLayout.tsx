@@ -33,6 +33,7 @@ export default function AppointmentLayout() {
   const [subject, setSubject] = useState<"Blood Donation" | "Blood Request" | null>(null);
   const [failed, setFailed] = useState(false);
   const [timeError, setTimeError] = useState<string | null>(null);
+  const [subjectCount, setSubjectCount] = useState(1);
   const timeInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -50,6 +51,7 @@ export default function AppointmentLayout() {
       setSuccess(true);
       setAppointmentDate(null);
       setAppointmentTime("");
+      setSubjectCount((prev) => prev + 1);
     },
     onError: (error) => {
       setFailed(true);
@@ -78,15 +80,18 @@ export default function AppointmentLayout() {
     const fullName = session?.user?.name ?? "Your Name";
 
     const generatedMessage = generateAppointmentMessage({
-      subject: subject ?? "Appointment",
+      subject,
       formattedDate,
       formattedTime,
       fullName,
     });
 
+    const displaySubject = `[${subjectCount}] Appointment - ${subject}`;
+
     createAppointment.mutate({
       datetime,
       subject,
+      displaySubject,
       message: generatedMessage,
     });
   };
