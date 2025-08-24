@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Center, Flex } from "@mantine/core";
 import { useSession } from "next-auth/react";
 import DashboardNavbar from "@/components/Dashboard/DashboardNavbar";
@@ -8,6 +8,7 @@ import DashboardSidebar from "@/components/Dashboard/DashboardSidebar";
 // import DonorLayout from "@/components/Donors/DonorLayout"; // make this statistics layout
 import CustomLoader from "@/components/Loader/CustomLoader";
 import { api } from "@/trpc/react";
+import { useRouter } from "next/navigation";
 
 const StatisticsPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -15,8 +16,24 @@ const StatisticsPage = () => {
   const { data: isUserDonor, isLoading: donorStatusLoading } = api.donor.getIsUserDonor.useQuery(undefined, {
         enabled: !!session?.user?.email,
   });
+  const router = useRouter();
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/");
+    }
+    
+    if (status === "authenticated") {
+      const role = session?.user?.role;
+      const allowed = role === "ADMIN";
+
+      if (!allowed) {
+        router.replace("/dashboard");
+      }
+    }
+  }, [status, donorStatusLoading, session?.user?.role, router]);
 
   if (status === "loading" || donorStatusLoading) {
     return (
