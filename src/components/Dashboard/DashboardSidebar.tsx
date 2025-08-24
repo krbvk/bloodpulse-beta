@@ -129,6 +129,15 @@ const DashboardSidebar = ({ isOpen, session, isUserDonor }: SidebarProps) => {
           </Flex>
         </UnstyledButton>
 
+        {role === "ADMIN" && (
+          <UnstyledButton onClick={() => router.push("/statistics")}>
+            <Flex align="center" gap="xs">
+              <IconListCheck size={20} color="white" />
+              <Text size="sm" c="white">Statistics</Text>
+            </Flex>
+          </UnstyledButton>
+        )}
+
         <UnstyledButton onClick={handleSignOut}>
           <Flex align="center" gap="xs">
             <IconLogout size={20} color="white" />
