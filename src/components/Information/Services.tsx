@@ -39,7 +39,7 @@ const servicesData: Service[] = [
       'Receive your Donor Card after a successful donation.',
     ],
     display: 'Step-by-step guide to start your blood donor journey.',
-    imgSrc: '/IntroductionImage1.svg',
+    imgSrc: 'donation.svg',
   },
   {
     title: 'Book a Donation Appointment',
@@ -51,7 +51,7 @@ const servicesData: Service[] = [
       'Click the "Send Appointment Request" button and wait for a confirmation email from Red Cross Youth - Our Lady of Fatima University Valenzuela Campus.',
     ],
     display: 'Schedule your donation in a few simple steps — quick, easy, and secure.',
-    imgSrc: '/IntroductionImage1.svg',
+    imgSrc: 'booking.svg',
   },
   {
     title: 'Blood Donation Events',
@@ -61,7 +61,7 @@ const servicesData: Service[] = [
       'You can also visit their official Facebook page for announcements and schedules.',
     ],
     display: 'Stay updated on upcoming blood drives and events near you.',
-    imgSrc: '/IntroductionImage1.svg',
+    imgSrc: 'event.svg',
   },
 ];
 
@@ -136,9 +136,15 @@ const Services = () => {
             <Image
               src={service.imgSrc}
               alt={service.title}
-              height={180}
+              width="100%"
+              height={300}
               radius="md"
-              style={{ objectFit: 'cover', marginBottom: '1rem' }}
+              fit="contain"
+              style={{
+                marginBottom: '1rem',
+                backgroundColor: '#f9f9f9',
+                borderRadius: 12,
+              }}
             />
             <Box px="sm">
               <Text
@@ -162,7 +168,7 @@ const Services = () => {
                 fw={500}
                 style={{ fontStyle: 'italic' }}
               >
-                Click to learn more 
+                Click to learn more
               </Text>
             </Box>
           </Card>
@@ -226,8 +232,9 @@ const Services = () => {
               alt={selectedService?.title}
               radius="md"
               height={200}
-              fit="cover"
-              style={{ borderRadius: 10, marginTop: 8 }}
+              fit="contain"
+              width="100%"
+              style={{ borderRadius: 10, marginTop: 8, backgroundColor: '#f9f9f9' }}
             />
 
             <Divider color="#b0b0b0" my="sm" />
@@ -288,8 +295,8 @@ const Services = () => {
                   radius="md"
                   height={400}
                   width="100%"
-                  fit="cover"
-                  style={{ borderRadius: 12 }}
+                  fit="contain"
+                  style={{ borderRadius: 12, backgroundColor: '#f9f9f9' }}
                 />
               </Grid.Col>
 

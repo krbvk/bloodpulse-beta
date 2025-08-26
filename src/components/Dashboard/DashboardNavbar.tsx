@@ -35,7 +35,7 @@ const getInitials = (name: string) => {
 
 const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
   const router = useRouter();
-  const [burgerOpened, setBurgerOpened] = useState(false);
+  const [burgerOpened, setBurgerOpened] = useState(true);
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [loading, setLoading] = useState(false);
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);

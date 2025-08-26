@@ -10,6 +10,7 @@ import {
   IconUser,
   IconListCheck,
   IconCalendarPlus,
+  IconChartInfographic 
 } from "@tabler/icons-react";
 import { useState, useEffect } from "react";
 import CustomLoader from "@/components/Loader/CustomLoader";
@@ -128,6 +129,15 @@ const DashboardSidebar = ({ isOpen, session, isUserDonor }: SidebarProps) => {
             <Text size="sm" c="white">Book Appointment</Text>
           </Flex>
         </UnstyledButton>
+
+        {role === "ADMIN" && (
+          <UnstyledButton onClick={() => router.push("/statistics")}>
+            <Flex align="center" gap="xs">
+              <IconChartInfographic  size={20} color="white" />
+              <Text size="sm" c="white">Statistics</Text>
+            </Flex>
+          </UnstyledButton>
+        )}
 
         <UnstyledButton onClick={handleSignOut}>
           <Flex align="center" gap="xs">
