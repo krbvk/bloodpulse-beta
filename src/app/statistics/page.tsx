@@ -5,7 +5,7 @@ import { Box, Center, Flex } from "@mantine/core";
 import { useSession } from "next-auth/react";
 import DashboardNavbar from "@/components/Dashboard/DashboardNavbar";
 import DashboardSidebar from "@/components/Dashboard/DashboardSidebar";
-// import DonorLayout from "@/components/Donors/DonorLayout"; // make this statistics layout
+import StatisticsLayout from "@/components/Statistics/StatisticsLayout"; 
 import CustomLoader from "@/components/Loader/CustomLoader";
 import { api } from "@/trpc/react";
 import { useRouter } from "next/navigation";
@@ -67,6 +67,7 @@ const StatisticsPage = () => {
           }}
         >
           {/* <DonorLayout (change into statistics/> */} 
+          <StatisticsLayout />
         </Box>
       </Flex>
     </Box>
