@@ -252,7 +252,7 @@ const StatisticsLayout = () => {
   const theme = useMantineTheme();
 
   return (
-    <Box style={{ height: "100vh", padding: theme.spacing.md, overflowY: "auto" }}>
+    <Box style={{ height: "100vh", padding: theme.spacing.md }}>
       <Box px="lg" py="md" mih="100%">
         <Group justify="space-between" mb="md">
           <div>
