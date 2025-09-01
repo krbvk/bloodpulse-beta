@@ -9,7 +9,8 @@ type RequestBody = {
 }
 
 export async function POST(req: Request) {
-  const { email }: RequestBody = await req.json();
+  const body = (await req.json()) as RequestBody;
+  const { email } = body;
   if (!email) return NextResponse.json({ error: "Email required" }, { status: 400 });
 
   const code = await generateOTP(email); 
