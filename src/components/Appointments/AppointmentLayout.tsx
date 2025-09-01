@@ -77,13 +77,12 @@ export default function AppointmentLayout() {
 
     const formattedDate = dayjs(datetime).format("MMMM D, YYYY");
     const formattedTime = dayjs(datetime).format("hh:mm A");
-    const fullName = session?.user?.name ?? "Your Name";
+    // const fullName = session?.user?.name ?? "Your Name";
 
     const generatedMessage = generateAppointmentMessage({
       subject,
       formattedDate,
       formattedTime,
-      fullName,
     });
 
     const displaySubject = `[${subjectCount}] Appointment - ${subject}`;
