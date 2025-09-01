@@ -102,7 +102,7 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
           <Group gap="xs" align="center" wrap="wrap" justify="flex-end">
             {!isMobile && (
               <Text size="sm" fw={600} c="white">
-                Welcome, {name}
+                {name ? `Welcome, ${name}` : "Welcome"}
               </Text>
             )}
 

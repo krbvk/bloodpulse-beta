@@ -58,7 +58,7 @@ export default function DonorProfileLayout() {
             alt={name ?? "User Avatar"}
             />
             <Text fw={700} size="lg" mt="md" style={{textAlign: "center"}}>
-            {name}
+            {name ? `, ${name}` : "No Name Set"}
             </Text>
             <Text size="sm" c="dimmed" mt={4} style={{textAlign: "center"}}>
             {email}
@@ -71,7 +71,7 @@ export default function DonorProfileLayout() {
           <Text size="xs" c="dimmed" fw={500} mb={4}>
             Full Name
           </Text>
-          <Text fw={500}>{name ?? "—"}</Text>
+          <Text fw={500}>{name ?? "No Name Set"}</Text>
         </Grid.Col>
         <Grid.Col span={{ base: 12, sm: 6 }}>
           <Text size="xs" c="dimmed" fw={500} mb={4}>
