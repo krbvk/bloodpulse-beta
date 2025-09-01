@@ -4,8 +4,12 @@ import { generateOTP } from "@/lib/otp";
 
 const resend = new Resend(process.env.AUTH_RESEND_KEY);
 
+type RequestBody = {
+  email: string;
+}
+
 export async function POST(req: Request) {
-  const { email } = await req.json();
+  const { email }: RequestBody = await req.json();
   if (!email) return NextResponse.json({ error: "Email required" }, { status: 400 });
 
   const code = await generateOTP(email); 

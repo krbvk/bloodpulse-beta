@@ -18,6 +18,16 @@ declare module "next-auth" {
   }
 }
 
+  interface User {
+    id: string;
+    role: Role;
+  }
+
+  interface JWT {
+    id: string;
+    role: Role;
+  }
+
 export const authConfig = {
   providers: [
     Google({}),
@@ -72,8 +82,9 @@ export const authConfig = {
       console.log("🟡 jwt() callback - before:", token, "user:", user);
 
       if (user) {
-        token.id = (user as any).id;
-        token.role = (user as any).role ?? Role.USER;
+        const typedUser = user as User;
+        token.id = typedUser.id;
+        token.role = typedUser.role ?? Role.USER;
         console.log("✅ jwt() storing user into token:", token);
       }
 
