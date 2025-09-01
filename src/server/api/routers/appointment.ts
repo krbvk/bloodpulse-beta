@@ -58,21 +58,19 @@ export const appointmentRouter = createTRPCRouter({
             to: userEmail,
             replyTo: ctx.session.user.email ?? undefined,
             subject: input.displaySubject,
-            text: `Appointment request from: ${ctx.session.user.name} (${ctx.session.user.email})
+            text: `Appointment request from: (${ctx.session.user.email})
             Appointment is for: ${formattedDate}
             Message:
             ${generateAppointmentMessage({
               subject: input.displaySubject,
               formattedDate: dayjs(input.datetime).tz("Asia/Manila").format("MMMM D, YYYY"),
               formattedTime: dayjs(input.datetime).tz("Asia/Manila").format("hh:mm A"),
-              fullName: ctx.session.user.name ?? "Unknown User",
             })}`,
 
             html: `
               <div style="font-family: Arial, sans-serif; font-size: 14px; color: #000; line-height: 1.6;">
                 <p>
                   <strong>Appointment request from:</strong>
-                  ${ctx.session.user.name}
                   (<span style="color: inherit; text-decoration: none;">${ctx.session.user.email}</span>)
                 </p>
                 <p><strong>Appointment is for:</strong> ${formattedDate}</p>
@@ -81,7 +79,6 @@ export const appointmentRouter = createTRPCRouter({
                   subject: input.displaySubject,
                   formattedDate: dayjs(input.datetime).tz("Asia/Manila").format("MMMM D, YYYY"),
                   formattedTime: dayjs(input.datetime).tz("Asia/Manila").format("hh:mm A"),
-                  fullName: ctx.session.user.name ?? "Unknown User",
                 }).replace(/\n/g, '<br>')}</p>
               </div>
             `.trim(),

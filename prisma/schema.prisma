@@ -75,6 +75,13 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model OTP {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  code      String
+  expiresAt DateTime
+}
+
 model Donor {
   id        String   @id @default(cuid())
   name      String
