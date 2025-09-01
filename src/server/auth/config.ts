@@ -46,7 +46,7 @@ export const authConfig = {
           return null;
         }
 
-        const isValid = verifyOTP(credentials.email as string, credentials.code as string);
+        const isValid = await verifyOTP(credentials.email as string, credentials.code as string);
         console.log("🔑 OTP validation result:", isValid);
 
         if (!isValid) {
