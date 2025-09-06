@@ -21,7 +21,7 @@ export const donorRouter = createTRPCRouter({
               /@student\.fatima\.edu\.ph$/i.test(val),
             {
               message:
-                "Email must be from gmail.com, fatima email, yahoo.com, outlook.com, or hotmail.com",
+                "Email must be from gmail.com, yahoo.com, outlook.com, hotmail.com, or student.fatima.edu.ph",
             }
           ),
         contactEmail: z.string().email().optional(),
