@@ -5,6 +5,7 @@ import Credentials from "next-auth/providers/credentials";
 import { db } from "@/server/db";
 import { Role } from "@prisma/client";
 import { verifyOTP } from "@/lib/otp";
+import type { User as NextAuthUser, Account } from "next-auth";
 
 /**
  * Extend session with id + role
@@ -26,6 +27,12 @@ declare module "next-auth" {
   interface JWT {
     id: string;
     role: Role;
+  }
+
+  interface GoogleUserProfile {
+    name?: string;
+    picture?: string;
+    email?: string;
   }
 
 export const authConfig = {
@@ -106,9 +113,10 @@ export const authConfig = {
     console.log("🔵 signIn() callback - user:", user, "account:", account);
 
   if (account?.provider === "google" && user?.email) {
+    const googleProfile = profile as GoogleUserProfile | null;
     // provider profile usually contains name and picture
-    const googleName = (profile as any)?.name ?? (user as any)?.name ?? null;
-    const googleImage = (profile as any)?.picture ?? (user as any)?.image ?? null;
+    const googleName = googleProfile?.name ?? user.name ?? null;
+    const googleImage = googleProfile?.picture ?? user.image ?? null;
 
     try {
       // Upsert by email: update name/image if present, or create with them.
