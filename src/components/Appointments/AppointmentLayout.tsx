@@ -152,6 +152,7 @@ export default function AppointmentLayout() {
       </Title>
 
       {success && (
+        <Box style={{ maxWidth: 800, margin: "0 auto", }}>
         <Notification
           icon={<IconCheck />}
           color="green"
@@ -161,6 +162,7 @@ export default function AppointmentLayout() {
         >
           Your appointment request has been sent successfully.
         </Notification>
+        </Box>
       )}
 
       {failed && (
@@ -190,9 +192,9 @@ export default function AppointmentLayout() {
   radius="lg"
   p="xl"
   withBorder
-  style={{ width: 500, flexShrink: 0, height: "350px" }}
+  style={{ width: 500, flexShrink: 0, height: subject === "Blood Request" ? "415px" : "350px", transition: "height 0.3s ease" }}
 >
-  <Stack gap="md" style={{ height: "100%", overflowY: "auto" }}>
+  <Stack gap="md" style={{ height: "100%" }}>
     <DatePickerInput
       label="Date"
       placeholder="Select date"
