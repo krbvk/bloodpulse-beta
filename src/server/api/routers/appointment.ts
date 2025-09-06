@@ -4,6 +4,7 @@ import { Resend } from "resend";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import { generateAppointmentMessage } from "@/utils/generateAppointmentMessage";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -39,14 +40,12 @@ export const appointmentRouter = createTRPCRouter({
       const formattedDateLong = dayjs(input.datetime).tz("Asia/Manila").format("MMMM D, YYYY");
       const formattedTime = dayjs(input.datetime).tz("Asia/Manila").format("hh:mm A");
 
-      let message: string;
-      if (input.subject === "Blood Request") {
-        message = `I would like to request an appointment for: Blood Request${
-          input.bloodType ? ` bloodtype needed ${input.bloodType}` : ""
-        } on ${formattedDateLong} at ${formattedTime}.`;
-      } else {
-        message = `I would like to request an appointment for: Blood Donation on ${formattedDateLong} at ${formattedTime}.`;
-      }
+      const message = generateAppointmentMessage({
+        subject: input.subject,
+        formattedDate: formattedDateLong,
+        formattedTime,
+        bloodType: input.bloodType,
+      });
 
       // Create appointment in DB
       const appointment = await ctx.db.appointment.create({
@@ -75,27 +74,27 @@ export const appointmentRouter = createTRPCRouter({
             replyTo: ctx.session.user.email ?? undefined,
             subject: input.displaySubject,
             text: `Appointment request from: (${ctx.session.user.email})
-Appointment is for: ${formattedDate}
-${input.subject === "Blood Request" && input.bloodType ? `Blood type: ${input.bloodType}` : ""}
-Message:
-${message}`,
+          Appointment is for: ${formattedDate}
+          ${input.subject === "Blood Request" && input.bloodType ? `Blood type: ${input.bloodType}` : ""}
+          Message:
+          ${message}`,
 
-            html: `
-              <div style="font-family: Arial, sans-serif; font-size: 14px; color: #000; line-height: 1.6;">
-                <p>
-                  <strong>Appointment request from:</strong>
-                  (<span style="color: inherit; text-decoration: none;">${ctx.session.user.email}</span>)
-                </p>
-                <p><strong>Appointment is for:</strong> ${formattedDate}</p>
-                ${
-                  input.subject === "Blood Request" && input.bloodType
-                    ? `<p><strong>Blood type needed:</strong> ${input.bloodType}</p>`
-                    : ""
-                }
-                <p><strong>Message:</strong></p>
-                <p>${message}</p>
-              </div>
-            `.trim(),
+          html: `
+            <div style="font-family: Arial, sans-serif; font-size: 14px; color: #000; line-height: 1.6;">
+              <p>
+                <strong>Appointment request from:</strong>
+                (<span style="color: inherit; text-decoration: none;">${ctx.session.user.email}</span>)
+              </p>
+              <p><strong>Appointment is for:</strong> ${formattedDate}</p>
+              ${
+                input.subject === "Blood Request" && input.bloodType
+                  ? `<p><strong>Blood type needed:</strong> ${input.bloodType}</p>`
+                  : ""
+              }
+              <p><strong>Message:</strong></p>
+              <div style="white-space: pre-line; font-family: inherit; margin: 0;">${message}
+            </div>
+          `.trim(),
           });
         } catch (error) {
           console.error("Error sending appointment email:", error);
