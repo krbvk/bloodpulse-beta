@@ -239,7 +239,7 @@ export default function AppointmentLayout() {
 
     <Select
       label="Subject"
-      placeholder="Choose subject"
+      placeholder="Select request type"
       data={["Blood Donation", "Blood Request"]}
       value={subject}
       onChange={(value) =>
