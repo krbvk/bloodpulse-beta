@@ -17,14 +17,17 @@ export const donorRouter = createTRPCRouter({
           .email()
           .refine(
             (val) =>
-              /@(gmail|yahoo|outlook|hotmail)\.com$/i.test(val) || /@student\.fatima\.edu\.ph$/i.test(val),
+              /@(gmail|yahoo|outlook|hotmail)\.com$/i.test(val) ||
+              /@student\.fatima\.edu\.ph$/i.test(val),
             {
               message:
                 "Email must be from gmail.com, fatima email, yahoo.com, outlook.com, or hotmail.com",
             }
           ),
-          contactEmail: z.string().email().optional(),
-          donationCount: z.number().min(0).default(0).optional(),
+        contactEmail: z.string().email().optional(),
+        donationCount: z.number().min(0).default(0).optional(),
+        gender: z.string().min(1), // <-- new
+        age: z.number().int().min(0), // <-- new
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -48,6 +51,8 @@ export const donorRouter = createTRPCRouter({
           email,
           contactEmail: input.contactEmail,
           donationCount: input.donationCount,
+          gender: input.gender,
+          age: input.age,
         },
       });
     }),
@@ -96,6 +101,8 @@ export const donorRouter = createTRPCRouter({
           ),
         contactEmail: z.string().email().optional(),
         donationCount: z.number().min(0).optional(),
+        gender: z.string().min(1), // <-- new
+        age: z.number().int().min(0), // <-- new
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -128,15 +135,16 @@ export const donorRouter = createTRPCRouter({
           email: input.email.toLowerCase(),
           contactEmail: input.contactEmail,
           donationCount: input.donationCount,
+          gender: input.gender,
+          age: input.age,
         },
       });
     }),
 
-  getIsUserDonor: protectedProcedure
-    .query(async ({ ctx }) => {
-      const userEmail = ctx.session.user.email;
-      const donor = await ctx.db.donor.findUnique({
-        where: { email: userEmail ?? "" },
+  getIsUserDonor: protectedProcedure.query(async ({ ctx }) => {
+    const userEmail = ctx.session.user.email;
+    const donor = await ctx.db.donor.findUnique({
+      where: { email: userEmail ?? "" },
     });
     return !!donor && (donor.donationCount ?? 0) > 0;
   }),
