@@ -36,7 +36,7 @@ const config = {
                 source: '/(.*)',
                 headers: [
                   {
-                    key: "Permission-Policy",
+                    key: "Permissions-Policy",
                     value: "geolocation(), microphone(), camera(), fullscreen(self), payment()"
                   },
                   {
