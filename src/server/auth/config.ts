@@ -102,25 +102,43 @@ export const authConfig = {
         },
       };
     },
-    async signIn({ user, account }) {
-      console.log("🔵 signIn() callback - user:", user, "account:", account);
+  async signIn({ user, account, profile }) {
+    console.log("🔵 signIn() callback - user:", user, "account:", account);
 
-      if (account && account.provider === "google") {
-        const existingUser = await db.user.findUnique({
-          where: { id: user.id },
-          select: { email: true },
+    if (account?.provider === "google" && user.email) {
+      const existingUser = await db.user.findUnique({
+        where: { email: user.email },
+      });
+
+      if (existingUser) {
+        // Link Google account to this existing user
+        await db.account.upsert({
+          where: {
+            provider_providerAccountId: {
+              provider: account.provider,
+              providerAccountId: account.providerAccountId,
+            },
+          },
+          update: {
+            userId: existingUser.id,
+          },
+          create: {
+            userId: existingUser.id,
+            type: account.type,
+            provider: account.provider,
+            providerAccountId: account.providerAccountId,
+            access_token: account.access_token,
+            token_type: account.token_type,
+            scope: account.scope,
+            id_token: account.id_token,
+          },
         });
 
-        if (existingUser && !existingUser.email) {
-          await db.user.update({
-            where: { id: user.id },
-            data: { email: user.email },
-          });
-          console.log("✏️ Updated Google user email:", user.email);
-        }
+        console.log("🔗 Linked Google account to existing user:", existingUser.id);
       }
+    }
 
-      return true;
-    },
+    return true;
+  }
   },
 } satisfies NextAuthConfig;
