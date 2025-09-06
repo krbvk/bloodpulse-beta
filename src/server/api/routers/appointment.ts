@@ -4,7 +4,6 @@ import { Resend } from "resend";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { generateAppointmentMessage } from "@/utils/generateAppointmentMessage";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -23,34 +22,51 @@ export const appointmentRouter = createTRPCRouter({
         displaySubject: z.string(),
         message: z.string().min(1),
         subject: z.enum(["Blood Donation", "Blood Request"]),
+        bloodType: z.preprocess(
+          (val) => (typeof val === "string" ? val.trim().toUpperCase() : val),
+          z
+            .string()
+            .optional()
+            .refine(
+              (v) => v === undefined || /^(A|B|AB|O)[+-]$/.test(v),
+              { message: "Use A+, A-, B+, B-, AB+, AB-, O+, or O-" }
+            )
+        ),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // console.log("Creating appointment with input:", input);
+      // Build the message dynamically
+      const formattedDateLong = dayjs(input.datetime).tz("Asia/Manila").format("MMMM D, YYYY");
+      const formattedTime = dayjs(input.datetime).tz("Asia/Manila").format("hh:mm A");
 
+      let message: string;
+      if (input.subject === "Blood Request") {
+        message = `I would like to request an appointment for: Blood Request${
+          input.bloodType ? ` bloodtype needed ${input.bloodType}` : ""
+        } on ${formattedDateLong} at ${formattedTime}.`;
+      } else {
+        message = `I would like to request an appointment for: Blood Donation on ${formattedDateLong} at ${formattedTime}.`;
+      }
+
+      // Create appointment in DB
       const appointment = await ctx.db.appointment.create({
         data: {
           datetime: input.datetime,
-          message: input.message,
+          message,
           subject: input.subject === "Blood Donation" ? "BloodDonation" : "BloodRequest",
           displaySubject: input.displaySubject,
           requesterId: ctx.session.user.id,
+          bloodType: input.bloodType ?? undefined,
         },
       });
 
-      // console.log("Appointment created:", appointment);
-
-      // const userEmail = ctx.session.user.email;
+      // Email sending
       const userEmail = process.env.SAMPLE_EMAIL; // test
-      // console.log("Sending email to:", userEmail);
-
       let emailResponse = null;
 
       if (userEmail && process.env.AUTH_RESEND_KEY) {
         const resend = new Resend(process.env.AUTH_RESEND_KEY);
-        const formattedDate = dayjs(input.datetime)
-        .tz("Asia/Manila")
-        .format("YYYY-MM-DD hh:mm A");
+        const formattedDate = dayjs(input.datetime).tz("Asia/Manila").format("YYYY-MM-DD hh:mm A");
 
         try {
           emailResponse = await resend.emails.send({
@@ -59,13 +75,10 @@ export const appointmentRouter = createTRPCRouter({
             replyTo: ctx.session.user.email ?? undefined,
             subject: input.displaySubject,
             text: `Appointment request from: (${ctx.session.user.email})
-            Appointment is for: ${formattedDate}
-            Message:
-            ${generateAppointmentMessage({
-              subject: input.displaySubject,
-              formattedDate: dayjs(input.datetime).tz("Asia/Manila").format("MMMM D, YYYY"),
-              formattedTime: dayjs(input.datetime).tz("Asia/Manila").format("hh:mm A"),
-            })}`,
+Appointment is for: ${formattedDate}
+${input.subject === "Blood Request" && input.bloodType ? `Blood type: ${input.bloodType}` : ""}
+Message:
+${message}`,
 
             html: `
               <div style="font-family: Arial, sans-serif; font-size: 14px; color: #000; line-height: 1.6;">
@@ -74,21 +87,19 @@ export const appointmentRouter = createTRPCRouter({
                   (<span style="color: inherit; text-decoration: none;">${ctx.session.user.email}</span>)
                 </p>
                 <p><strong>Appointment is for:</strong> ${formattedDate}</p>
+                ${
+                  input.subject === "Blood Request" && input.bloodType
+                    ? `<p><strong>Blood type needed:</strong> ${input.bloodType}</p>`
+                    : ""
+                }
                 <p><strong>Message:</strong></p>
-                <p>${generateAppointmentMessage({
-                  subject: input.displaySubject,
-                  formattedDate: dayjs(input.datetime).tz("Asia/Manila").format("MMMM D, YYYY"),
-                  formattedTime: dayjs(input.datetime).tz("Asia/Manila").format("hh:mm A"),
-                }).replace(/\n/g, '<br>')}</p>
+                <p>${message}</p>
               </div>
             `.trim(),
           });
-          // console.log("Email sent successfully:", emailResponse);
         } catch (error) {
-          // console.error("Error sending email:", error);
+          console.error("Error sending appointment email:", error);
         }
-      } else {
-        // console.log("Email not sent, missing userEmail or API Key.");
       }
 
       return { appointment, emailResponse };

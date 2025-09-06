@@ -35,43 +35,7 @@ import {
   Pie,
 } from "recharts";
 
-/* -------------------------------------------------------------------------- */
-/*                                  Dummy Data                                */
-/* -------------------------------------------------------------------------- */
-
-const donorGender: { label: string; value: number; color: string }[] = [
-  { label: "Male", value: 55, color: "red.6" },
-  { label: "Female", value: 43, color: "pink.5" },
-  { label: "Other", value: 2, color: "gray.5" },
-];
-
-const donorAge: { label: string; value: number }[] = [
-  { label: "18–25", value: 40 },
-  { label: "26–35", value: 35 },
-  { label: "36–50", value: 20 },
-  { label: "51+", value: 5 },
-];
-
-const mostNeededBloodType = { type: "O+", demandRate: 38 };
-const mostDonatedBloodType = { type: "A+", donationRate: 34 };
-
-const bloodTypeStats: { type: string; needed: number; donated: number }[] = [
-  { type: "O+", needed: 38, donated: 25 },
-  { type: "A+", needed: 30, donated: 34 },
-  { type: "B+", needed: 15, donated: 20 },
-  { type: "AB+", needed: 10, donated: 8 },
-  { type: "O-", needed: 5, donated: 7 },
-  { type: "A-", needed: 2, donated: 3 },
-];
-
-const neededBloodTypes = bloodTypeStats.map(({ type, needed }) => ({
-  type,
-  percentage: needed,
-}));
-const donatedBloodTypes = bloodTypeStats.map(({ type, donated }) => ({
-  type,
-  percentage: donated,
-}));
+import { api } from "@/trpc/react";
 
 /* -------------------------------------------------------------------------- */
 /*                                  Components                                */
@@ -126,12 +90,18 @@ function StatCard({
   );
 }
 
-function BloodTypeChart() {
-  const mostNeeded = bloodTypeStats.reduce((a, b) =>
-    b.needed > a.needed ? b : a
+function BloodTypeChart({
+  bloodTypeStats,
+}: {
+  bloodTypeStats: { type: string; needed: number; donated: number }[];
+}) {
+  const mostNeeded = bloodTypeStats.reduce(
+    (a, b) => (b.needed > a.needed ? b : a),
+    { type: "", needed: 0, donated: 0 }
   );
-  const mostDonated = bloodTypeStats.reduce((a, b) =>
-    b.donated > a.donated ? b : a
+  const mostDonated = bloodTypeStats.reduce(
+    (a, b) => (b.donated > a.donated ? b : a),
+    { type: "", needed: 0, donated: 0 }
   );
 
   return (
@@ -145,7 +115,7 @@ function BloodTypeChart() {
           <XAxis type="number" />
           <YAxis dataKey="type" type="category" width={40} />
           <Tooltip />
-          <Bar dataKey="needed" name="Needed (%)">
+          <Bar dataKey="needed" name="Needed">
             {bloodTypeStats.map((entry, idx) => (
               <Cell
                 key={`needed-${idx}`}
@@ -153,7 +123,7 @@ function BloodTypeChart() {
               />
             ))}
           </Bar>
-          <Bar dataKey="donated" name="Donated (%)">
+          <Bar dataKey="donated" name="Donated">
             {bloodTypeStats.map((entry, idx) => (
               <Cell
                 key={`donated-${idx}`}
@@ -167,26 +137,24 @@ function BloodTypeChart() {
   );
 }
 
-interface LabelProps {
-  type: string;   // or number, depending on your data
-  value?: string | number;
-  [key: string]: unknown; // fallback for extra props
-}
-function NeededBloodTypePieChart() {
+function NeededBloodTypePieChart({
+  data,
+}: {
+  data: { type: string; percentage: number }[];
+}) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <PieChart>
         <Pie
-          data={neededBloodTypes}
+          data={data}
           dataKey="percentage"
           nameKey="type"
           cx="50%"
           cy="50%"
           outerRadius={100}
-          label={({ type }: LabelProps) => String(type)}
-
+          label={({ type }) => String(type)}
         >
-          {neededBloodTypes.map((_, index) => (
+          {data.map((_, index) => (
             <Cell
               key={`needed-pie-${index}`}
               fill={[
@@ -205,26 +173,25 @@ function NeededBloodTypePieChart() {
     </ResponsiveContainer>
   );
 }
-interface ChartLabelProps {
-  type?: string;
-  value?: string | number;
-  index?: number;
-  [key: string]: unknown;
-}
-function DonatedBloodTypePieChart() {
+
+function DonatedBloodTypePieChart({
+  data,
+}: {
+  data: { type: string; percentage: number }[];
+}) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <PieChart>
         <Pie
-          data={donatedBloodTypes}
+          data={data}
           dataKey="percentage"
           nameKey="type"
           cx="50%"
           cy="50%"
           outerRadius={100}
-          label={(props: ChartLabelProps) => String(props.type ?? props.value ?? "")}
+          label={({ type }) => String(type)}
         >
-          {donatedBloodTypes.map((_, index) => (
+          {data.map((_, index) => (
             <Cell
               key={`donated-pie-${index}`}
               fill={[
@@ -251,6 +218,35 @@ function DonatedBloodTypePieChart() {
 const StatisticsLayout = () => {
   const theme = useMantineTheme();
 
+  // Queries
+  const { data: neededVsDonated } = api.statistics.getNeededVsDonated.useQuery();
+  const { data: demographics } = api.statistics.getDonorDemographics.useQuery();
+
+  // Transform data
+  const bloodTypeStats = neededVsDonated?.bloodTypeStats ?? [];
+  const mostNeededBloodType = neededVsDonated?.mostNeeded ?? {
+    type: "",
+    needed: 0,
+    donated: 0,
+  };
+  const mostDonatedBloodType = neededVsDonated?.mostDonated ?? {
+    type: "",
+    needed: 0,
+    donated: 0,
+  };
+
+  const neededBloodTypes = bloodTypeStats.map(({ type, needed }) => ({
+    type,
+    percentage: needed,
+  }));
+  const donatedBloodTypes = bloodTypeStats.map(({ type, donated }) => ({
+    type,
+    percentage: donated,
+  }));
+
+  const donorGender = demographics?.gender ?? [];
+  const donorAge = demographics?.age ?? [];
+
   return (
     <Box style={{ height: "100vh", padding: theme.spacing.md }}>
       <Box px="lg" py="md" mih="100%">
@@ -258,7 +254,7 @@ const StatisticsLayout = () => {
           <div>
             <Title order={2}>Statistics</Title>
             <Text c="dimmed" size="sm">
-              Overview of donations, donors, and demand (dummy data)
+              Overview of donations, donors, and demand
             </Text>
           </div>
         </Group>
@@ -266,12 +262,12 @@ const StatisticsLayout = () => {
         <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="lg" mb="lg">
           <StatCard
             label="Most needed blood type"
-            value={`${mostNeededBloodType.type} (${mostNeededBloodType.demandRate}%)`}
+            value={`${mostNeededBloodType.type} (${mostNeededBloodType.needed})`}
             icon={<IconDroplet size={18} />}
           />
           <StatCard
             label="Most donated blood type"
-            value={`${mostDonatedBloodType.type} (${mostDonatedBloodType.donationRate}%)`}
+            value={`${mostDonatedBloodType.type} (${mostDonatedBloodType.donated})`}
             icon={<IconUsers size={18} />}
           />
         </SimpleGrid>
@@ -279,11 +275,11 @@ const StatisticsLayout = () => {
         <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg" mb="lg">
           <Paper withBorder p="lg" radius="lg" shadow="sm">
             <Title order={5} mb="xs">Most Needed Blood Types</Title>
-            <NeededBloodTypePieChart />
+            <NeededBloodTypePieChart data={neededBloodTypes} />
           </Paper>
           <Paper withBorder p="lg" radius="lg" shadow="sm">
             <Title order={5} mb="xs">Most Donated Blood Types</Title>
-            <DonatedBloodTypePieChart />
+            <DonatedBloodTypePieChart data={donatedBloodTypes} />
           </Paper>
         </SimpleGrid>
 
@@ -294,7 +290,7 @@ const StatisticsLayout = () => {
               <Text size="sm" c="dimmed" mb="md">
                 Visual comparison of demand and donations by blood type
               </Text>
-              <BloodTypeChart />
+              <BloodTypeChart bloodTypeStats={bloodTypeStats} />
             </Paper>
           </Grid.Col>
 
@@ -305,12 +301,14 @@ const StatisticsLayout = () => {
 
               <Group mt="sm" justify="space-between" align="center">
                 <RingProgress
-                  size={140}
-                  thickness={12}
-                  sections={donorGender.map((g) => ({
-                    value: g.value,
-                    color: g.color,
-                  }))}
+  size={140}
+  thickness={12}
+  sections={donorGender.map((g, idx) => ({
+    value: g.value,
+    color: `red.${idx + 5}` as const, // e.g., red.5, red.6, etc.
+  }))}
+
+
                   label={
                     <Stack gap={0} align="center">
                       <Text fw={700}>100%</Text>
@@ -319,9 +317,14 @@ const StatisticsLayout = () => {
                   }
                 />
                 <Stack gap={6}>
-                  {donorGender.map((g) => (
+                  {donorGender.map((g, idx) => (
                     <Group key={g.label} gap="xs">
-                      <Badge variant="filled" color={g.color} size="xs" radius="sm">
+                      <Badge
+                        variant="filled"
+                        color={["red", "blue", "green", "yellow", "purple"][idx % 5]}
+                        size="xs"
+                        radius="sm"
+                      >
                         &nbsp;
                       </Badge>
                       <Text size="sm">
