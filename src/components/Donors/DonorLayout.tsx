@@ -382,7 +382,7 @@ export default function DonorLayout() {
                     editableDonor?.email && !validateEmail(editableDonor.email)
                       ? "Enter a valid email address (gmail, yahoo, or fatima)"
                       : updateDonor.error?.data?.code === "CONFLICT"
-                        ? "Email is already in use"
+                        ? "Another user already uses this email."
                         : null
                   }
                 />
@@ -565,7 +565,7 @@ export default function DonorLayout() {
                     newDonor.email && !validateEmail(newDonor.email)
                       ? "Enter a valid email address (gmail, yahoo, or fatima)"
                       : addDonor.error?.data?.code === "CONFLICT"
-                        ? "Email is already in use"
+                        ? "Another user already uses this email."
                         : null
                   }
                 />
