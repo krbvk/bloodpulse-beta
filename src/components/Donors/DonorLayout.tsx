@@ -32,6 +32,8 @@ interface Donor {
   bloodType: string;
   contactEmail: string;
   donationCount: number;
+  gender: string; // <-- added
+  age: number; // <-- added
 }
 
 export default function DonorLayout() {
@@ -55,13 +57,15 @@ export default function DonorLayout() {
     bloodType: "",
     contactEmail: "",
     donationCount: 0,
+    gender: "Male", // default
+    age: 0,
   });
 
   const addDonor = api.donor.create.useMutation({
     onSuccess: async () => {
       await utils.donor.getAll.invalidate();
       setAddModalOpened(false);
-      setNewDonor({ name: "", email: "", bloodType: "", contactEmail: "", donationCount: 0 });
+      setNewDonor({ name: "", email: "", bloodType: "", contactEmail: "", donationCount: 0, gender: "Male", age: 0 });
     },
   });
 
@@ -133,7 +137,7 @@ export default function DonorLayout() {
               </ActionIcon>
             </Tooltip>
             <Tooltip label="Delete Donor(s)" withArrow>
-              <ActionIcon variant="filled" color="red" size="md" onClick={() => setDeleteModalOpened(true)}>
+              <ActionIcon variant="filled" color="red" size='md' onClick={() => setDeleteModalOpened(true)}>
                 <IconTrash size={20} />
               </ActionIcon>
             </Tooltip>
@@ -178,15 +182,27 @@ export default function DonorLayout() {
         )}
       </Paper>
 
-      <Modal opened={modalOpened} onClose={() => { setModalOpened(false); setIsEditing(false); }} title="Donor Details" centered closeButtonProps={{"aria-label": "Close", onClick: () => {
-        setModalOpened(false);
-        setIsEditing(false);
-      }}}>
+      {/* View/Edit Modal */}
+      <Modal
+        opened={modalOpened}
+        onClose={() => { setModalOpened(false); setIsEditing(false); }}
+        title="Donor Details"
+        centered
+        closeButtonProps={{
+          "aria-label": "Close",
+          onClick: () => {
+            setModalOpened(false);
+            setIsEditing(false);
+          },
+        }}
+      >
         {!isEditing ? (
           <Stack gap="xs">
             <Text><strong>Name:</strong> {selectedDonor?.name}</Text>
             <Text><strong>Email:</strong> {selectedDonor?.email}</Text>
             <Text><strong>Blood Type:</strong> {selectedDonor?.bloodType}</Text>
+            <Text><strong>Gender:</strong> {selectedDonor?.gender}</Text>
+            <Text><strong>Age:</strong> {selectedDonor?.age}</Text>
             <Text><strong>Contact Email:</strong> {selectedDonor?.contactEmail}</Text>
             <Text><strong>Number of times donated:</strong> {selectedDonor?.donationCount}</Text>
             <ActionIcon onClick={() => { setIsEditing(true); setEditableDonor(selectedDonor); }}>
@@ -207,9 +223,32 @@ export default function DonorLayout() {
             />
             <Select
               label="Blood Type"
-              data={["A", "B", "AB", "O"]}
+              data={[
+  "A+",
+  "A-",
+  "B+",
+  "B-",
+  "AB+",
+  "AB-",
+  "O+",
+  "O-",
+]}
+
               value={editableDonor?.bloodType ?? ""}
               onChange={(val) => setEditableDonor({ ...editableDonor!, bloodType: val ?? "" })}
+            />
+            <Select
+              label="Gender"
+              data={["Male", "Female", "Others"]}
+              value={editableDonor?.gender ?? ""}
+              onChange={(val) => setEditableDonor({ ...editableDonor!, gender: val ?? "Male" })}
+            />
+            <TextInput
+              label="Age"
+              type="number"
+              min={0}
+              value={editableDonor?.age.toString() ?? "0"}
+              onChange={(e) => setEditableDonor({ ...editableDonor!, age: Number(e.target.value) })}
             />
             <TextInput
               label="Contact Email"
@@ -238,6 +277,7 @@ export default function DonorLayout() {
         )}
       </Modal>
 
+      {/* Add Modal */}
       <Modal opened={addModalOpened} onClose={() => setAddModalOpened(false)} title="Add Donor" centered>
         <Stack>
           <TextInput
@@ -271,9 +311,34 @@ export default function DonorLayout() {
           <Select
             label="Blood Type"
             placeholder="Select"
-            data={["A", "B", "AB", "O"]}
+            data={[
+  "A+",
+  "A-",
+  "B+",
+  "B-",
+  "AB+",
+  "AB-",
+  "O+",
+  "O-",
+]}
+
             value={newDonor.bloodType}
             onChange={(val) => setNewDonor({ ...newDonor, bloodType: val ?? "" })}
+          />
+          <Select
+            label="Gender"
+            placeholder="Select"
+            data={["Male", "Female", "Others"]}
+            value={newDonor.gender}
+            onChange={(val) => setNewDonor({ ...newDonor, gender: val ?? "Male" })}
+          />
+          <TextInput
+            label="Age"
+            type="number"
+            min={0}
+            placeholder="0"
+            value={newDonor.age.toString()}
+            onChange={(e) => setNewDonor({ ...newDonor, age: Number(e.target.value) })}
           />
           <TextInput
             label="Contact Email"
@@ -300,6 +365,7 @@ export default function DonorLayout() {
         </Stack>
       </Modal>
 
+      {/* Delete Modal */}
       <Modal
         opened={deleteModalOpened}
         onClose={() => setDeleteModalOpened(false)}

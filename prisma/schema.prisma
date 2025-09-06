@@ -87,6 +87,8 @@ model Donor {
   name      String
   bloodType String
   email     String   @unique
+  gender    String   
+  age       Int  
   contactEmail String?
   donationCount  Int?@default(0)
   createdAt DateTime @default(now())
@@ -99,6 +101,7 @@ model Appointment {
   requester   User     @relation("UserAppointments", fields: [requesterId], references: [id], onDelete: Cascade)
   datetime    DateTime
   message     String
+  bloodType   String?
   displaySubject String
   subject   AppointmentSubject @default(BloodDonation)
   createdAt   DateTime @default(now())
