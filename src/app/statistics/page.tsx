@@ -72,12 +72,11 @@ const StatisticsPage = () => {
       <Flex style={{ flex: 1, overflow: "hidden", position: "relative" }}>
         {/* Sidebar */}
         <DashboardSidebar
-  isOpen={sidebarOpen}
-  session={session}
-  isUserDonor={isUserDonor?.isDonor} // this is now boolean | undefined
-/>
-
-
+          isOpen={sidebarOpen}
+          session={session}
+          isUserDonor={isUserDonor?.isDonor} // this is now boolean | undefined
+        />
+        
         {/* Backdrop for mobile */}
         {isMobile && sidebarOpen && (
           <Box

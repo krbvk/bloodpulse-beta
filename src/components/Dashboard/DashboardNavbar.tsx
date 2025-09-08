@@ -37,6 +37,7 @@ const getInitials = (name: string) => {
 const DashboardNavbar = ({ toggleSidebar }: Props) => {
   const { data: session } = useSession();
   const { data: profile } = api.user.getProfile.useQuery();
+  const { data: donor } = api.donor.getIsUserDonor.useQuery();
   const router = useRouter();
   const [burgerOpened, setBurgerOpened] = useState(true);
   const isMobile = useMediaQuery("(max-width: 768px)");
@@ -44,6 +45,7 @@ const DashboardNavbar = ({ toggleSidebar }: Props) => {
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);
 
   const displayName =
+  donor?.name ??
   profile?.name ??
   session?.user?.name ??
   "User";

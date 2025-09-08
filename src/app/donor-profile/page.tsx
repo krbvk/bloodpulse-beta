@@ -48,7 +48,7 @@ const Page = () => {
 
     if (status === "authenticated" && !isUserDonorLoading) {
       const role = session?.user?.role;
-      const allowed = role === "ADMIN" || isUserDonor;
+      const allowed = isUserDonor?.isDonor === true;
 
       if (!allowed) {
         router.replace("/dashboard");
@@ -56,7 +56,7 @@ const Page = () => {
     }
   }, [status, isUserDonorLoading, isUserDonor, session?.user?.role, router]);
 
-  if (status === "loading" || isUserDonorLoading) {
+  if (status === "loading" || isUserDonorLoading || (status === "authenticated" && !isUserDonor?.isDonor)) {
     return (
       <Center h="100vh">
         <CustomLoader />

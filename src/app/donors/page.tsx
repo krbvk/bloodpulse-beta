@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Center, Flex } from "@mantine/core";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import DashboardNavbar from "@/components/Dashboard/DashboardNavbar";
 import DashboardSidebar from "@/components/Dashboard/DashboardSidebar";
 import DonorLayout from "@/components/Donors/DonorLayout";
@@ -13,6 +14,7 @@ import { useMediaQuery } from "@mantine/hooks";
 const Page = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { data: session, status } = useSession();
+  const router = useRouter();
   const { data: isUserDonor, isLoading: donorStatusLoading } =
     api.donor.getIsUserDonor.useQuery(undefined, {
       enabled: !!session?.user?.email,
@@ -21,6 +23,18 @@ const Page = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/"); // Kick out if not logged in
+    }
+
+    if (status === "authenticated") {
+      if (session?.user?.role !== "ADMIN") {
+        router.replace("/dashboard"); // Kick out if not admin
+      }
+    }
+  }, [status, session?.user?.role, router]);
 
   // Lock/unlock scroll when sidebar is open on mobile
   useEffect(() => {
@@ -41,6 +55,10 @@ const Page = () => {
         <CustomLoader />
       </Center>
     );
+  }
+
+  if (session?.user?.role !== "ADMIN") {
+    return null;
   }
 
   return (
