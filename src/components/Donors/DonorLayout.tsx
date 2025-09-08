@@ -31,7 +31,7 @@ interface Donor {
   bloodType: string;
   contactEmail: string;
   donationCount: number;
-  gender: string;
+  gender: "Male" | "Female" | "Other";
   age: number;
 }
 
@@ -320,10 +320,10 @@ export default function DonorLayout() {
                 <Select
                   label="Gender"
                   placeholder="Select"
-                  data={["Male", "Female", "Others"]}
+                  data={["Male", "Female", "Other"]}
                   value={editableDonor?.gender ?? "Male"}
                   onChange={(val) =>
-                    setEditableDonor({ ...editableDonor!, gender: val ?? "Male" })
+                    setEditableDonor({ ...editableDonor!, gender: (val ?? "Male") as "Male" | "Female" | "Other" })
                   }
                 />
               </Grid.Col>
@@ -512,7 +512,7 @@ export default function DonorLayout() {
                   data={["Male", "Female", "Others"]}
                   value={newDonor.gender}
                   onChange={(val) =>
-                    setNewDonor({ ...newDonor, gender: val ?? "Male" })
+                    setNewDonor({ ...newDonor, gender: (val ?? "Male") as "Male" | "Female" | "Other" })
                   }
                 />
               </Grid.Col>

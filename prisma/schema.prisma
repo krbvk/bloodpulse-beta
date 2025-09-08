@@ -65,8 +65,6 @@ model User {
   sessions      Session[]
   posts         Post[]
   appointments  Appointment[] @relation("UserAppointments")
-
-  // New fields
   gender        String?
   age           Int?
 }

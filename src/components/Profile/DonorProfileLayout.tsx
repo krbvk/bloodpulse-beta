@@ -101,7 +101,6 @@ export default function DonorProfileLayout() {
       {/* Content Area */}
       <Box px={{ base: "md", sm: "lg" }} py="lg" style={{ maxWidth: 900, margin: "0 auto" }}>
         <Flex justify="space-between" align="center" mb="lg">
-          <Button onClick={() => setSidebarOpened(true)}>Open Sidebar</Button>
           <Title order={2} style={{ textAlign: "center", flex: 1 }}>
             Donor Profile
           </Title>
