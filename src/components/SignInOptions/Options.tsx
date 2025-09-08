@@ -8,7 +8,7 @@ import {
   Text,
   Divider,
   rem,
-  Image
+  Image,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { GoogleSignInButton } from '../GoogleSignin/GoogleSignInButton';
@@ -19,11 +19,10 @@ export default function Options() {
 
   const sharedBoxStyles = {
     border: '1px solid #ccc',
-    borderRadius: isMobile ? 0 : 5,
-    width: '100%',
-    maxWidth: 500,
-    padding: isMobile ? rem(12) : rem(24),
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.05)',
+    borderRadius: isMobile ? rem(12) : 5,
+    padding: isMobile ? rem(20) : rem(24),
+    boxShadow: isMobile ? '0 6px 18px rgba(0,0,0,0.1)' : '0 8px 24px rgba(0,0,0,0.05)',
+    backgroundColor: 'white',
   };
 
   return (
@@ -33,95 +32,104 @@ export default function Options() {
       align="stretch"
       style={{
         width: '100%',
-        maxWidth: '1000px',
+         maxWidth: isMobile ? '900' : '790px',
         margin: '0 auto',
         borderRadius: isMobile ? 0 : 5,
         overflow: 'hidden',
-        height: isMobile ? 'auto' : '500px', 
+        height: isMobile ? 'auto' : '500px',
       }}
     >
-      {/* Left Box Container (just the image now) */}
+      {/* Left Box: Image */}
       <Box
         style={{
           ...sharedBoxStyles,
-          width: '100%',  // Half the width on desktop to align with the right box
-          height: '100%',  // Ensure it takes up 100% of the height of the container
-          overflow: 'hidden',
+          width: isMobile ? '100%' : '50%',
+          height: isMobile ? 'auto' : '100%',
           padding: 0,
-          borderRadius: isMobile ? 0 : 5,
+          marginTop: isMobile ? '10%' : 0,
+          marginBottom: isMobile ? '5%' : 0,
         }}
       >
         <Image
-          src="/IntroductionImage1.svg"
+          src="/signin.svg"
           alt="Hero Banner"
           style={{
             width: '100%',
-            height: '100%',
+            height: isMobile ? 'auto' : '100%',
             objectFit: 'cover',
             display: 'block',
-            borderRadius: 0, // No border-radius needed here
+            borderRadius: 0,
           }}
         />
       </Box>
 
-      {/* Right Box Container */}
-      <Box style={{ ...sharedBoxStyles, backgroundColor: 'white', height: '100%' }}>
-        <Flex direction="column" align="center" justify="center" style={{ height: '100%' }}>
-          <Stack gap={isMobile ? 6 : 10} align="center" mb="md">
-            <Flex align="center" gap="xs" justify="center">
-              <Title
-                order={2}
-                style={{
-                  color: '#FF4D4D',
-                  fontWeight: 700,
-                  fontSize: isMobile ? rem(20) : rem(26),
-                  fontFamily: 'monospace',
-                  userSelect: 'none',
-                }}
-              >
-                BLOODPULSE:
-              </Title>
-              <Image
-                src="/web-app-manifest-192x192.png"
-                alt="BloodPulse Logo"
-                width={28}
-                height={28}
-                style={{ marginTop: 2 }}
-              />
-            </Flex>
-            <Text
+      {/* Right Box: Form */}
+      <Box
+        style={{
+          ...sharedBoxStyles,
+          width: isMobile ? '90%' : '50%',
+          margin: isMobile ? '0 auto 10%' : 0,
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+        }}
+      >
+        <Stack gap={isMobile ? 10 : 12} align="center" mb="md">
+          <Flex align="center" gap="xs" justify="center">
+            <Title
+              order={2}
               style={{
-                fontSize: isMobile ? rem(18) : rem(25),
-                color: 'black',
+                color: '#FF4D4D',
+                fontWeight: 700,
+                fontSize: isMobile ? rem(22) : rem(26),
+                fontFamily: 'monospace',
+                userSelect: 'none',
                 textAlign: 'center',
               }}
             >
-              Sign Up or Log In
-            </Text>
-          </Stack>
-
-          <Stack gap="md" align="center" style={{ width: '100%' }}>
-            <GoogleSignInButton />
-            <Divider
-              label={
-                <span
-                  style={{
-                    fontWeight: 600,
-                    color: '#444',
-                    fontSize: isMobile ? rem(12) : rem(14),
-                  }}
-                >
-                  OR
-                </span>
-              }
-              labelPosition="center"
-              my="xs"
-              color="dark"
-              size="sm"
+              BLOODPULSE:
+            </Title>
+            <Image
+              src="/web-app-manifest-192x192.png"
+              alt="BloodPulse Logo"
+              width={28}
+              height={28}
+              style={{ marginTop: 2 }}
             />
-            <ResendSignIn />
-          </Stack>
-        </Flex>
+          </Flex>
+          <Text
+            style={{
+              fontSize: isMobile ? rem(20) : rem(25),
+              color: 'black',
+              textAlign: 'center',
+            }}
+          >
+            Sign Up or Log In
+          </Text>
+        </Stack>
+
+        <Stack gap="md" align="center" style={{ width: '100%' }}>
+          <GoogleSignInButton fullWidth={isMobile} />
+          <Divider
+            label={
+              <span
+                style={{
+                  fontWeight: 600,
+                  color: '#444',
+                  fontSize: isMobile ? rem(13) : rem(14),
+                }}
+              >
+                OR
+              </span>
+            }
+            labelPosition="center"
+            my="sm"
+            color="dark"
+            size="sm"
+          />
+          <ResendSignIn fullWidth={isMobile} />
+        </Stack>
       </Box>
     </Flex>
   );
