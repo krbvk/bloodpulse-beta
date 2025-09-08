@@ -16,6 +16,7 @@ import {
   TextInput,
   NumberInput,
   Select,
+  Modal,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useForm } from "@mantine/form";
@@ -61,7 +62,7 @@ export default function ProfileLayout() {
       {
         onSuccess: async () => {
           await refetch();
-          setIsEditing(false); // close form after save
+          setIsEditing(false); // close modal after save
         },
       }
     );
@@ -92,90 +93,89 @@ export default function ProfileLayout() {
             {profile?.email}
           </Text>
 
-          {!isEditing && (
-            <Button variant="light" mt="md" onClick={() => setIsEditing(true)}>
-              Edit Profile
-            </Button>
-          )}
+          <Button variant="light" mt="md" onClick={() => setIsEditing(true)}>
+            Edit Profile
+          </Button>
         </Flex>
 
         <Divider my="md" />
 
-        {!isEditing ? (
-          <>
-            {/* Profile Details */}
-            <Grid gutter="md">
-              <Grid.Col span={{ base: 12, sm: 6 }}>
-                <Text size="xs" c="dimmed" fw={500} mb={4}>
-                  Full Name
-                </Text>
-                <Text fw={500}>{profile?.name ?? "—"}</Text>
-              </Grid.Col>
+        {/* Profile Details */}
+        <Grid gutter="md">
+          <Grid.Col span={{ base: 12, sm: 6 }}>
+            <Text size="xs" c="dimmed" fw={500} mb={4}>
+              Full Name
+            </Text>
+            <Text fw={500}>{profile?.name ?? "—"}</Text>
+          </Grid.Col>
 
-              <Grid.Col span={{ base: 12, sm: 6 }}>
-                <Text size="xs" c="dimmed" fw={500} mb={4}>
-                  Email Address
-                </Text>
-                <Text fw={500}>{profile?.email ?? "—"}</Text>
-              </Grid.Col>
+          <Grid.Col span={{ base: 12, sm: 6 }}>
+            <Text size="xs" c="dimmed" fw={500} mb={4}>
+              Email Address
+            </Text>
+            <Text fw={500}>{profile?.email ?? "—"}</Text>
+          </Grid.Col>
 
-              <Grid.Col span={{ base: 12, sm: 6 }}>
-                <Text size="xs" c="dimmed" fw={500} mb={4}>
-                  Gender
-                </Text>
-                <Text fw={500}>{profile?.gender ?? "—"}</Text>
-              </Grid.Col>
+          <Grid.Col span={{ base: 12, sm: 6 }}>
+            <Text size="xs" c="dimmed" fw={500} mb={4}>
+              Gender
+            </Text>
+            <Text fw={500}>{profile?.gender ?? "—"}</Text>
+          </Grid.Col>
 
-              <Grid.Col span={{ base: 12, sm: 6 }}>
-                <Text size="xs" c="dimmed" fw={500} mb={4}>
-                  Age
-                </Text>
-                <Text fw={500}>{profile?.age ?? "—"}</Text>
-              </Grid.Col>
-            </Grid>
-          </>
-        ) : (
-          <>
-            {/* Edit Form */}
-            <form onSubmit={form.onSubmit((values) => void handleSubmit(values))}>
-              <Stack>
-                <TextInput
-                  label="Full Name"
-                  placeholder="Enter your full name"
-                  {...form.getInputProps("name")}
-                />
-
-                <Select
-                  label="Gender"
-                  placeholder="Select gender"
-                  data={["Male", "Female", "Other"]}
-                  {...form.getInputProps("gender")}
-                />
-
-                <NumberInput
-                  label="Age"
-                  placeholder="Enter your age"
-                  min={1}
-                  {...form.getInputProps("age")}
-                />
-
-                <Flex gap="md">
-                  <Button type="submit" loading={updateProfile.isPending}>
-                    Save Changes
-                  </Button>
-                  <Button
-                    variant="light"
-                    color="gray"
-                    onClick={() => setIsEditing(false)}
-                  >
-                    Cancel
-                  </Button>
-                </Flex>
-              </Stack>
-            </form>
-          </>
-        )}
+          <Grid.Col span={{ base: 12, sm: 6 }}>
+            <Text size="xs" c="dimmed" fw={500} mb={4}>
+              Age
+            </Text>
+            <Text fw={500}>{profile?.age ?? "—"}</Text>
+          </Grid.Col>
+        </Grid>
       </Paper>
+
+      {/* Edit Modal */}
+      <Modal
+        opened={isEditing}
+        onClose={() => setIsEditing(false)}
+        title="Edit Profile"
+        centered
+      >
+        <form onSubmit={form.onSubmit(handleSubmit)}>
+          <Stack>
+            <TextInput
+              label="Full Name"
+              placeholder="Enter your full name"
+              {...form.getInputProps("name")}
+            />
+
+            <Select
+              label="Gender"
+              placeholder="Select gender"
+              data={["Male", "Female", "Other"]}
+              {...form.getInputProps("gender")}
+            />
+
+            <NumberInput
+              label="Age"
+              placeholder="Enter your age"
+              min={1}
+              {...form.getInputProps("age")}
+            />
+
+            <Flex gap="md" justify="flex-end">
+              <Button type="submit" loading={updateProfile.isPending}>
+                Save Changes
+              </Button>
+              <Button
+                variant="light"
+                color="gray"
+                onClick={() => setIsEditing(false)}
+              >
+                Cancel
+              </Button>
+            </Flex>
+          </Stack>
+        </form>
+      </Modal>
     </Box>
   );
 }

@@ -222,11 +222,11 @@ export default function DonorProfileLayout() {
           />
 
           <Group mt="md" style={{ justifyContent: "flex-end" }}>
+            <Button onClick={handleEditSave} loading={saving}>
+              Save Changes
+            </Button>
             <Button variant="outline" onClick={() => setEditOpened(false)}>
               Cancel
-            </Button>
-            <Button onClick={handleEditSave} loading={saving}>
-              Save
             </Button>
           </Group>
         </Modal>
