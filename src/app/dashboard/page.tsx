@@ -5,20 +5,37 @@ import DashboardContent from "@/components/Dashboard/DashboardContent";
 import DashboardNavbar from "@/components/Dashboard/DashboardNavbar";
 import DashboardSidebar from "@/components/Dashboard/DashboardSidebar";
 import { Box, Flex, Center } from "@mantine/core";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CustomLoader from "@/components/Loader/CustomLoader";
 import { api } from "@/trpc/react";
+import { useMediaQuery } from "@mantine/hooks";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
-  const { data: isUserDonor, isLoading: donorStatusLoading } = api.donor.getIsUserDonor.useQuery(undefined, {
-    enabled: !!session?.user?.email,
-  });
+  const { data: isUserDonor, isLoading: donorStatusLoading } =
+    api.donor.getIsUserDonor.useQuery(undefined, {
+      enabled: !!session?.user?.email,
+    });
+
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   const toggleSidebar = () => {
     setSidebarOpen((prev) => !prev);
   };
+
+  // Prevent scrolling when sidebar is open on mobile
+  useEffect(() => {
+    if (isMobile && isSidebarOpen) {
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.width = "100%";
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
+    }
+  }, [isMobile, isSidebarOpen]);
 
   if (status === "loading" || donorStatusLoading) {
     return (
@@ -37,12 +54,19 @@ export default function Dashboard() {
 
       {/* Main content area below navbar */}
       <Flex style={{ flex: 1, overflow: "hidden" }}>
-        <DashboardSidebar isOpen={isSidebarOpen} session={session} isUserDonor={isUserDonor}/>
+        {/* Sidebar */}
+        <DashboardSidebar
+          isOpen={isSidebarOpen}
+          session={session}
+          isUserDonor={isUserDonor}
+        />
 
+        {/* Content area */}
         <Box
           style={{
             flex: 1,
-            marginLeft: isSidebarOpen ? 250 : 0,
+            // Only shift content on desktop, overlay on mobile
+            marginLeft: !isMobile && isSidebarOpen ? 250 : 0,
             transition: "margin-left 0.3s ease-in-out",
             overflowY: "auto",
             height: "calc(100vh - 60px)",

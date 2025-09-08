@@ -20,15 +20,16 @@ import {
   ActionIcon,
   Select,
   Text,
+
 } from "@mantine/core";
 import { DatePickerInput, TimeInput } from "@mantine/dates";
 import dayjs from "dayjs";
 import CustomLoader from "@/components/Loader/CustomLoader";
 import { useRouter } from "next/navigation";
+import { useMediaQuery } from "@mantine/hooks";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { generateAppointmentMessage } from "@/utils/generateAppointmentMessage";
-
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -47,6 +48,8 @@ export default function AppointmentLayout() {
   const [timeError, setTimeError] = useState<string | null>(null);
   const [subjectCount, setSubjectCount] = useState(1);
   const timeInputRef = useRef<HTMLInputElement | null>(null);
+
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -75,7 +78,6 @@ export default function AppointmentLayout() {
 
   const handleSubmit = () => {
     if (!appointmentDate || !appointmentTime || !subject) return;
-
     if (subject === "Blood Request" && !bloodType) {
       setFailed(true);
       return;
@@ -146,22 +148,22 @@ export default function AppointmentLayout() {
   };
 
   return (
-    <Box px={{ base: "md", sm: "lg" }} py="lg">
-      <Title order={2} mb="lg" style={{ textAlign: "center" }}>
+    <Box px={{ base: "sm", sm: "lg" }} py="lg">
+      <Title order={2} mb="lg" ta="center">
         Book an Appointment
       </Title>
 
       {success && (
-        <Box style={{ maxWidth: 800, margin: "0 auto", }}>
-        <Notification
-          icon={<IconCheck />}
-          color="green"
-          title="Request Sent"
-          onClose={() => setSuccess(false)}
-          mb="md"
-        >
-          Your appointment request has been sent successfully.
-        </Notification>
+        <Box maw={800} mx="auto">
+          <Notification
+            icon={<IconCheck />}
+            color="green"
+            title="Request Sent"
+            onClose={() => setSuccess(false)}
+            mb="md"
+          >
+            Your appointment request has been sent successfully.
+          </Notification>
         </Box>
       )}
 
@@ -177,196 +179,177 @@ export default function AppointmentLayout() {
         </Notification>
       )}
 
-      {/* Centered two-column layout */}
+      {/* Responsive two-column layout */}
       <Box
         style={{
           display: "flex",
+          flexDirection: isMobile ? "column" : "row",
           justifyContent: "center",
+          alignItems: "flex-start",
           gap: "2rem",
           marginTop: "2rem",
         }}
       >
-     {/* Left side - Appointment Form (fixed height) */}
-<Paper
-  shadow="md"
-  radius="lg"
-  p="xl"
-  withBorder
-  style={{ width: 500, flexShrink: 0, height: subject === "Blood Request" ? "415px" : "350px", transition: "height 0.3s ease" }}
->
-  <Stack gap="md" style={{ height: "100%" }}>
-    <DatePickerInput
-      label="Date"
-      placeholder="Select date"
-      value={appointmentDate}
-      onChange={(d) => {
-        setAppointmentDate(d);
-        setTimeError(null);
-      }}
-      minDate={new Date()}
-      withAsterisk
-      clearable
-      popoverProps={{ withinPortal: true }}
-    />
-
-    <TimeInput
-      label="Time"
-      placeholder="Select time"
-      value={appointmentTime}
-      onChange={handleTimeChange}
-      withAsterisk
-      ref={timeInputRef}
-      rightSection={
-        <ActionIcon
-          variant="subtle"
-          onClick={() => {
-            const inputEl = timeInputRef.current;
-            if (inputEl?.showPicker) {
-              inputEl.showPicker();
-            } else {
-              inputEl?.focus();
-            }
+        {/* Left side - Appointment Form */}
+        <Paper
+          shadow="md"
+          radius="lg"
+          p="xl"
+          withBorder
+          style={{
+            width: isMobile ? "100%" : 500,
+            flexShrink: 0,
+            transition: "height 0.3s ease",
           }}
         >
-          <IconClock size={18} />
-        </ActionIcon>
-      }
-    />
+          <Stack gap="md">
+            <DatePickerInput
+              label="Date"
+              placeholder="Select date"
+              value={appointmentDate}
+              onChange={(d) => {
+                setAppointmentDate(d);
+                setTimeError(null);
+              }}
+              minDate={new Date()}
+              withAsterisk
+              clearable
+              popoverProps={{ withinPortal: true }}
+            />
 
-    {timeError && (
-      <Text c="red" size="sm" mt="xs">
-        {timeError}
-      </Text>
-    )}
+            <TimeInput
+              label="Time"
+              placeholder="Select time"
+              value={appointmentTime}
+              onChange={handleTimeChange}
+              withAsterisk
+              ref={timeInputRef}
+              rightSection={
+                <ActionIcon
+                  variant="subtle"
+                  onClick={() => {
+                    const inputEl = timeInputRef.current;
+                    if (inputEl?.showPicker) {
+                      inputEl.showPicker();
+                    } else {
+                      inputEl?.focus();
+                    }
+                  }}
+                >
+                  <IconClock size={18} />
+                </ActionIcon>
+              }
+            />
 
-    <Select
-      label="Subject"
-      placeholder="Select request type"
-      data={["Blood Donation", "Blood Request"]}
-      value={subject}
-      onChange={(value) =>
-        setSubject(value as "Blood Donation" | "Blood Request" | null)
-      }
-      withAsterisk
-    />
+            {timeError && (
+              <Text c="red" size="sm" mt="xs">
+                {timeError}
+              </Text>
+            )}
 
-    {subject === "Blood Request" && (
-      <Select
-        label="Blood Type"
-        placeholder="Select blood type"
-        data={["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]}
-        value={bloodType}
-        onChange={setBloodType}
-        withAsterisk
-      />
-    )}
+            <Select
+              label="Subject"
+              placeholder="Select request type"
+              data={["Blood Donation", "Blood Request"]}
+              value={subject}
+              onChange={(value) =>
+                setSubject(value as "Blood Donation" | "Blood Request" | null)
+              }
+              withAsterisk
+            />
 
-    <Button
-      leftSection={<IconMail size={18} />}
-      fullWidth
-      onClick={handleSubmit}
-      loading={createAppointment.status === "pending"}
-      disabled={
-        !appointmentDate ||
-        !appointmentTime ||
-        !subject ||
-        !!timeError ||
-        (subject === "Blood Request" && !bloodType)
-      }
-    >
-      Send Appointment Request
-    </Button>
-  </Stack>
-</Paper>
+            {subject === "Blood Request" && (
+              <Select
+                label="Blood Type"
+                placeholder="Select blood type"
+                data={["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]}
+                value={bloodType}
+                onChange={setBloodType}
+                withAsterisk
+              />
+            )}
 
+            <Button
+              leftSection={<IconMail size={18} />}
+              fullWidth
+              onClick={handleSubmit}
+              loading={createAppointment.status === "pending"}
+              disabled={
+                !appointmentDate ||
+                !appointmentTime ||
+                !subject ||
+                !!timeError ||
+                (subject === "Blood Request" && !bloodType)
+              }
+            >
+              Send Appointment Request
+            </Button>
+          </Stack>
+        </Paper>
 
         {/* Right side - Sticky Notes */}
         <Box
           style={{
             display: "flex",
-            flexDirection: "column",
+            flexDirection: isMobile ? "column" : "column",
             gap: "1.5rem",
-            minWidth: 260,
+            width: isMobile ? "100%" : 260,
           }}
         >
-          {/* Note 1 */}
-          <Paper
-            shadow="xl"
-            p="md"
-            style={{
-              backgroundColor: "#fffef9",
-              backgroundImage:
-                "repeating-linear-gradient(to bottom, transparent 0px, transparent 23px, rgba(0,0,0,0.1) 24px)",
-              backgroundSize: "100% 24px",
-              width: 260,
-              height: 320,
-              textAlign: "center",
-              transform: "rotate(-2deg)",
-              borderRadius: "6px",
-              boxShadow: "4px 6px 15px rgba(0,0,0,0.3)",
-              position: "relative",
-            }}
-          >
-            <IconPin
-              size={26}
+          {[ 
+            {
+              color: "#1565c0",
+              text: `“OLFU RCY blood donation scheduling is available only 
+                Monday to Friday, 8:00 AM – 5:00 PM. 
+                If you book an appointment beyond these hours, 
+                OLFU RCY may not respond immediately. 
+                Your request will likely be addressed on the next working day.”`,
+              rotate: "-2deg",
+            },
+            {
+              color: "#c62828",
+              text: `“OLFU RCY blood request scheduling is available only 
+                Monday to Friday, 8:00 AM – 5:00 PM. 
+                If you book an appointment beyond these hours, 
+                OLFU RCY may not respond immediately. 
+                Your request will likely be addressed on the next working day.”`,
+              rotate: "2deg",
+            },
+          ].map((note, i) => (
+            <Paper
+              key={i}
+              shadow="xl"
+              p="md"
               style={{
-                position: "absolute",
-                top: -16,
-                left: "50%",
-                transform: "translateX(-50%)",
-                color: "#1565c0",
-                filter: "drop-shadow(0px 2px 2px rgba(0,0,0,0.6))",
+                backgroundColor: "#fffef9",
+                backgroundImage:
+                  "repeating-linear-gradient(to bottom, transparent 0px, transparent 23px, rgba(0,0,0,0.1) 24px)",
+                backgroundSize: "100% 24px",
+                width: "100%",
+                height: isMobile ? "auto" : 320,
+                textAlign: "center",
+                transform: `rotate(${note.rotate})`,
+                borderRadius: "6px",
+                boxShadow: "4px 6px 15px rgba(0,0,0,0.3)",
+                position: "relative",
               }}
-            />
-            <Text fw={600} size="sm" mt="xl" c="black">
-              “OLFU RCY <b>blood donation scheduling</b> is available only{" "}
-              <br />
-              <b>Monday to Friday, 8:00 AM – 5:00 PM.</b>” <br />
-              <br />
-              If you book an appointment beyond these hours, <br />
-              OLFU RCY may not respond immediately. <br />
-              Your request will likely be addressed on the next working day.
-            </Text>
-          </Paper>
-
-          {/* Note 2 */}
-          <Paper
-            shadow="xl"
-            p="md"
-            style={{
-              backgroundColor: "#fffef9",
-              backgroundImage:
-                "repeating-linear-gradient(to bottom, transparent 0px, transparent 23px, rgba(0,0,0,0.1) 24px)",
-              backgroundSize: "100% 24px",
-              width: 260,
-              height: 320,
-              textAlign: "center",
-              transform: "rotate(2deg)",
-              borderRadius: "4px",
-              boxShadow: "4px 6px 15px rgba(0,0,0,0.3)",
-              position: "relative",
-            }}
-          >
-            <IconPin
-              size={26}
-              style={{
-                position: "absolute",
-                top: -16,
-                left: "50%",
-                transform: "translateX(-50%)",
-                color: "#c62828",
-                filter: "drop-shadow(0px 2px 2px rgba(0,0,0,0.6))",
-              }}
-            />
-            <Text fw={600} size="sm" mt="xl" c="black">
-              “OLFU RCY <b>blood request scheduling</b> is available only <br />
-              <b>Monday to Friday, 8:00 AM – 5:00 PM.</b>” <br />
-              <br />
-              If you book an appointment beyond these hours, <br />
-              OLFU RCY may not respond immediately. <br />
-              Your request will likely be addressed on the next working day.
-            </Text>
-          </Paper>
+            >
+              <IconPin
+                size={26}
+                style={{
+                  position: "absolute",
+                  top: -16,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  color: note.color,
+                  filter: "drop-shadow(0px 2px 2px rgba(0,0,0,0.6))",
+                }}
+              />
+              <Text fw={600} size="sm" mt="xl" c="black">
+                {note.text}
+              </Text>
+            </Paper>
+          ))}
         </Box>
       </Box>
     </Box>

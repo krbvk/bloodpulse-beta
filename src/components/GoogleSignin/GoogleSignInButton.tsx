@@ -7,7 +7,11 @@ import { useEffect } from "react";
 import { IconBrandGoogle } from '@tabler/icons-react';
 import CustomLoader from "../Loader/CustomLoader";
 
-export function GoogleSignInButton() {
+interface GoogleSignInButtonProps {
+  fullWidth?: boolean; // Add this
+}
+
+export function GoogleSignInButton({ fullWidth = false }: GoogleSignInButtonProps) {
   const { status } = useSession();
   const router = useRouter();
 
@@ -25,13 +29,13 @@ export function GoogleSignInButton() {
   };
 
   if (status === "loading") {
-    return <CustomLoader />
+    return <CustomLoader />;
   }
 
   return (
-    <Box style={{ width: 300 }}>
+    <Box style={{ width: fullWidth ? '100%' : 300 }}> {/* dynamic width */}
       <Button
-        fullWidth
+        fullWidth={fullWidth} // pass fullWidth to Button
         h={50}
         onClick={handleSignIn}
         size="lg"

@@ -10,11 +10,9 @@ import {
   useMantineTheme,
   Divider,
   Group,
-  Stack,
   Grid,
 } from "@mantine/core";
 import { Carousel } from "@mantine/carousel";
-
 import type { Session } from "next-auth";
 import { useSdkContext } from "@/components/Dashboard/SdkContext";
 import { useMediaQuery } from "@mantine/hooks";
@@ -45,7 +43,9 @@ const DashboardContent = ({ session }: Props) => {
     if (sdkLoaded && typeof window !== "undefined" && window.FB?.XFBML) {
       try {
         window.FB.XFBML.parse();
-      } catch {}
+      } catch {
+        // ignore
+      }
     }
   }, [sdkLoaded]);
 
@@ -60,32 +60,33 @@ const DashboardContent = ({ session }: Props) => {
   if (!session?.user) return null;
 
   return (
-    <Box px="md" py="xl" bg={theme.colors.gray[0]} style={{ minHeight: "100%" }}>
-      <Grid gutter="md">
-        {/* Left Column: 30% */}
-        <Grid.Col span={{ base: 12, md: 4 }}>
-          <Stack gap="md">
-            <AnnouncementsCard
-              sdkLoaded={sdkLoaded}
-              sdkFailed={sdkFailed}
-              pad={theme.spacing.md}
-              radius={theme.radius.lg}
-            />
-          </Stack>
+    <Box px="md" py="lg" bg={theme.colors.gray[0]} style={{ minHeight: "100%" }}>
+      <Grid gutter="sm">
+        {/* Desktop: Announcements + Calendar side by side */}
+        <Grid.Col span={{ base: 12, md: 6 }}>
+          <AnnouncementsCard
+            sdkLoaded={sdkLoaded}
+            sdkFailed={sdkFailed}
+            pad={theme.spacing.sm}
+            radius={theme.radius.md}
+          />
         </Grid.Col>
 
-        {/* Right Column: 70% */}
-        <Grid.Col span={{ base: 12, md: 8 }}>
-          <Stack gap="md">
-            <CarouselCard pad={theme.spacing.md} radius={theme.radius.lg} />
+        {!isMobile && (
+          <Grid.Col span={{ base: 12, md: 6 }}>
             <CalendarCard
               calendarRef={calendarRef}
               currentDate={currentDate}
-              pad={theme.spacing.md}
-              radius={theme.radius.lg}
+              pad={theme.spacing.sm}
+              radius={theme.radius.md}
               isMobile={!!isMobile}
             />
-          </Stack>
+          </Grid.Col>
+        )}
+
+        {/* Carousel - Full Width */}
+        <Grid.Col span={12}>
+          <CarouselCard pad={theme.spacing.sm} radius={theme.radius.md} />
         </Grid.Col>
       </Grid>
     </Box>
@@ -105,34 +106,67 @@ function AnnouncementsCard({
   pad: string | number;
   radius: string | number;
 }) {
-  const theme = useMantineTheme();
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(1000);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      setContainerWidth(containerRef.current.offsetWidth);
+    }
+
+    const handleResize = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.offsetWidth);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
-    <Card shadow="sm" padding={pad} radius={radius} withBorder style={{ backgroundColor: theme.white }}>
-      <Title order={2} mb="xs">
+    <Card shadow="sm" padding={pad} radius={radius} withBorder>
+      <Title order={3} mb="xs">
         Announcements
       </Title>
       <Divider mb="sm" />
+
       {!sdkLoaded && sdkFailed && (
-        <Alert title="Content Not Available" color="red" radius="md" variant="filled" mb="sm">
+        <Alert
+          title="Content Not Available"
+          color="red"
+          radius="md"
+          variant="filled"
+          mb="sm"
+        >
           <Text size="sm">
-            Your browser may be blocking Facebook content. Try a different browser or adjust your settings.
+            Your browser may be blocking Facebook content. Try a different
+            browser or adjust your settings.
           </Text>
         </Alert>
       )}
+
       {sdkLoaded && !sdkFailed && (
-        <div
-          className="fb-page"
-          data-href="https://www.facebook.com/olfurcyval"
-          data-tabs="timeline"
-          data-width="500"
-          data-height="600"
-          data-small-header="false"
-          data-adapt-container-width="true"
-          data-hide-cover="false"
-          data-show-facepile="true"
-          style={{ width: "100%", display: "block" }}
-        />
+        <Box
+          ref={containerRef}
+          style={{ width: "100%", maxWidth: "100%", margin: "0 auto" }}
+        >
+          <div
+            className="fb-page"
+            data-href="https://www.facebook.com/olfurcyval"
+            data-tabs="timeline"
+            data-width={containerWidth}
+            data-height={isMobile ? "400" : "600"}
+            data-small-header="false"
+            data-adapt-container-width="true"
+            data-hide-cover="false"
+            data-show-facepile="true"
+            style={{ width: "100%", display: "block" }}
+          />
+        </Box>
       )}
+
       {(!sdkLoaded || sdkFailed) && (
         <Text size="sm" c="dimmed">
           Loading announcements…
@@ -142,8 +176,15 @@ function AnnouncementsCard({
   );
 }
 
-function CarouselCard({ pad, radius }: { pad: string | number; radius: string | number }) {
+function CarouselCard({
+  pad,
+  radius,
+}: {
+  pad: string | number;
+  radius: string | number;
+}) {
   const theme = useMantineTheme();
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   const reminders = [
     {
@@ -178,30 +219,37 @@ function CarouselCard({ pad, radius }: { pad: string | number; radius: string | 
     },
   ];
 
-  const chunkData = (data: typeof reminders, chunkSize: number) => {
-    const chunks = [];
+  const chunkData = <T,>(data: T[], chunkSize: number): T[][] => {
+    const chunks: T[][] = [];
     for (let i = 0; i < data.length; i += chunkSize) {
       chunks.push(data.slice(i, i + chunkSize));
     }
     return chunks;
   };
 
-  const slides = chunkData(reminders, 4);
+  const slides = chunkData(reminders, isMobile ? 1 : 3);
 
   return (
-    <Card shadow="sm" padding={pad} radius={radius} withBorder style={{ backgroundColor: theme.white }}>
+    <Card shadow="sm" padding={pad} radius={radius} withBorder>
       <Title order={3} mb="xs">
         Reminders Before Donating Blood
       </Title>
       <Divider mb="sm" />
 
-      <Carousel loop withIndicators height={230} slideSize="100%" align="center" mx="auto" withControls>
-        {slides.map((group, index) => (
-          <Carousel.Slide key={index}>
+      <Carousel
+        loop
+        withIndicators
+        withControls
+        slideSize="100%"
+        height={isMobile ? 240 : 210}
+        align={isMobile ? "start" : "center"}
+      >
+        {slides.map((group, slideIndex) => (
+          <Carousel.Slide key={slideIndex}>
             <Box
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(4, 1fr)",
+                gridTemplateColumns: isMobile ? "1fr" : `repeat(${group.length}, 1fr)`,
                 gap: theme.spacing.sm,
               }}
             >
@@ -214,12 +262,12 @@ function CarouselCard({ pad, radius }: { pad: string | number; radius: string | 
                     justifyContent: "flex-end",
                     alignItems: "center",
                     borderRadius: theme.radius.md,
-                    backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0.1)), url(${item.image})`,
+                    backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.5), rgba(0,0,0,0.1)), url(${item.image})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     color: theme.white,
                     padding: theme.spacing.sm,
-                    minHeight: 230,
+                    minHeight: isMobile ? 200 : 180,
                     boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
                   }}
                 >
@@ -244,7 +292,6 @@ function CalendarCard({
   currentDate,
   pad,
   radius,
-  isMobile,
 }: {
   calendarRef: React.RefObject<FullCalendar | null>;
   currentDate: Date;
@@ -254,17 +301,16 @@ function CalendarCard({
 }) {
   const theme = useMantineTheme();
   return (
-    <Card padding={pad} shadow="sm" radius={radius} withBorder style={{ backgroundColor: theme.white }}>
+    <Card padding={pad} shadow="sm" radius={radius} withBorder>
       <Group align="apart" mb="xs">
-        <Title order={2}>Calendar</Title>
+        <Title order={3}>Calendar</Title>
         <Text size="sm" c="dimmed">
           {currentDate.toLocaleDateString()}
         </Text>
       </Group>
-      <Divider />
+      <Divider mb="sm" />
       <Box
         style={{
-          flex: 1,
           width: "100%",
           borderRadius: theme.radius.md,
           border: `1px solid ${theme.colors.gray[3]}`,
@@ -278,9 +324,9 @@ function CalendarCard({
           height="450px"
           expandRows
           headerToolbar={{ start: "title", center: "", end: "prev,next" }}
-          dayMaxEventRows={isMobile ? 2 : 3}
+          dayMaxEventRows={3}
           fixedWeekCount={false}
-          aspectRatio={isMobile ? 1.2 : 1.6}
+          aspectRatio={1.6}
         />
       </Box>
     </Card>
