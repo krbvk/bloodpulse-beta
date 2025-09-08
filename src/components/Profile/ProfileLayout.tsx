@@ -23,7 +23,7 @@ import CustomLoader from "@/components/Loader/CustomLoader";
 
 export default function ProfileLayout() {
   const { status } = useSession();
-  const { data: profile, isLoading } = api.user.getProfile.useQuery();
+  const { data: profile, isLoading, refetch } = api.user.getProfile.useQuery();
   const updateProfile = api.user.updateProfile.useMutation();
   const [isEditing, setIsEditing] = useState(false);
 
@@ -59,7 +59,8 @@ export default function ProfileLayout() {
         age: values.age,
       },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
+          await refetch();
           setIsEditing(false); // close form after save
         },
       }
@@ -144,12 +145,6 @@ export default function ProfileLayout() {
                   {...form.getInputProps("name")}
                 />
 
-                <TextInput
-                  label="Email Address"
-                  readOnly
-                  {...form.getInputProps("email")}
-                />
-
                 <Select
                   label="Gender"
                   placeholder="Select gender"
@@ -165,7 +160,7 @@ export default function ProfileLayout() {
                 />
 
                 <Flex gap="md">
-                  <Button type="submit" loading={updateProfile.isLoading}>
+                  <Button type="submit" loading={updateProfile.isPending}>
                     Save Changes
                   </Button>
                   <Button

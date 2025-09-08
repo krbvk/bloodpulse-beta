@@ -221,13 +221,6 @@ export default function DonorProfileLayout() {
             mb="sm"
           />
 
-          <TextInput
-            label="Blood Type"
-            value={formValues.bloodType}
-            onChange={(e) => setFormValues({ ...formValues, bloodType: e.currentTarget.value })}
-            mb="sm"
-          />
-
           <Group mt="md" style={{ justifyContent: "flex-end" }}>
             <Button variant="outline" onClick={() => setEditOpened(false)}>
               Cancel

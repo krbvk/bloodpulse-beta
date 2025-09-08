@@ -120,12 +120,15 @@ export const authConfig = {
 
     try {
       // Upsert by email: update name/image if present, or create with them.
+      const dbUser = await db.user.findUnique({
+        where: { email: user.email },
+      });
       await db.user.upsert({
         where: { email: user.email },
         update: {
           // only set fields if provider gave them; otherwise leave existing values
-          ...(googleName ? { name: googleName } : {}),
-          ...(googleImage ? { image: googleImage } : {}),
+          ...(googleName ? { name: dbUser?.name ?? googleName } : {}),
+          ...(googleImage ? { image: dbUser?.image ?? googleImage } : {}),
         },
         create: {
           email: user.email,
