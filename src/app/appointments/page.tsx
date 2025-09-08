@@ -48,7 +48,7 @@ const Page = () => {
         <DashboardSidebar
           isOpen={sidebarOpen}
           session={session}
-          isUserDonor={isUserDonor}
+          isUserDonor={isUserDonor?.isDonor}
         />
 
         {/* Appointment content area */}

@@ -77,7 +77,7 @@ const Page = () => {
         <DashboardSidebar
           isOpen={sidebarOpen}
           session={session}
-          isUserDonor={isUserDonor}
+          isUserDonor={isUserDonor?.isDonor}
         />
 
         {/* Profile content */}

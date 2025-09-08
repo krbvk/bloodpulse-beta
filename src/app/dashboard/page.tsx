@@ -58,7 +58,7 @@ export default function Dashboard() {
         <DashboardSidebar
           isOpen={isSidebarOpen}
           session={session}
-          isUserDonor={isUserDonor}
+          isUserDonor={isUserDonor?.isDonor}
         />
 
         {/* Content area */}
