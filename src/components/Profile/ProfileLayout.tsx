@@ -137,7 +137,7 @@ export default function ProfileLayout() {
         ) : (
           <>
             {/* Edit Form */}
-            <form onSubmit={form.onSubmit(handleSubmit)}>
+            <form onSubmit={form.onSubmit((values) => void handleSubmit(values))}>
               <Stack>
                 <TextInput
                   label="Full Name"

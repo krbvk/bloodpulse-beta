@@ -44,8 +44,8 @@ const DashboardNavbar = ({ toggleSidebar }: Props) => {
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);
 
   const displayName =
-  profile?.name ||
-  session?.user?.name ||
+  profile?.name ??
+  session?.user?.name ??
   "User";
 
   if (!session?.user) return null;
