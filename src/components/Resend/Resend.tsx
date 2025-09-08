@@ -9,13 +9,18 @@ import {
   TextInput,
   Notification,
   Modal,
+
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { IconMail } from "@tabler/icons-react";
 import CustomLoader from "../Loader/CustomLoader";
 
-export function ResendSignIn() {
+interface ResendSignInProps {
+  fullWidth?: boolean; // <- add fullWidth prop
+}
+
+export function ResendSignIn({ fullWidth = false }: ResendSignInProps) {
   const { status, data: session } = useSession();
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
@@ -38,10 +43,7 @@ export function ResendSignIn() {
     const formData = new FormData(formRef.current!);
     const emailValue = formData.get("email");
 
-    if (typeof emailValue !== "string") {
-      console.error("Email must be a string");
-      return;
-    }
+    if (typeof emailValue !== "string") return;
 
     setLoading(true);
 
@@ -106,7 +108,11 @@ export function ResendSignIn() {
         mt="md"
         mx="auto"
         withBorder
-        style={{ maxWidth: 400, width: "100%", backgroundColor: "white" }}
+        style={{
+          maxWidth: 400,
+          width: "100%",
+          backgroundColor: "white",
+        }}
       >
         <form ref={formRef} onSubmit={handleSendOtp} style={{ width: "100%" }}>
           <Stack gap="lg">
@@ -120,7 +126,7 @@ export function ResendSignIn() {
               type="email"
               required
             />
-            <Button type="submit" size="lg" color="blue" fullWidth>
+            <Button type="submit" size="lg" color="blue" fullWidth={fullWidth}>
               Send Login Code
             </Button>
           </Stack>
@@ -149,12 +155,7 @@ export function ResendSignIn() {
       </Paper>
 
       {/* OTP Modal */}
-      <Modal
-        opened={otpModalOpen}
-        onClose={() => setOtpModalOpen(false)}
-        title="Enter OTP"
-        centered
-      >
+      <Modal opened={otpModalOpen} onClose={() => setOtpModalOpen(false)} title="Enter OTP" centered>
         <Stack gap="md">
           <TextInput
             label={`OTP sent to ${email}`}
@@ -162,7 +163,7 @@ export function ResendSignIn() {
             value={otpCode}
             onChange={(e) => setOtpCode(e.currentTarget.value)}
           />
-          <Button onClick={handleVerifyOtp} fullWidth color="blue">
+          <Button onClick={handleVerifyOtp} fullWidth={fullWidth} color="blue">
             Verify Code
           </Button>
         </Stack>

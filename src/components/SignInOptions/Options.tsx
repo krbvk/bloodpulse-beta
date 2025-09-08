@@ -52,7 +52,7 @@ export default function Options() {
         }}
       >
         <Image
-          src="/IntroductionImage1.svg"
+          src="/signin-banner.svg"
           alt="Hero Banner"
           style={{
             width: '100%',

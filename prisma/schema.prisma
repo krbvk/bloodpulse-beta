@@ -65,7 +65,10 @@ model User {
   sessions      Session[]
   posts         Post[]
   appointments  Appointment[] @relation("UserAppointments")
+  gender        String?
+  age           Int?
 }
+
 
 model VerificationToken {
   identifier String

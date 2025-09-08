@@ -1,4 +1,4 @@
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import {
   Text,
   Avatar,
@@ -22,10 +22,11 @@ import { useState } from "react";
 import type { DefaultSession } from "next-auth";
 import CustomLoader from "@/components/Loader/CustomLoader";
 import dayjs from "dayjs";
+import { api } from "@/trpc/react";
 
 type Props = {
   toggleSidebar: () => void;
-  session: DefaultSession | null;
+  session?: DefaultSession | null;
 };
 
 const getInitials = (name: string) => {
@@ -33,12 +34,21 @@ const getInitials = (name: string) => {
   return nameParts.map((n) => n[0]?.toUpperCase()).join("").slice(0, 2);
 };
 
-const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
+const DashboardNavbar = ({ toggleSidebar }: Props) => {
+  const { data: session } = useSession();
+  const { data: profile } = api.user.getProfile.useQuery();
+  const { data: donor } = api.donor.getIsUserDonor.useQuery();
   const router = useRouter();
   const [burgerOpened, setBurgerOpened] = useState(true);
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [loading, setLoading] = useState(false);
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);
+
+  const displayName =
+  donor?.name ??
+  profile?.name ??
+  session?.user?.name ??
+  "User";
 
   if (!session?.user) return null;
 
@@ -102,7 +112,7 @@ const DashboardNavbar = ({ toggleSidebar, session }: Props) => {
           <Group gap="xs" align="center" wrap="wrap" justify="flex-end">
             {!isMobile && (
               <Text size="sm" fw={600} c="white">
-                {name ? `Welcome, ${name}` : "Welcome, User"}
+                Welcome, {displayName}
               </Text>
             )}
 

@@ -26,17 +26,14 @@ export const donorRouter = createTRPCRouter({
           ),
         contactEmail: z.string().email().optional(),
         donationCount: z.number().min(0).default(0).optional(),
-        gender: z.string().min(1), // <-- new
-        age: z.number().int().min(0), // <-- new
+        gender: z.enum(["Male", "Female", "Other"]),
+        age: z.number().int().min(0),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const email = input.email.toLowerCase();
 
-      const existingDonor = await ctx.db.donor.findUnique({
-        where: { email },
-      });
-
+      const existingDonor = await ctx.db.donor.findUnique({ where: { email } });
       if (existingDonor) {
         throw new TRPCError({
           code: "CONFLICT",
@@ -60,26 +57,20 @@ export const donorRouter = createTRPCRouter({
   getById: publicProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
-      const donor = await ctx.db.donor.findUnique({
-        where: { id: input },
-      });
+      const donor = await ctx.db.donor.findUnique({ where: { id: input } });
       return donor ?? null;
     }),
 
   getDonorsByBloodType: publicProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
-      return await ctx.db.donor.findMany({
-        where: { bloodType: input },
-      });
+      return await ctx.db.donor.findMany({ where: { bloodType: input } });
     }),
 
   delete: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
-      return await ctx.db.donor.delete({
-        where: { id: input },
-      });
+      return await ctx.db.donor.delete({ where: { id: input } });
     }),
 
   update: authProcedure
@@ -91,40 +82,22 @@ export const donorRouter = createTRPCRouter({
         email: z
           .string()
           .email()
-          .refine(
-            (val) =>
-              /@(gmail|yahoo|outlook|hotmail)\.com$/i.test(val),
-            {
-              message:
-                "Email must be from gmail.com, yahoo.com, outlook.com, or hotmail.com",
-            }
+          .refine((val) =>
+            /@(gmail|yahoo|outlook|hotmail)\.com$/i.test(val)
           ),
         contactEmail: z.string().email().optional(),
         donationCount: z.number().min(0).optional(),
-        gender: z.string().min(1), // <-- new
-        age: z.number().int().min(0), // <-- new
+        gender: z.enum(["Male", "Female", "Other"]),
+        age: z.number().int().min(0),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const donor = await ctx.db.donor.findUnique({
-        where: { id: input.id },
-      });
-
-      if (!donor) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Donor not found" });
-      }
+      const donor = await ctx.db.donor.findUnique({ where: { id: input.id } });
+      if (!donor) throw new TRPCError({ code: "NOT_FOUND", message: "Donor not found" });
 
       if (input.email.toLowerCase() !== donor.email.toLowerCase()) {
-        const existing = await ctx.db.donor.findUnique({
-          where: { email: input.email.toLowerCase() },
-        });
-
-        if (existing) {
-          throw new TRPCError({
-            code: "CONFLICT",
-            message: "Another donor already uses this email.",
-          });
-        }
+        const existing = await ctx.db.donor.findUnique({ where: { email: input.email.toLowerCase() } });
+        if (existing) throw new TRPCError({ code: "CONFLICT", message: "Another donor already uses this email." });
       }
 
       return await ctx.db.donor.update({
@@ -143,9 +116,62 @@ export const donorRouter = createTRPCRouter({
 
   getIsUserDonor: protectedProcedure.query(async ({ ctx }) => {
     const userEmail = ctx.session.user.email;
+
     const donor = await ctx.db.donor.findUnique({
       where: { email: userEmail ?? "" },
+      select: { name: true, age: true, gender: true, donationCount: true, contactEmail: true, bloodType: true },
     });
-    return !!donor && (donor.donationCount ?? 0) > 0;
+
+    if (!donor) return null;
+
+    return {
+      isDonor: (donor.donationCount ?? 0) > 0,
+      name: donor.name,
+      age: donor.age,
+      gender: donor.gender as "Male" | "Female" | "Other",
+      donationCount: donor.donationCount ?? 0,
+      contactEmail: donor.contactEmail ?? "",
+      bloodType: donor.bloodType ?? null,
+    };
   }),
+
+  updateProfile: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().min(1),
+        age: z.number().int().min(0),
+        gender: z.enum(["Male", "Female", "Other"]),
+        contactEmail: z.string().email(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userEmail = ctx.session.user.email;
+
+      // Fetch existing donor to preserve bloodType
+      const existingDonor = await ctx.db.donor.findUnique({
+        where: { email: userEmail ?? "" },
+      });
+
+      if (!existingDonor) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Donor not found" });
+      }
+
+      const updatedDonor = await ctx.db.donor.update({
+        where: { email: userEmail ?? "" },
+        data: {
+          name: input.name,
+          age: input.age,
+          gender: input.gender,
+          contactEmail: input.contactEmail,
+          bloodType: existingDonor.bloodType, // preserve bloodType
+          updatedAt: new Date(),
+        },
+      });
+
+      return updatedDonor;
+    }),
+
+
+    
+    
 });
