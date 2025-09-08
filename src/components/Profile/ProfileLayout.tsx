@@ -52,7 +52,7 @@ export default function ProfileLayout() {
     return <CustomLoader />;
   }
 
-  const handleSubmit = (values: typeof form.values) => {
+  const handleSubmit = (values: typeof form.values): void => {
     updateProfile.mutate(
       {
         name: values.name,
