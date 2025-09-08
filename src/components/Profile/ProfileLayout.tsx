@@ -60,9 +60,11 @@ export default function ProfileLayout() {
         age: values.age,
       },
       {
-        onSuccess: async () => {
-          await refetch();
-          setIsEditing(false); // close modal after save
+        onSuccess: () => {
+          void (async () => {
+            await refetch();
+            setIsEditing(false);
+          })();
         },
       }
     );
