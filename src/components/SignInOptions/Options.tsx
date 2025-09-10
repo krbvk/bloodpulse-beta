@@ -52,16 +52,16 @@ export default function Options() {
         }}
       >
         <Image
-          src="/signin-banner.svg"
-          alt="Hero Banner"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            display: 'block',
-            borderRadius: 0, // No border-radius needed here
-          }}
-        />
+  src="/signin-banner.svg"
+  alt="Hero Banner"
+  loading="lazy"
+  style={{
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  }}
+/>
+
       </Box>
 
       {/* Right Box Container */}

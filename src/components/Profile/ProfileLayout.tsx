@@ -17,6 +17,7 @@ import {
   NumberInput,
   Select,
   Modal,
+  Group,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useForm } from "@mantine/form";
@@ -28,12 +29,25 @@ export default function ProfileLayout() {
   const updateProfile = api.user.updateProfile.useMutation();
   const [isEditing, setIsEditing] = useState(false);
 
+  // ✅ Validation
   const form = useForm({
     initialValues: {
       name: "",
       gender: "",
       age: undefined as number | undefined,
       email: "",
+    },
+    validate: {
+      name: (value) =>
+        value.trim().length === 0
+          ? "Name is required"
+          : /^[A-Za-z\s]+$/.test(value)
+          ? null
+          : "Name must only contain letters and spaces",
+      age: (value) =>
+        value === undefined || value <= 0
+          ? "Please enter a valid age"
+          : null,
     },
   });
 
@@ -53,21 +67,19 @@ export default function ProfileLayout() {
   }
 
   const handleSubmit = (values: typeof form.values): void => {
-    updateProfile.mutate(
-      {
-        name: values.name,
-        gender: values.gender,
-        age: values.age,
-      },
-      {
+    const payload: Record<string, unknown> = {};
+
+    if (values.name?.trim()) payload.name = values.name.trim();
+    if (values.gender?.trim()) payload.gender = values.gender.trim();
+    if (typeof values.age === "number" && values.age > 0) payload.age = values.age;
+
+    if (Object.keys(payload).length > 0) {
+      updateProfile.mutate(payload, {
         onSuccess: () => {
-          void (async () => {
-            await refetch();
-            setIsEditing(false);
-          })();
+          void refetch().then(() => setIsEditing(false));
         },
-      }
-    );
+      });
+    }
   };
 
   return (
@@ -76,26 +88,50 @@ export default function ProfileLayout() {
       py="lg"
       style={{ maxWidth: 900, margin: "0 auto" }}
     >
-      <Title order={2} mb="lg" style={{ textAlign: "center" }}>
+      <Title order={2} mb="lg" ta="center" fw={700}>
         My Profile
       </Title>
 
-      <Paper shadow="sm" radius="md" p={{ base: "md", sm: "xl" }} withBorder>
+      <Paper
+        shadow="md"
+        radius="lg"
+        p={{ base: "md", sm: "xl" }}
+        withBorder
+        style={{
+          backgroundColor: "var(--mantine-color-body)",
+        }}
+      >
+        {/* Profile Header */}
         <Flex direction="column" align="center" mb="xl">
           <Avatar
             src={profile?.image ?? "/placeholder-avatar.png"}
-            size={100}
-            radius="xl"
+            size={120}
+            radius={9999}
             alt={profile?.name ?? "User Avatar"}
           />
-          <Text fw={700} size="lg" mt="md" style={{ textAlign: "center" }}>
+          <Text fw={700} size="xl" mt="md" ta="center">
             {profile?.name ?? "No Name Set"}
           </Text>
-          <Text size="sm" c="dimmed" mt={4} style={{ textAlign: "center" }}>
+          <Text
+            size="sm"
+            c="dimmed"
+            mt={4}
+            ta="center"
+            style={{
+              wordBreak: "break-word",
+              overflowWrap: "anywhere",
+              maxWidth: "100%",
+            }}
+          >
             {profile?.email}
           </Text>
 
-          <Button variant="light" mt="md" onClick={() => setIsEditing(true)}>
+          <Button
+            variant="gradient"
+            gradient={{ from: "red", to: "pink" }}
+            mt="md"
+            onClick={() => setIsEditing(true)}
+          >
             Edit Profile
           </Button>
         </Flex>
@@ -103,33 +139,35 @@ export default function ProfileLayout() {
         <Divider my="md" />
 
         {/* Profile Details */}
-        <Grid gutter="md">
+        <Grid gutter="lg">
           <Grid.Col span={{ base: 12, sm: 6 }}>
             <Text size="xs" c="dimmed" fw={500} mb={4}>
               Full Name
             </Text>
-            <Text fw={500}>{profile?.name ?? "—"}</Text>
+            <Text fw={600}>{profile?.name ?? "—"}</Text>
           </Grid.Col>
 
           <Grid.Col span={{ base: 12, sm: 6 }}>
             <Text size="xs" c="dimmed" fw={500} mb={4}>
-              Email Address
+              Email
             </Text>
-            <Text fw={500}>{profile?.email ?? "—"}</Text>
+            <Text fw={600} style={{ wordBreak: "break-word" }}>
+              {profile?.email ?? "—"}
+            </Text>
           </Grid.Col>
 
           <Grid.Col span={{ base: 12, sm: 6 }}>
             <Text size="xs" c="dimmed" fw={500} mb={4}>
               Gender
             </Text>
-            <Text fw={500}>{profile?.gender ?? "—"}</Text>
+            <Text fw={600}>{profile?.gender ?? "—"}</Text>
           </Grid.Col>
 
           <Grid.Col span={{ base: 12, sm: 6 }}>
             <Text size="xs" c="dimmed" fw={500} mb={4}>
               Age
             </Text>
-            <Text fw={500}>{profile?.age ?? "—"}</Text>
+            <Text fw={600}>{profile?.age ?? "—"}</Text>
           </Grid.Col>
         </Grid>
       </Paper>
@@ -138,20 +176,25 @@ export default function ProfileLayout() {
       <Modal
         opened={isEditing}
         onClose={() => setIsEditing(false)}
-        title="Edit Profile"
+        title={<Text fw={700}>Edit Profile</Text>}
         centered
+        radius="lg"
+        overlayProps={{ blur: 3 }}
       >
         <form onSubmit={form.onSubmit(handleSubmit)}>
-          <Stack>
+          <Stack gap="md">
             <TextInput
               label="Full Name"
               placeholder="Enter your full name"
+              radius="md"
+              withAsterisk
               {...form.getInputProps("name")}
             />
 
             <Select
               label="Gender"
               placeholder="Select gender"
+              radius="md"
               data={["Male", "Female", "Other"]}
               {...form.getInputProps("gender")}
             />
@@ -160,21 +203,30 @@ export default function ProfileLayout() {
               label="Age"
               placeholder="Enter your age"
               min={1}
+              radius="md"
+              withAsterisk
               {...form.getInputProps("age")}
             />
 
-            <Flex gap="md" justify="flex-end">
-              <Button type="submit" loading={updateProfile.isPending}>
-                Save Changes
-              </Button>
+            <Group justify="flex-end" mt="md">
               <Button
                 variant="light"
                 color="gray"
+                radius="md"
                 onClick={() => setIsEditing(false)}
               >
                 Cancel
               </Button>
-            </Flex>
+              <Button
+                type="submit"
+                radius="md"
+                loading={updateProfile.isPending}
+                variant="gradient"
+                gradient={{ from: "red", to: "pink" }}
+              >
+                Save Changes
+              </Button>
+            </Group>
           </Stack>
         </form>
       </Modal>
