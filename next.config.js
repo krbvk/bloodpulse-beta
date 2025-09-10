@@ -37,7 +37,7 @@ const config = {
                 headers: [
                   {
                     key: "Permissions-Policy",
-                    value: "geolocation(), microphone(), camera(), fullscreen(self), payment()"
+                    value: "geolocation=(), microphone=(), camera=(), fullscreen=(self), payment=()"
                   },
                   {
                     key: 'X-Content-Type-Options',
