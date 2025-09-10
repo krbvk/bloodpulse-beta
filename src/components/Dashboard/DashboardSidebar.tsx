@@ -54,7 +54,7 @@ const DashboardSidebar = ({ isOpen, session, isUserDonor }: SidebarProps) => {
         height: "100vh",
         width: 250,
         position: "fixed",
-        top: 60,
+        top: 64,
         left: isOpen ? 0 : -260,
         backgroundColor: "#222222",
         color: "white",
