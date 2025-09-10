@@ -43,7 +43,6 @@ import { api } from "@/trpc/react";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { Document, Packer, Paragraph, TextRun, ImageRun, HeadingLevel } from "docx";
-import * as ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 
 /* ------------------------------- Types --------------------------------- */
@@ -365,6 +364,7 @@ const StatisticsLayout: React.FC = () => {
         const imageRun = new ImageRun({
           data: uint8,
           transformation: { width: 600, height: 300 },
+          type: "png",
         });
         children.push(new Paragraph({ children: [imageRun] }));
         if (caption) children.push(new Paragraph({ text: caption, spacing: { after: 200 } }));
@@ -397,106 +397,6 @@ const StatisticsLayout: React.FC = () => {
     }
   };
 
-  // Excel
-const downloadExcel = async () => {
-  const wb = new ExcelJS.Workbook();
-
-  // --- Summary Sheet with Key Figures ---
-  const summary = wb.addWorksheet("Summary");
-  summary.addRow(["BloodPulse Statistics Report"]);
-  summary.mergeCells("A1:D1");
-  summary.getCell("A1").font = { bold: true, size: 16 };
-
-  summary.addRow([`Generated: ${new Date().toLocaleString()}`]);
-  summary.addRow([]);
-
-  // Calculate totals
-  const totalNeeded = bloodTypeStats.reduce((a, b) => a + b.needed, 0);
-  const totalDonated = bloodTypeStats.reduce((a, b) => a + b.donated, 0);
-  const mostNeeded = bloodTypeStats.reduce((a, b) =>
-    a.needed > b.needed ? a : b
-  );
-  const mostDonated = bloodTypeStats.reduce((a, b) =>
-    a.donated > b.donated ? a : b
-  );
-
-  // Add summary data
-  summary.addRow(["Total Needed", totalNeeded]);
-  summary.addRow(["Total Donated", totalDonated]);
-  summary.addRow(["Most Needed Blood Type", mostNeeded.type]);
-  summary.addRow(["Most Donated Blood Type", mostDonated.type]);
-  summary.addRow([]);
-
-  summary.addRow(["Gender Distribution"]);
-  donorGender.forEach(({ label, value }) =>
-    summary.addRow([label, `${value}%`])
-  );
-
-  summary.addRow([]);
-  summary.addRow(["Age Distribution"]);
-  donorAge.forEach(({ label, value }) =>
-    summary.addRow([label, `${value}%`])
-  );
-
-  // --- Blood Type Data ---
-  const ws1 = wb.addWorksheet("Blood Type Stats");
-  ws1.addRow(["Blood Type", "Needed", "Donated"]);
-  bloodTypeStats.forEach(({ type, needed, donated }) =>
-    ws1.addRow([type, needed, donated])
-  );
-
-  // --- Gender Data ---
-  const ws2 = wb.addWorksheet("Gender");
-  ws2.addRow(["Gender", "Percentage"]);
-  donorGender.forEach(({ label, value }) => ws2.addRow([label, value]));
-
-  // --- Age Data ---
-  const ws3 = wb.addWorksheet("Age");
-  ws3.addRow(["Age Group", "Percentage"]);
-  donorAge.forEach(({ label, value }) => ws3.addRow([label, value]));
-
-  // --- Charts Sheet ---
-  const chartsSheet = wb.addWorksheet("Charts");
-
-  // capture each chart via html2canvas
-  const captureChart = async (id: string) => {
-    const el = document.getElementById(id);
-    if (!el) return null;
-    const canvas = await html2canvas(el);
-    return canvas.toDataURL("image/png");
-  };
-
-  const barChartImg = await captureChart("bloodtype-chart");
-  const neededPieImg = await captureChart("needed-pie-chart");
-  const donatedPieImg = await captureChart("donated-pie-chart");
-  const demographicsImg = await captureChart("demographics-chart");
-
-  const addChartImage = (
-    title: string,
-    img: string | null,
-    startRow: number
-  ) => {
-    if (!img) return;
-    chartsSheet.getCell(`A${startRow}`).value = title;
-    chartsSheet.getCell(`A${startRow}`).font = { bold: true };
-
-    const imageId = wb.addImage({ base64: img, extension: "png" });
-    chartsSheet.addImage(imageId, {
-      tl: { col: 0, row: startRow + 1 }, // place below the title
-      ext: { width: 600, height: 400 },
-    });
-  };
-
-  addChartImage("Blood Type Needs vs Donations", barChartImg, 2);
-  addChartImage("Most Needed Blood Types", neededPieImg, 25);
-  addChartImage("Most Donated Blood Types", donatedPieImg, 48);
-  addChartImage("Donor Demographics", demographicsImg, 71);
-
-  // Save Excel
-  const buf = await wb.xlsx.writeBuffer();
-  saveAs(new Blob([buf]), "statistics_report.xlsx");
-};
-
   /* ------------------------------- UI ---------------------------------- */
 
   return (
@@ -522,9 +422,6 @@ const downloadExcel = async () => {
               </Menu.Item>
               <Menu.Item onClick={downloadDOCX} disabled={exporting}>
                 {exporting ? "Preparing DOCX..." : "DOCX (with charts)"}
-              </Menu.Item>
-              <Menu.Item onClick={downloadExcel} disabled={exporting}>
-                {exporting ? "Preparing Excel..." : "Excel (with charts)"}
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
