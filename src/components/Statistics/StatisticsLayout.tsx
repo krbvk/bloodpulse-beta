@@ -39,7 +39,7 @@ import {
 } from "recharts";
 
 import { api } from "@/trpc/react";
-
+import type { FileChild } from "docx";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { Document, Packer, Paragraph, TextRun, ImageRun, HeadingLevel } from "docx";
@@ -256,7 +256,7 @@ const StatisticsLayout: React.FC = () => {
       doc.setTextColor(34, 34, 34);
       doc.text("Executive Summary", 40, 40);
       doc.setFontSize(11);
-      const summaryLines = doc.splitTextToSize(generateReportText(), pageWidth - 80);
+      const summaryLines: string[] = doc.splitTextToSize(generateReportText(), pageWidth - 80) as string[];
       doc.text(summaryLines, 40, 60);
 
       // Insert Bar chart full width
@@ -331,14 +331,12 @@ const StatisticsLayout: React.FC = () => {
       const donatedPieImg = await captureEl(donatedPieRef.current, 2);
       const demographicsImg = await captureEl(demographicsRef.current, 2);
 
-      const children: any[] = [];
+      const children: FileChild[] = [];
 
       // Cover
       children.push(
         new Paragraph({
-          children: [
-            new TextRun({ text: "OLFU RCY", bold: true, size: 40 }),
-          ],
+          children: [new TextRun({ text: "OLFU RCY", bold: true, size: 40 })],
         })
       );
       children.push(
@@ -418,10 +416,10 @@ const StatisticsLayout: React.FC = () => {
             </Menu.Target>
             <Menu.Dropdown>
               <Menu.Item onClick={downloadPDF} disabled={exporting}>
-                {exporting ? "Preparing PDF..." : "PDF (with charts)"}
+                {exporting ? "Preparing PDF..." : "PDF"}
               </Menu.Item>
               <Menu.Item onClick={downloadDOCX} disabled={exporting}>
-                {exporting ? "Preparing DOCX..." : "DOCX (with charts)"}
+                {exporting ? "Preparing DOCX..." : "DOCX"}
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
