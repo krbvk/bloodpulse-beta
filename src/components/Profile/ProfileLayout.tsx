@@ -88,9 +88,6 @@ export default function ProfileLayout() {
       py="lg"
       style={{ maxWidth: 900, margin: "0 auto" }}
     >
-      <Title order={2} mb="lg" ta="center" fw={700}>
-        My Profile
-      </Title>
 
       <Paper
         shadow="md"
@@ -100,7 +97,10 @@ export default function ProfileLayout() {
         style={{
           backgroundColor: "var(--mantine-color-body)",
         }}
-      >
+      > 
+      <Title order={2} mb="lg" ta="center" fw={700}>
+        My Profile
+      </Title>
         {/* Profile Header */}
         <Flex direction="column" align="center" mb="xl">
           <Avatar
@@ -170,6 +170,11 @@ export default function ProfileLayout() {
             <Text fw={600}>{profile?.age ?? "—"}</Text>
           </Grid.Col>
         </Grid>
+        <Divider my="lg" />
+        <Text size="sm" c="dimmed" ta="center" mt="md">
+          <strong>Note:</strong> This profile is for your website account only.  
+          You will still need to fill up a form onsite if you are donating blood or making a blood request.
+        </Text>
       </Paper>
 
       {/* Edit Modal */}

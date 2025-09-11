@@ -20,7 +20,7 @@ import {
   ActionIcon,
   Select,
   Text,
-
+  Divider,
 } from "@mantine/core";
 import { DatePickerInput, TimeInput } from "@mantine/dates";
 import dayjs from "dayjs";
@@ -284,6 +284,12 @@ export default function AppointmentLayout() {
             >
               Send Appointment Request
             </Button>
+            <Divider my="xs" />
+            <Text size="sm" c="dimmed" ta="center" mt="md">
+              <strong>Note:</strong> Booking an appointment here only schedules your
+              request. You will still need to fill up the official onsite form when you
+              arrive for blood donation or blood request processing.
+            </Text>
           </Stack>
         </Paper>
 
