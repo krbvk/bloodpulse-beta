@@ -58,7 +58,7 @@ const servicesData: Service[] = [
     description: [
       'Create an account or log in to BloodPulse using your Gmail.',
       'Once logged in, check the "News & Announcements" section for updates on blood drives and events by Red Cross Youth - Our Lady of Fatima University, Valenzuela Campus.',
-      'You can also visit their official Facebook page for announcements and schedules.',
+      'You can also visit OLFU Valenzuela - Red Cross Youth Facebook page for announcements and schedules.',
     ],
     display: 'Stay updated on upcoming blood drives and events near you.',
     imgSrc: 'event.svg',

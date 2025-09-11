@@ -11,6 +11,8 @@ import {
   Divider,
   Group,
   Grid,
+  Modal,
+  Stack,
 } from "@mantine/core";
 import { Carousel } from "@mantine/carousel";
 import type { Session } from "next-auth";
@@ -62,7 +64,7 @@ const DashboardContent = ({ session }: Props) => {
   return (
     <Box px="md" py="lg" bg={theme.colors.gray[0]} style={{ minHeight: "100%" }}>
       <Grid gutter="sm">
-        {/* Desktop: Announcements + Calendar side by side */}
+        {/* Announcements always on left */}
         <Grid.Col span={{ base: 12, md: 6 }}>
           <AnnouncementsCard
             sdkLoaded={sdkLoaded}
@@ -72,22 +74,21 @@ const DashboardContent = ({ session }: Props) => {
           />
         </Grid.Col>
 
+        {/* Right Column: Reminders + Calendar stacked */}
         {!isMobile && (
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <CalendarCard
-              calendarRef={calendarRef}
-              currentDate={currentDate}
-              pad={theme.spacing.sm}
-              radius={theme.radius.md}
-              isMobile={!!isMobile}
-            />
+            <Stack gap="sm">
+              <RemindersCard pad={theme.spacing.sm} radius={theme.radius.md} />
+              <CalendarCard
+                calendarRef={calendarRef}
+                currentDate={currentDate}
+                pad={theme.spacing.sm}
+                radius={theme.radius.md}
+                isMobile={!!isMobile}
+              />
+            </Stack>
           </Grid.Col>
         )}
-
-        {/* Carousel - Full Width */}
-        <Grid.Col span={12}>
-          <CarouselCard pad={theme.spacing.sm} radius={theme.radius.md} />
-        </Grid.Col>
       </Grid>
     </Box>
   );
@@ -176,7 +177,7 @@ function AnnouncementsCard({
   );
 }
 
-function CarouselCard({
+function RemindersCard({
   pad,
   radius,
 }: {
@@ -219,6 +220,8 @@ function CarouselCard({
     },
   ];
 
+  const [selected, setSelected] = useState<null | (typeof reminders)[0]>(null);
+
   const chunkData = <T,>(data: T[], chunkSize: number): T[][] => {
     const chunks: T[][] = [];
     for (let i = 0; i < data.length; i += chunkSize) {
@@ -230,60 +233,92 @@ function CarouselCard({
   const slides = chunkData(reminders, isMobile ? 1 : 3);
 
   return (
-    <Card shadow="sm" padding={pad} radius={radius} withBorder>
-      <Title order={3} mb="xs">
-        Reminders Before Donating Blood
-      </Title>
-      <Divider mb="sm" />
+    <>
+      <Card shadow="sm" padding={pad} radius={radius} withBorder>
+        <Title order={3} mb="xs">
+          Reminders Before Donating Blood
+        </Title>
+        <Divider mb="sm" />
 
-      <Carousel
-        loop
-        withIndicators
-        withControls
-        slideSize="100%"
-        height={isMobile ? 240 : 210}
-        align={isMobile ? "start" : "center"}
+        <Carousel
+          loop
+          withIndicators
+          withControls
+          slideSize="100%"
+          height={isMobile ? 240 : 210}
+          align={isMobile ? "start" : "center"}
+        >
+          {slides.map((group, slideIndex) => (
+            <Carousel.Slide key={slideIndex}>
+              <Box
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: isMobile ? "1fr" : `repeat(${group.length}, 1fr)`,
+                  gap: theme.spacing.sm,
+                }}
+              >
+                {group.map((item, i) => (
+                  <Box
+                    key={i}
+                    onClick={() => setSelected(item)}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "flex-end",
+                      alignItems: "center",
+                      borderRadius: theme.radius.md,
+                      backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.5), rgba(0,0,0,0.1)), url(${item.image})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      color: theme.white,
+                      padding: theme.spacing.sm,
+                      minHeight: isMobile ? 200 : 180,
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                      cursor: "pointer",
+                      transition: "transform 0.2s ease",
+                    }}
+                  >
+                    <Text fw={700} size="sm" mb={4} ta="center" lineClamp={2}>
+                      {item.title}
+                    </Text>
+                    <Text size="xs" ta="center" lineClamp={3}>
+                      {item.description}
+                    </Text>
+                  </Box>
+                ))}
+              </Box>
+            </Carousel.Slide>
+          ))}
+        </Carousel>
+      </Card>
+
+      {/* Popup Modal when reminder is clicked */}
+      <Modal
+        opened={!!selected}
+        onClose={() => setSelected(null)}
+        title={selected?.title}
+        centered
+        size="md"
       >
-        {slides.map((group, slideIndex) => (
-          <Carousel.Slide key={slideIndex}>
-            <Box
-              style={{
-                display: "grid",
-                gridTemplateColumns: isMobile ? "1fr" : `repeat(${group.length}, 1fr)`,
-                gap: theme.spacing.sm,
-              }}
-            >
-              {group.map((item, i) => (
-                <Box
-                  key={i}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "flex-end",
-                    alignItems: "center",
-                    borderRadius: theme.radius.md,
-                    backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.5), rgba(0,0,0,0.1)), url(${item.image})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    color: theme.white,
-                    padding: theme.spacing.sm,
-                    minHeight: isMobile ? 200 : 180,
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-                  }}
-                >
-                  <Text fw={700} size="sm" mb={4} ta="center" lineClamp={2}>
-                    {item.title}
-                  </Text>
-                  <Text size="xs" ta="center" lineClamp={3}>
-                    {item.description}
-                  </Text>
-                </Box>
-              ))}
-            </Box>
-          </Carousel.Slide>
-        ))}
-      </Carousel>
-    </Card>
+        {selected && (
+          <Box>
+            <Divider mb="sm" />
+            <img
+            src={selected.image}
+            alt={selected.title}
+            style={{
+              width: "100%",
+              maxHeight: "250px",
+              objectFit: "contain",
+              marginBottom: "1rem",
+            }}
+          />
+            <Divider mb="sm" />
+            <Text size="sm">{selected.description}</Text>
+          </Box>
+        )}
+      </Modal>
+    </>
   );
 }
 
@@ -321,7 +356,7 @@ function CalendarCard({
           ref={calendarRef}
           plugins={[dayGridPlugin]}
           initialView="dayGridMonth"
-          height="450px"
+          height="400px"
           expandRows
           headerToolbar={{ start: "title", center: "", end: "prev,next" }}
           dayMaxEventRows={3}

@@ -62,7 +62,7 @@ export default function Services() {
       px="md"
       py={isMobile ? "2rem" : "5rem"}
       style={{
-        background: "linear-gradient(135deg, #fff 0%, #fdecea 100%)",
+        backgroundImage: "linear-gradient(to right, #fdecea, #fff)",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",

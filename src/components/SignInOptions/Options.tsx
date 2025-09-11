@@ -14,6 +14,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import { GoogleSignInButton } from '../GoogleSignin/GoogleSignInButton';
 import { ResendSignIn } from '../Resend/Resend';
 import NextImage from 'next/image';
+import Head from 'next/head';
 
 export default function Options() {
   const isMobile = useMediaQuery('(max-width: 600px)');
@@ -28,6 +29,10 @@ export default function Options() {
   };
 
   return (
+    <>
+    <Head>
+      <link rel="preload" as="image" href="/signin-banner.svg" />
+    </Head>
     <Flex
       direction={isMobile ? 'column' : 'row'}
       justify="center"
@@ -128,5 +133,6 @@ export default function Options() {
         </Flex>
       </Box>
     </Flex>
+    </>
   );
 }
