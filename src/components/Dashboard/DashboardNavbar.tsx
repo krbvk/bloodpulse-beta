@@ -169,7 +169,7 @@ const DashboardNavbar = ({ toggleSidebar }: Props) => {
               </Menu.Dropdown>
             </Menu>
 
-            {isMobile && (
+          
               <>
                 <ActionIcon
                   onClick={() => setCalendarModalOpen(true)}
@@ -206,7 +206,7 @@ const DashboardNavbar = ({ toggleSidebar }: Props) => {
                   />
                 </Modal>
               </>
-            )}
+       
           </Group>
         </Flex>
       </Container>
