@@ -8,48 +8,79 @@ import {
   Paper,
   TextInput,
   Notification,
+  Modal,
+
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { IconMail } from "@tabler/icons-react";
 import CustomLoader from "../Loader/CustomLoader";
 
-export function ResendSignIn() {
-  const { status } = useSession();
+interface ResendSignInProps {
+  fullWidth?: boolean; // <- add fullWidth prop
+}
+
+export function ResendSignIn({ fullWidth = false }: ResendSignInProps) {
+  const { status, data: session } = useSession();
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+
   const [loading, setLoading] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
+  const [otpModalOpen, setOtpModalOpen] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     if (status === "authenticated") {
       router.push("/dashboard");
     }
-  }, [status, router]);
+  }, [status, session, router]);
 
-  const resendAction = async (event: React.FormEvent) => {
+  const handleSendOtp = async (event: React.FormEvent) => {
     event.preventDefault();
 
     const formData = new FormData(formRef.current!);
-    const email = formData.get("email");
+    const emailValue = formData.get("email");
 
-    if (typeof email !== "string") {
-      console.error("Email must be a string");
-      return;
-    }
+    if (typeof emailValue !== "string") return;
 
     setLoading(true);
 
-    const res = await signIn("resend", {
+    const res = await fetch("/api/send-otp", {
+      method: "POST",
+      body: JSON.stringify({ email: emailValue }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    setLoading(false);
+
+    if (res.ok) {
+      setEmail(emailValue);
+      setShowNotification(true);
+      setOtpModalOpen(true);
+      setTimeout(() => setShowNotification(false), 5000);
+    } else {
+      alert("Failed to send OTP. Please try again.");
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    setLoading(true);
+
+    const res = await signIn("otp-login", {
       email,
+      code: otpCode,
       redirect: false,
     });
 
     setLoading(false);
 
     if (res?.ok) {
-      setShowNotification(true);
-      setTimeout(() => setShowNotification(false), 5000);
+      setOtpModalOpen(false);
+      router.push("/dashboard");
+    } else {
+      alert("Invalid OTP. Please try again.");
     }
   };
 
@@ -69,55 +100,74 @@ export function ResendSignIn() {
   }
 
   return (
-    <Paper
-      shadow="md"
-      radius="lg"
-      p="xl"
-      mt="md"
-      mx="auto"
-      withBorder
-      style={{ maxWidth: 400, width: "100%", backgroundColor: "white" }}
-    >
-      <form ref={formRef} onSubmit={resendAction} style={{ width: "100%" }}>
-        <Stack gap="lg">
-          <Text style={{ textAlign: "center" }} size="md" c="black">
-            Continue with Email
-          </Text>
+    <>
+      <Paper
+        shadow="md"
+        radius="lg"
+        p="xl"
+        mt="md"
+        mx="auto"
+        withBorder
+        style={{
+          maxWidth: 400,
+          width: "100%",
+          backgroundColor: "white",
+        }}
+      >
+        <form ref={formRef} onSubmit={handleSendOtp} style={{ width: "100%" }}>
+          <Stack gap="lg">
+            <Text style={{ textAlign: "center" }} size="md" c="black">
+              Continue with Email
+            </Text>
+            <TextInput
+              label="Email"
+              placeholder="your@email.com"
+              name="email"
+              type="email"
+              required
+            />
+            <Button type="submit" size="lg" color="blue" fullWidth={fullWidth}>
+              Send Login Code
+            </Button>
+          </Stack>
+        </form>
+
+        {showNotification && (
+          <Notification
+            icon={<IconMail size={18} />}
+            title="Check your email!"
+            color="green"
+            onClose={() => setShowNotification(false)}
+            style={{
+              marginTop: "20px",
+              position: "fixed",
+              top: "20px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: 1000,
+              width: "600px",
+              maxWidth: "90vw",
+            }}
+          >
+            We’ve sent a 6-digit OTP to your email. Please enter it below.
+          </Notification>
+        )}
+      </Paper>
+
+      {/* OTP Modal */}
+      <Modal opened={otpModalOpen} onClose={() => setOtpModalOpen(false)} title="Enter OTP" centered>
+        <Stack gap="md">
           <TextInput
-            label="Email"
-            placeholder="your@email.com"
-            name="email"
-            type="email"
-            required
+            label={`OTP sent to ${email}`}
+            placeholder="Enter 6-digit code"
+            value={otpCode}
+            onChange={(e) => setOtpCode(e.currentTarget.value)}
           />
-          <Button type="submit" size="lg" color="blue" fullWidth>
-            Send login link
+          <Button onClick={handleVerifyOtp} fullWidth={fullWidth} color="blue">
+            Verify Code
           </Button>
         </Stack>
-      </form>
-
-      {showNotification && (
-        <Notification
-          icon={<IconMail size={18} />}
-          title="Check your email!"
-          color="green"
-          onClose={() => setShowNotification(false)}
-          style={{
-            marginTop: "20px",
-            position: "fixed",
-            top: "20px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: 1000,
-            width: "600px",
-            maxWidth: "90vw"
-          }}
-        >
-          Check your email for the sign-in link! 
-          <br />
-          If you can&apos;t find the email, be sure to check your spam or junk folder.
-        </Notification>
-      )}
-    </Paper>
+      </Modal>
+    </>
   );
 }

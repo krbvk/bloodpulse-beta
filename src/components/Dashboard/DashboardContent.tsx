@@ -1,13 +1,24 @@
 "use client";
 
-import { useEffect, useState, useRef } from 'react';
-import { Box, Title, Alert, Card } from '@mantine/core'; 
-import type { Session } from 'next-auth';
-import { useSdkContext } from '@/components/Dashboard/SdkContext';
-import { useMediaQuery } from '@mantine/hooks';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import type { CalendarApi } from '@fullcalendar/core';
+import { useEffect, useRef, useState } from "react";
+import {
+  Box,
+  Title,
+  Alert,
+  Card,
+  Text,
+  useMantineTheme,
+  Divider,
+  Group,
+  Grid,
+} from "@mantine/core";
+import { Carousel } from "@mantine/carousel";
+import type { Session } from "next-auth";
+import { useSdkContext } from "@/components/Dashboard/SdkContext";
+import { useMediaQuery } from "@mantine/hooks";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import type { CalendarApi } from "@fullcalendar/core";
 
 type Props = {
   session: Session | null;
@@ -16,118 +27,310 @@ type Props = {
 declare global {
   interface Window {
     FB?: {
-      XFBML: {
-        parse: () => void;
-      };
+      XFBML: { parse: () => void };
     };
   }
 }
 
 const DashboardContent = ({ session }: Props) => {
+  const theme = useMantineTheme();
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const { sdkLoaded, sdkFailed } = useSdkContext();
-  const isMobile = useMediaQuery('(max-width: 768px)');
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate] = useState(new Date());
   const calendarRef = useRef<FullCalendar | null>(null);
 
   useEffect(() => {
-    if (sdkLoaded && typeof window !== 'undefined' && window.FB?.XFBML) {
-      window.FB.XFBML.parse();
+    if (sdkLoaded && typeof window !== "undefined" && window.FB?.XFBML) {
+      try {
+        window.FB.XFBML.parse();
+      } catch {
+        // ignore
+      }
     }
-  }, [sdkLoaded, isMobile]);
+  }, [sdkLoaded]);
 
   useEffect(() => {
-    setTimeout(() => {
-      const calendarApi: CalendarApi | undefined = calendarRef.current?.getApi();
-      calendarApi?.updateSize();
-    }, 100);
+    const t = setTimeout(() => {
+      const api: CalendarApi | undefined = calendarRef.current?.getApi();
+      api?.updateSize();
+    }, 120);
+    return () => clearTimeout(t);
   }, [isMobile]);
 
-  if (!session || !session.user) return null;
+  if (!session?.user) return null;
 
   return (
-    <Box
-      px="md"
-      py="lg"
-      style={{
-        overflowX: 'hidden',
-        overflowY: 'hidden',
-        height: '100%',
-        display: 'flex',
-        flexDirection: isMobile ? 'column' : 'row',
-        gap: '20px',
-      }}
-    >
-      <Box style={{ flex: 1 }}>
-        <Title order={2} mb="md">
-          Announcements
-        </Title>
+    <Box px="md" py="lg" bg={theme.colors.gray[0]} style={{ minHeight: "100%" }}>
+      <Grid gutter="sm">
+        {/* Desktop: Announcements + Calendar side by side */}
+        <Grid.Col span={{ base: 12, md: 6 }}>
+          <AnnouncementsCard
+            sdkLoaded={sdkLoaded}
+            sdkFailed={sdkFailed}
+            pad={theme.spacing.sm}
+            radius={theme.radius.md}
+          />
+        </Grid.Col>
 
-        {!sdkLoaded && sdkFailed && (
-          <Alert title="Content Not Available" color="red">
-            It seems like you&apos;re using a browser that blocks Facebook content (e.g., Brave Browser). 
-            Please try a different browser or adjust your browser settings to view the content and refresh your page.
-            after adjusting.
-          </Alert>
-        )}
-
-        {sdkLoaded && !sdkFailed && (
-          <div
-            key={isMobile ? "fb-mobile" : "fb-desktop"}
-            className="fb-page"
-            data-href="https://www.facebook.com/olfurcyval"
-            data-tabs="timeline"
-            data-width={isMobile ? "320" : "800"}
-            data-height={isMobile ? "400" : "600"}
-            data-small-header="false"
-            data-adapt-container-width="false"
-            data-hide-cover="false"
-            data-show-facepile="true"
-          ></div>
-        )}
-      </Box>
-      {!isMobile && (
-      <Box style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <Card
-          padding="md"
-          shadow='md'
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <Title order={2} mb="md" style={{marginTop: 0}}>Calendar</Title>
-          <Box 
-            style={{ 
-              flex: 1, 
-              height: isMobile ? '500px' : '500px',
-              width: isMobile ? '100%' : '500px',
-              }}
-            >
-            <FullCalendar
-              ref={calendarRef}
-              plugins={[dayGridPlugin]}
-              initialView="dayGridMonth"
-              height="100%"
-              headerToolbar={{
-                start: 'title',
-                center: '',
-                end: 'prev,next',
-              }}
+        {!isMobile && (
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <CalendarCard
+              calendarRef={calendarRef}
+              currentDate={currentDate}
+              pad={theme.spacing.sm}
+              radius={theme.radius.md}
+              isMobile={!!isMobile}
             />
-          </Box>
-          <style jsx global>{`
-            .fc-day-today {
-              background-color:rgb(178, 233, 255) !important;
-              border: 1px solid rgba(252, 252, 252, 0) !important;
-              color: #000 !important;
-            }
-          `}</style>
-        </Card>
-      </Box>
-      )}
+          </Grid.Col>
+        )}
+
+        {/* Carousel - Full Width */}
+        <Grid.Col span={12}>
+          <CarouselCard pad={theme.spacing.sm} radius={theme.radius.md} />
+        </Grid.Col>
+      </Grid>
     </Box>
   );
 };
+
+/* ---------------- COMPONENTS ---------------- */
+
+function AnnouncementsCard({
+  sdkLoaded,
+  sdkFailed,
+  pad,
+  radius,
+}: {
+  sdkLoaded: boolean;
+  sdkFailed: boolean;
+  pad: string | number;
+  radius: string | number;
+}) {
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(1000);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      setContainerWidth(containerRef.current.offsetWidth);
+    }
+
+    const handleResize = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.offsetWidth);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return (
+    <Card shadow="sm" padding={pad} radius={radius} withBorder>
+      <Title order={3} mb="xs">
+        Announcements
+      </Title>
+      <Divider mb="sm" />
+
+      {!sdkLoaded && sdkFailed && (
+        <Alert
+          title="Content Not Available"
+          color="red"
+          radius="md"
+          variant="filled"
+          mb="sm"
+        >
+          <Text size="sm">
+            Your browser may be blocking Facebook content. Try a different
+            browser or adjust your settings.
+          </Text>
+        </Alert>
+      )}
+
+      {sdkLoaded && !sdkFailed && (
+        <Box
+          ref={containerRef}
+          style={{ width: "100%", maxWidth: "100%", margin: "0 auto" }}
+        >
+          <div
+            className="fb-page"
+            data-href="https://www.facebook.com/olfurcyval"
+            data-tabs="timeline"
+            data-width={containerWidth}
+            data-height={isMobile ? "400" : "600"}
+            data-small-header="false"
+            data-adapt-container-width="true"
+            data-hide-cover="false"
+            data-show-facepile="true"
+            style={{ width: "100%", display: "block" }}
+          />
+        </Box>
+      )}
+
+      {(!sdkLoaded || sdkFailed) && (
+        <Text size="sm" c="dimmed">
+          Loading announcements…
+        </Text>
+      )}
+    </Card>
+  );
+}
+
+function CarouselCard({
+  pad,
+  radius,
+}: {
+  pad: string | number;
+  radius: string | number;
+}) {
+  const theme = useMantineTheme();
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
+  const reminders = [
+    {
+      title: "Get enough sleep",
+      description: "Have at least 6–8 hours of rest the night before donating.",
+      image: "/sleep.svg",
+    },
+    {
+      title: "Eat a healthy meal",
+      description: "Avoid fatty foods. Eat iron-rich meals before donating.",
+      image: "/meal.svg",
+    },
+    {
+      title: "Stay hydrated",
+      description: "Drink plenty of water before and after your donation.",
+      image: "/water.svg",
+    },
+    {
+      title: "Bring a valid ID",
+      description: "Always carry a government-issued or school ID.",
+      image: "/idcard.svg",
+    },
+    {
+      title: "Avoid alcohol & smoking",
+      description: "Do not drink alcohol or smoke 24 hours before donating.",
+      image: "/noalcohol.svg",
+    },
+    {
+      title: "Be in good health",
+      description: "Donate only if you feel well and meet the requirements.",
+      image: "/healthy.svg",
+    },
+  ];
+
+  const chunkData = <T,>(data: T[], chunkSize: number): T[][] => {
+    const chunks: T[][] = [];
+    for (let i = 0; i < data.length; i += chunkSize) {
+      chunks.push(data.slice(i, i + chunkSize));
+    }
+    return chunks;
+  };
+
+  const slides = chunkData(reminders, isMobile ? 1 : 3);
+
+  return (
+    <Card shadow="sm" padding={pad} radius={radius} withBorder>
+      <Title order={3} mb="xs">
+        Reminders Before Donating Blood
+      </Title>
+      <Divider mb="sm" />
+
+      <Carousel
+        loop
+        withIndicators
+        withControls
+        slideSize="100%"
+        height={isMobile ? 240 : 210}
+        align={isMobile ? "start" : "center"}
+      >
+        {slides.map((group, slideIndex) => (
+          <Carousel.Slide key={slideIndex}>
+            <Box
+              style={{
+                display: "grid",
+                gridTemplateColumns: isMobile ? "1fr" : `repeat(${group.length}, 1fr)`,
+                gap: theme.spacing.sm,
+              }}
+            >
+              {group.map((item, i) => (
+                <Box
+                  key={i}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                    borderRadius: theme.radius.md,
+                    backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.5), rgba(0,0,0,0.1)), url(${item.image})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    color: theme.white,
+                    padding: theme.spacing.sm,
+                    minHeight: isMobile ? 200 : 180,
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                  }}
+                >
+                  <Text fw={700} size="sm" mb={4} ta="center" lineClamp={2}>
+                    {item.title}
+                  </Text>
+                  <Text size="xs" ta="center" lineClamp={3}>
+                    {item.description}
+                  </Text>
+                </Box>
+              ))}
+            </Box>
+          </Carousel.Slide>
+        ))}
+      </Carousel>
+    </Card>
+  );
+}
+
+function CalendarCard({
+  calendarRef,
+  currentDate,
+  pad,
+  radius,
+}: {
+  calendarRef: React.RefObject<FullCalendar | null>;
+  currentDate: Date;
+  pad: string | number;
+  radius: string | number;
+  isMobile: boolean;
+}) {
+  const theme = useMantineTheme();
+  return (
+    <Card padding={pad} shadow="sm" radius={radius} withBorder>
+      <Group align="apart" mb="xs">
+        <Title order={3}>Calendar</Title>
+        <Text size="sm" c="dimmed">
+          {currentDate.toLocaleDateString()}
+        </Text>
+      </Group>
+      <Divider mb="sm" />
+      <Box
+        style={{
+          width: "100%",
+          borderRadius: theme.radius.md,
+          border: `1px solid ${theme.colors.gray[3]}`,
+          overflow: "hidden",
+        }}
+      >
+        <FullCalendar
+          ref={calendarRef}
+          plugins={[dayGridPlugin]}
+          initialView="dayGridMonth"
+          height="450px"
+          expandRows
+          headerToolbar={{ start: "title", center: "", end: "prev,next" }}
+          dayMaxEventRows={3}
+          fixedWeekCount={false}
+          aspectRatio={1.6}
+        />
+      </Box>
+    </Card>
+  );
+}
 
 export default DashboardContent;

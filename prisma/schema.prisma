@@ -65,7 +65,10 @@ model User {
   sessions      Session[]
   posts         Post[]
   appointments  Appointment[] @relation("UserAppointments")
+  gender        String?
+  age           Int?
 }
+
 
 model VerificationToken {
   identifier String
@@ -75,11 +78,20 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model OTP {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  code      String
+  expiresAt DateTime
+}
+
 model Donor {
   id        String   @id @default(cuid())
   name      String
   bloodType String
   email     String   @unique
+  gender    String   
+  age       Int  
   contactEmail String?
   donationCount  Int?@default(0)
   createdAt DateTime @default(now())
@@ -92,6 +104,8 @@ model Appointment {
   requester   User     @relation("UserAppointments", fields: [requesterId], references: [id], onDelete: Cascade)
   datetime    DateTime
   message     String
+  bloodType   String?
+  displaySubject String
   subject   AppointmentSubject @default(BloodDonation)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

@@ -8,6 +8,7 @@ import {
   ThemeIcon,
   useMantineTheme,
   rem,
+  Grid,
 } from "@mantine/core";
 import { IconTarget } from "@tabler/icons-react";
 
@@ -21,11 +22,12 @@ const MissionCard = () => {
       aria-labelledby="mission-title"
       shadow="lg"
       radius="md"
-      p="xl"
+      p="0"
       withBorder
       style={{
         borderColor: redColor,
         backgroundColor: theme.white,
+        overflow: "hidden",
         transition: "transform 0.2s ease, box-shadow 0.2s ease",
         cursor: "default",
       }}
@@ -38,25 +40,53 @@ const MissionCard = () => {
         e.currentTarget.style.boxShadow = theme.shadows.lg;
       }}
     >
-      <Flex align="center" gap="sm" mb="sm">
-        <ThemeIcon
-          color="red"
-          variant="gradient"
-          gradient={{ from: "red", to: "pink", deg: 45 }}
-          radius="xl"
-          size={rem(40)}
+      <Grid align="stretch">
+        {/* Right: Icon + Title (displayed first on mobile) */}
+        <Grid.Col
+          span={{ base: 12, sm: 4 }}
+          order={{ base: 1, sm: 2 }}
+          style={{ backgroundColor: theme.black }}
         >
-          <IconTarget size={20} />
-        </ThemeIcon>
-        <Title id="mission-title" order={4} style={{ color: redColor }}>
-          What is Our Mission?
-        </Title>
-      </Flex>
+          <Flex
+            direction="column"
+            align="center"
+            justify="center"
+            h="100%"
+            p="xl"
+            gap="sm"
+          >
+            <ThemeIcon
+              color="red"
+              variant="gradient"
+              gradient={{ from: "red", to: "pink", deg: 45 }}
+              radius="xl"
+              size={rem(40)}
+            >
+              <IconTarget size={20} />
+            </ThemeIcon>
+            <Title
+              id="mission-title"
+              order={4}
+              style={{
+                color: "white",
+                textAlign: "center",
+              }}
+            >
+              What is Our Mission?
+            </Title>
+          </Flex>
+        </Grid.Col>
 
-      <Text size="sm" c="dimmed">
-        Our mission is to save lives by connecting generous blood donors with those in urgent need,
-        fostering a reliable and efficient blood donation network across communities.
-      </Text>
+        {/* Left: Content (displayed second on mobile) */}
+        <Grid.Col span={{ base: 12, sm: 8 }} order={{ base: 2, sm: 1 }}>
+          <Flex h="100%" p="xl" align="center">
+            <Text size="sm" c="black">
+              Our mission is to save lives by connecting generous blood donors with those in urgent
+              need, fostering a reliable and efficient blood donation network across communities.
+            </Text>
+          </Flex>
+        </Grid.Col>
+      </Grid>
     </Paper>
   );
 };

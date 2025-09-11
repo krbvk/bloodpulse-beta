@@ -1,132 +1,236 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { Box, Paper, Text, Title, Grid, Divider, Button, Flex, Avatar } from "@mantine/core";
+import {
+  Box,
+  Paper,
+  Text,
+  Title,
+  Grid,
+  Divider,
+  Button,
+  Flex,
+  Avatar,
+  Badge,
+  Modal,
+  TextInput,
+  NumberInput,
+  Select,
+  Group,
+  Drawer,
+} from "@mantine/core";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import CustomLoader from "@/components/Loader/CustomLoader";
 import { api } from "@/trpc/react";
 
-interface Donor {
-  id: string;
-  name: string;
-  email: string;
-  bloodType: string;
-  contactEmail: string;
-  donationCount: number;
-}
+type Gender = "Male" | "Female" | "Other";
 
 export default function DonorProfileLayout() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const { data: donors = [], isLoading } = api.donor.getAll.useQuery() as { data: Donor[]; isLoading: boolean };
+  const [editOpened, setEditOpened] = useState(false);
+  const [sidebarOpened, setSidebarOpened] = useState(false); // overlay sidebar state
+  const [saving, setSaving] = useState(false);
+  const [formValues, setFormValues] = useState<{
+    name: string;
+    age: number;
+    gender: Gender;
+    contactEmail: string;
+    bloodType: string;
+  }>({
+    name: "",
+    age: 0,
+    gender: "Male",
+    contactEmail: "",
+    bloodType: "",
+  });
+
+  // Fetch donor profile
+  const { data: donor, isLoading, refetch } = api.donor.getIsUserDonor.useQuery();
+  const updateProfile = api.donor.updateProfile.useMutation();
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/");
+    if (status === "unauthenticated") router.push("/");
+
+    if (donor) {
+      setFormValues({
+        name: donor.name,
+        age: Number(donor.age),
+        gender: donor.gender as Gender,
+        contactEmail: donor.contactEmail ?? "",
+        bloodType: donor.bloodType ?? "",
+      });
     }
-  }, [status, router]);
+  }, [status, donor, router]);
 
-  if (status !== "authenticated" || isLoading) {
-    return <CustomLoader />;
-  }
+  if (status !== "authenticated" || isLoading) return <CustomLoader />;
 
-  const { name, email, image } = session.user;
+  const { email, image } = session.user;
 
-  const donor = donors.find(d => d.email.toLowerCase() === (email ?? "").toLowerCase());
-
-  const { bloodType, contactEmail, donationCount } = donor ?? {};
-
-  const isDonor =
-    (bloodType ?? "").trim() !== "" &&
-    (contactEmail ?? "").trim() !== "" &&
-    donationCount !== null && donationCount !== undefined;
+  const handleEditSave = async () => {
+    setSaving(true);
+    try {
+      await updateProfile.mutateAsync(formValues);
+      await refetch();
+      setEditOpened(false);
+    } catch (error: unknown) {
+      console.error("Failed to update profile:", error);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
-    <Box px={{ base: "md", sm: "lg" }} py="lg" style={{ maxWidth: 900, margin: "0 auto"}}>
-      <Title order={2} mb="lg" style={{ textAlign: "center",}}>
-        Donor Profile
-      </Title>
+    <Box>
+      {/* Sidebar Drawer (overlay) */}
+      <Drawer
+        opened={sidebarOpened}
+        onClose={() => setSidebarOpened(false)}
+        title="Menu"
+        padding="md"
+        size="250px"
+      >
+        {/* Replace with your actual Sidebar content */}
+        <Text>Dashboard</Text>
+        <Text>Profile</Text>
+        <Text>Settings</Text>
+      </Drawer>
 
-      <Paper shadow="sm" radius="md" p={{ base: "md", sm: "xl" }} withBorder>
-        <Flex direction="column" align="center" mb="xl">
-            <Avatar
-            src={image ?? "/placeholder-avatar.png"}
-            size={100}
-            radius="xl"
-            alt={name ?? "User Avatar"}
-            />
-            <Text fw={700} size="lg" mt="md" style={{textAlign: "center"}}>
-            {name}
-            </Text>
-            <Text size="sm" c="dimmed" mt={4} style={{textAlign: "center"}}>
-            {email}
-            </Text>
+      {/* Content Area */}
+      <Box px={{ base: "md", sm: "lg" }} py="lg" style={{ maxWidth: 900, margin: "0 auto" }}>
+        <Flex justify="space-between" align="center" mb="lg">
+          <Title order={2} style={{ textAlign: "center", flex: 1 }}>
+            Donor Profile
+          </Title>
         </Flex>
-        
-        <Divider my="md" />
-        <Grid gutter="md">
-        <Grid.Col span={{ base: 12, sm: 6 }}>
-          <Text size="xs" c="dimmed" fw={500} mb={4}>
-            Full Name
-          </Text>
-          <Text fw={500}>{name ?? "—"}</Text>
-        </Grid.Col>
-        <Grid.Col span={{ base: 12, sm: 6 }}>
-          <Text size="xs" c="dimmed" fw={500} mb={4}>
-            Email Address
-          </Text>
-          <Text fw={500}>{email ?? "—"}</Text>
-        </Grid.Col>
-        </Grid>
-        {isDonor ? (
-          <>
-            {/* Profile Details */}
-            <Grid gutter="md">
-              <Grid.Col span={{ base: 12, sm: 6 }}>
-                <Text size="xs" c="dimmed" fw={500} mb={4}>
-                  Blood Type
-                </Text>
-                <Text fw={500}>{bloodType ?? "—"}</Text>
-              </Grid.Col>
 
-              <Grid.Col span={{ base: 12, sm: 6 }}>
-                <Text size="xs" c="dimmed" fw={500} mb={4}>
-                  Contact Email
-                </Text>
-                <Text fw={500}>{contactEmail ?? "—"}</Text>
-              </Grid.Col>
+        <Paper shadow="sm" radius="md" p={{ base: "md", sm: "xl" }} withBorder>
+          {/* Profile Header */}
+          <Flex direction="column" align="center" mb="xl">
+            <Avatar src={image ?? "/placeholder-avatar.png"} size={100} radius="xl" alt={donor?.name ?? "User Avatar"} />
+            <Text fw={700} size="lg" mt="md" style={{ textAlign: "center" }}>
+              {donor?.name ?? "No Name Set"}
+            </Text>
+            <Text size="sm" c="dimmed" mt={4} style={{ textAlign: "center" }}>
+              {email}
+            </Text>
+            {donor?.isDonor ? (
+              <Badge mt="sm" color="red">
+                Active Donor
+              </Badge>
+            ) : (
+              <Badge mt="sm" color="gray" variant="light">
+                Not a Donor
+              </Badge>
+            )}
 
-              <Grid.Col span={{ base: 12, sm: 6 }}>
-                <Text size="xs" c="dimmed" fw={500} mb={4}>
-                  Number of times donated
-                </Text>
-                <Text fw={500}>{donationCount ?? "—"}</Text>
-              </Grid.Col>
-            </Grid>
-          </>
-        ) : (
-          <>
-            <Divider my="md" />
-            <Text style={{ textAlign: "left" }} c="red" fw={600}>
-              If some data are missing like blood type, contact, etc. It means you are not part of our donor list yet.
-            </Text>
-            <Text style={{ textAlign: "left" }} mt="md">
-              Want to be part of our donor list and help others? Book an appointment to donate blood, and not only will you be added to our list, but you&apos;ll also be helping those in need.
-            </Text>
-            <Button
-              mt="md"
-              variant="filled"
-              color="red"
-              fullWidth
-              onClick={() => router.push("/appointments")}
-            >
-              Book an Appointment
+            <Button mt="md" variant="outline" onClick={() => setEditOpened(true)}>
+              Edit Profile
             </Button>
-          </>
-        )}
-      </Paper>
+          </Flex>
+
+          <Divider my="md" />
+
+          <Grid gutter="md">
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <Text size="xs" c="dimmed" fw={500} mb={4}>
+                Full Name
+              </Text>
+              <Text fw={500}>{donor?.name ?? "No Name Set"}</Text>
+            </Grid.Col>
+
+            <Grid.Col span={{ base: 12, sm: 6 }}>
+              <Text size="xs" c="dimmed" fw={500} mb={4}>
+                Email Address
+              </Text>
+              <Text fw={500}>{email ?? "—"}</Text>
+            </Grid.Col>
+
+            {donor?.isDonor && (
+              <>
+                <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <Text size="xs" c="dimmed" fw={500} mb={4}>
+                    Age
+                  </Text>
+                  <Text fw={500}>{Number(donor?.age ?? 0)}</Text>
+                </Grid.Col>
+
+                <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <Text size="xs" c="dimmed" fw={500} mb={4}>
+                    Gender
+                  </Text>
+                  <Text fw={500}>{donor?.gender ?? "—"}</Text>
+                </Grid.Col>
+
+                <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <Text size="xs" c="dimmed" fw={500} mb={4}>
+                    Contact Email
+                  </Text>
+                  <Text fw={500}>{donor?.contactEmail ?? "—"}</Text>
+                </Grid.Col>
+
+                <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <Text size="xs" c="dimmed" fw={500} mb={4}>
+                    Blood Type
+                  </Text>
+                  <Text fw={500}>{donor?.bloodType ?? "—"}</Text>
+                </Grid.Col>
+
+                <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <Text size="xs" c="dimmed" fw={500} mb={4}>
+                    Number of Donations
+                  </Text>
+                  <Text fw={500}>{Number(donor?.donationCount ?? 0)}</Text>
+                </Grid.Col>
+              </>
+            )}
+          </Grid>
+        </Paper>
+
+        {/* Edit Modal */}
+        <Modal opened={editOpened} onClose={() => setEditOpened(false)} title="Edit Profile" centered>
+          <TextInput
+            label="Full Name"
+            value={formValues.name}
+            onChange={(e) => setFormValues({ ...formValues, name: e.currentTarget.value })}
+            mb="sm"
+          />
+
+          <NumberInput
+            label="Age"
+            value={formValues.age}
+            onChange={(value) => setFormValues({ ...formValues, age: Number(value ?? 0) })}
+            mb="sm"
+            min={0}
+          />
+
+          <Select
+            label="Gender"
+            data={["Male", "Female", "Other"]}
+            value={formValues.gender}
+            onChange={(value) => value && setFormValues({ ...formValues, gender: value as Gender })}
+            mb="sm"
+          />
+
+          <TextInput
+            label="Contact Email"
+            value={formValues.contactEmail}
+            onChange={(e) => setFormValues({ ...formValues, contactEmail: e.currentTarget.value })}
+            mb="sm"
+          />
+
+          <Group mt="md" style={{ justifyContent: "flex-end" }}>
+            <Button onClick={handleEditSave} loading={saving}>
+              Save Changes
+            </Button>
+            <Button variant="outline" onClick={() => setEditOpened(false)}>
+              Cancel
+            </Button>
+          </Group>
+        </Modal>
+      </Box>
     </Box>
   );
 }

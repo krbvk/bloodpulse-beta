@@ -8,6 +8,8 @@ import '@mantine/carousel/styles.css';
 import '@mantine/dates/styles.css';
 import { SdkProvider } from "@/components/Dashboard/SdkContext";
 import ClientOnly from "@/components/Loader/ClientOnly";
+import { ServiceWorkerProvider } from "@/components/ServiceWorkerProvider";
+import { InstallPromptProvider } from "@/components/InstallPromptProvider";
 
 export const metadata: Metadata = {
   title: "Bloodpulse",
@@ -23,6 +25,7 @@ const theme = createTheme({
   /** Put your mantine theme override here */
 })
 
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -30,14 +33,19 @@ export default function RootLayout({
     <html lang="en" {...mantineHtmlProps}>
       <head>
         <ColorSchemeScript />
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <meta name="theme-color" content="#000000" />
       </head>
       <body className={geist.className}>
         <MantineProvider theme={theme}>
           <SessionProviders>
             <SdkProvider>
               <ClientOnly>
-              {children}
+                <InstallPromptProvider>
+                  {children}
+              </InstallPromptProvider>
             </ClientOnly>
+            <ServiceWorkerProvider />
             </SdkProvider>
           </SessionProviders>
         </MantineProvider>

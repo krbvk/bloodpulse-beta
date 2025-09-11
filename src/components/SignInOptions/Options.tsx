@@ -52,7 +52,7 @@ export default function Options() {
         }}
       >
         <Image
-          src="/IntroductionImage1.svg"
+          src="/signin-banner.svg"
           alt="Hero Banner"
           style={{
             width: '100%',
@@ -68,17 +68,27 @@ export default function Options() {
       <Box style={{ ...sharedBoxStyles, backgroundColor: 'white', height: '100%' }}>
         <Flex direction="column" align="center" justify="center" style={{ height: '100%' }}>
           <Stack gap={isMobile ? 6 : 10} align="center" mb="md">
-            <Title
-              order={2}
-              style={{
-                color: '#FF4D4D',
-                fontWeight: 700,
-                fontSize: isMobile ? rem(20) : rem(26),
-                textAlign: 'center',
-              }}
-            >
-              BLOODPULSE: LOGO
-            </Title>
+            <Flex align="center" gap="xs" justify="center">
+              <Title
+                order={2}
+                style={{
+                  color: '#FF4D4D',
+                  fontWeight: 700,
+                  fontSize: isMobile ? rem(20) : rem(26),
+                  fontFamily: 'monospace',
+                  userSelect: 'none',
+                }}
+              >
+                BLOODPULSE:
+              </Title>
+              <Image
+                src="/web-app-manifest-192x192.png"
+                alt="BloodPulse Logo"
+                width={28}
+                height={28}
+                style={{ marginTop: 2 }}
+              />
+            </Flex>
             <Text
               style={{
                 fontSize: isMobile ? rem(18) : rem(25),

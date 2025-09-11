@@ -10,10 +10,10 @@ import {
   IconUser,
   IconListCheck,
   IconCalendarPlus,
+  IconChartInfographic,
 } from "@tabler/icons-react";
 import { useState, useEffect } from "react";
 import CustomLoader from "@/components/Loader/CustomLoader";
-import { api } from "@/trpc/react";
 
 type SidebarProps = {
   isOpen: boolean;
@@ -24,13 +24,6 @@ type SidebarProps = {
 const DashboardSidebar = ({ isOpen, session, isUserDonor }: SidebarProps) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-
-  // console.log("Session Data:", session);
-  // console.log("User Role:", role);
-
-  // const { data: isUserDonor, isLoading: donorStatusLoading } = api.donor.getIsUserDonor.useQuery(undefined, {
-  //   enabled: !!session?.user?.email,
-  // });
 
   const handleSignOut = async () => {
     setLoading(true);
@@ -50,15 +43,10 @@ const DashboardSidebar = ({ isOpen, session, isUserDonor }: SidebarProps) => {
     }
   }, [session?.user?.role, router]);
 
-    if (!session || !session.user) {
-      return null;
-    }
+  if (!session?.user) return null;
+  if (loading) return <CustomLoader />;
 
-  if (loading) {
-    return <CustomLoader />;
-  }
-
-  const { role } = session.user;
+ const { role } = session.user;
 
   return (
     <Box
@@ -75,7 +63,7 @@ const DashboardSidebar = ({ isOpen, session, isUserDonor }: SidebarProps) => {
         flexDirection: "column",
         boxShadow: "2px 0 6px rgba(0, 0, 0, 0.1)",
         transition: "left 0.3s ease-in-out",
-        zIndex: 1000,
+        zIndex: 2000,
       }}
     >
       <Flex justify="center" mb="xl">
@@ -92,26 +80,16 @@ const DashboardSidebar = ({ isOpen, session, isUserDonor }: SidebarProps) => {
           </Flex>
         </UnstyledButton>
 
-        {typeof isUserDonor === "boolean" && (
-          <>
-        {!isUserDonor && (role === "USER" || role === "ADMIN") && (
-        <UnstyledButton onClick={() => router.push("/profile")}>
-          <Flex align="center" gap="xs">
-            <IconUser size={20} color="white" />
-            <Text size="sm" c="white">User Profile</Text>
-          </Flex>
-        </UnstyledButton>
-        )}
-
-        {isUserDonor && (role === "ADMIN" || role === "USER") && (
-          <UnstyledButton onClick={() => router.push("/donor-profile")}>
+        {/* FIXED: Always show profile link for USER or ADMIN */}
+        {(role === "USER" || role === "ADMIN") && (
+          <UnstyledButton onClick={() => router.push(isUserDonor ? "/donor-profile" : "/profile")}>
             <Flex align="center" gap="xs">
               <IconUser size={20} color="white" />
-              <Text size="sm" c="white">Donor Profile</Text>
+              <Text size="sm" c="white">
+                {isUserDonor ? "Donor Profile" : "User Profile"}
+              </Text>
             </Flex>
           </UnstyledButton>
-        )}
-        </>
         )}
 
         {role === "ADMIN" && (
@@ -122,13 +100,22 @@ const DashboardSidebar = ({ isOpen, session, isUserDonor }: SidebarProps) => {
             </Flex>
           </UnstyledButton>
         )}
-        
+
         <UnstyledButton onClick={() => router.push("/appointments")}>
           <Flex align="center" gap="xs">
             <IconCalendarPlus size={20} color="white" />
             <Text size="sm" c="white">Book Appointment</Text>
           </Flex>
         </UnstyledButton>
+
+        {role === "ADMIN" && (
+          <UnstyledButton onClick={() => router.push("/statistics")}>
+            <Flex align="center" gap="xs">
+              <IconChartInfographic size={20} color="white" />
+              <Text size="sm" c="white">Statistics</Text>
+            </Flex>
+          </UnstyledButton>
+        )}
 
         <UnstyledButton onClick={handleSignOut}>
           <Flex align="center" gap="xs">

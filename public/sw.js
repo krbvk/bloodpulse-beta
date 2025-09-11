@@ -2,6 +2,14 @@
 /* eslint-env serviceworker */
 /** @type {ServiceWorkerGlobalScope} */
 
+self.addEventListener('install', (event) => {
+  self.skipWaiting(); // activate immediately
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim()); // take control of all pages
+});
+
 self.addEventListener('push', function (event) {
   if (event.data) {
     const data = event.data.json();
