@@ -253,6 +253,9 @@ export default function AppointmentLayout() {
                 setTimeError(null);
               }}
               minDate={new Date()}
+              maxDate={
+                subject === "Blood Donation" && donationEnabled ? new Date() : undefined
+              }
               withAsterisk
               clearable
               popoverProps={{ withinPortal: true }}
@@ -297,9 +300,14 @@ export default function AppointmentLayout() {
                   : ["Blood Request"]
               }
               value={subject}
-              onChange={(value) =>
-                setSubject(value as "Blood Donation" | "Blood Request" | null)
-              }
+              onChange={(value) => {
+                const selected = value as "Blood Donation" | "Blood Request" | null;
+                setSubject(selected);
+
+                if (selected === "Blood Donation" && donationEnabled) {
+                  setAppointmentDate(new Date()); // force today
+                }
+              }}
               withAsterisk
             />
 
