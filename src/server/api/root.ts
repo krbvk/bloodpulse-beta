@@ -4,6 +4,7 @@ import { donorRouter } from "@/server/api/routers/donor";
 import { appointmentRouter } from "@/server/api/routers/appointment";
 import { statisticsRouter } from "@/server/api/routers/statistics"; 
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
+import { donationControlRouter } from "@/server/api/routers/control";
 
 /**
  * This is the primary router for your server.
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
   donor: donorRouter,
   appointment: appointmentRouter,
   statistics: statisticsRouter,
+  donationControl: donationControlRouter,
 });
 
 // export type definition of API

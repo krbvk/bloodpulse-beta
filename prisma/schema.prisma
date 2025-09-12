@@ -122,3 +122,9 @@ enum AppointmentSubject {
   BloodDonation
   BloodRequest
 }
+
+model DonationControl {
+  id       Int      @id @default(1) // single row (always id=1)
+  enabled  Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+}

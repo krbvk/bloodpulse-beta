@@ -21,6 +21,8 @@ import {
   Select,
   Text,
   Divider,
+  Switch,
+  Group,
 } from "@mantine/core";
 import { DatePickerInput, TimeInput } from "@mantine/dates";
 import dayjs from "dayjs";
@@ -48,7 +50,6 @@ export default function AppointmentLayout() {
   const [timeError, setTimeError] = useState<string | null>(null);
   const [subjectCount, setSubjectCount] = useState(1);
   const timeInputRef = useRef<HTMLInputElement | null>(null);
-
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
@@ -60,6 +61,23 @@ export default function AppointmentLayout() {
   if (status === "loading" || status === "unauthenticated") {
     return <CustomLoader />;
   }
+
+  // --- NEW: donation toggle status ---
+  const { data: donationEnabled, refetch } =
+    api.donationControl.getStatus.useQuery();
+
+  const toggle = api.donationControl.toggle.useMutation({
+    onMutate: (vars) => {
+      // console.log("[CLIENT] Toggle called with:", vars);
+    },
+    onSuccess: (data) => {
+      // console.log("[CLIENT] Toggle success, response:", data);
+      refetch();
+    },
+    onError: (error) => {
+      console.error("[CLIENT] Toggle failed:", error);
+    },
+  });
 
   const createAppointment = api.appointment.create.useMutation({
     onSuccess: () => {
@@ -79,6 +97,15 @@ export default function AppointmentLayout() {
   const handleSubmit = () => {
     if (!appointmentDate || !appointmentTime || !subject) return;
     if (subject === "Blood Request" && !bloodType) {
+      setFailed(true);
+      return;
+    }
+
+    // --- NEW: enforce donation only today ---
+    if (
+      subject === "Blood Donation" &&
+      !dayjs(appointmentDate).isSame(dayjs(), "day")
+    ) {
       setFailed(true);
       return;
     }
@@ -152,6 +179,20 @@ export default function AppointmentLayout() {
       <Title order={2} mb="lg" ta="center">
         Book an Appointment
       </Title>
+
+    {donationEnabled !== undefined && (
+      <Box maw={800} mx="auto" mb="md">
+        <Notification
+          color={donationEnabled ? "green" : "red"}
+          title={donationEnabled ? "Donation Open" : "Donation Closed"}
+          withBorder
+        >
+          {donationEnabled
+            ? "Blood Donation is open for today!"
+            : "Blood Donation is currently unavailable. Please wait for the official OLFU RCY blood donation drive event."}
+        </Notification>
+      </Box>
+    )}
 
       {success && (
         <Box maw={800} mx="auto">
@@ -250,7 +291,11 @@ export default function AppointmentLayout() {
             <Select
               label="Subject"
               placeholder="Select request type"
-              data={["Blood Donation", "Blood Request"]}
+              data={
+                donationEnabled
+                  ? ["Blood Donation", "Blood Request"]
+                  : ["Blood Request"]
+              }
               value={subject}
               onChange={(value) =>
                 setSubject(value as "Blood Donation" | "Blood Request" | null)
@@ -284,11 +329,24 @@ export default function AppointmentLayout() {
             >
               Send Appointment Request
             </Button>
+            {session?.user?.role === "ADMIN" && (
+              <Button
+                variant={donationEnabled ? "filled" : "outline"}
+                color={donationEnabled ? "green" : "red"}
+                onClick={() => toggle.mutate({ enabled: !donationEnabled })}
+                leftSection={
+                  donationEnabled ? <IconCheck size={16} /> : <IconX size={16} />
+                }
+              >
+                {donationEnabled ? "Disable Blood Donation" : "Enable Blood Donation"}
+              </Button>
+            )}
             <Divider my="xs" />
             <Text size="sm" c="dimmed" ta="center" mt="md">
-              <strong>Note:</strong> Booking an appointment here only schedules your
-              request. You will still need to fill up the official onsite form when you
-              arrive for blood donation or blood request processing.
+              <strong>Note:</strong> Booking an appointment here only schedules
+              your request. You will still need to fill up the official onsite
+              form when you arrive for blood donation or blood request
+              processing.
             </Text>
           </Stack>
         </Paper>
@@ -302,24 +360,14 @@ export default function AppointmentLayout() {
             width: isMobile ? "100%" : 260,
           }}
         >
-          {[ 
+          {[
             {
               color: "#1565c0",
-              text: `“OLFU RCY blood donation scheduling is available only 
-                Monday to Friday, 8:00 AM – 5:00 PM. 
-                If you book an appointment beyond these hours, 
-                OLFU RCY may not respond immediately. 
+              text: `“OLFU RCY Blood Donation is available only every 3 months during the official OLFU RCY blood donation drive.\n 
+                OLFU RCY Blood Request scheduling is available only Monday to Friday, 8:00 AM – 5:00 PM. 
+                For Blood Request, if you book an appointment beyond these hours, OLFU RCY may not respond immediately. 
                 Your request will likely be addressed on the next working day.”`,
               rotate: "-2deg",
-            },
-            {
-              color: "#c62828",
-              text: `“OLFU RCY blood request scheduling is available only 
-                Monday to Friday, 8:00 AM – 5:00 PM. 
-                If you book an appointment beyond these hours, 
-                OLFU RCY may not respond immediately. 
-                Your request will likely be addressed on the next working day.”`,
-              rotate: "2deg",
             },
           ].map((note, i) => (
             <Paper
@@ -332,7 +380,7 @@ export default function AppointmentLayout() {
                   "repeating-linear-gradient(to bottom, transparent 0px, transparent 23px, rgba(0,0,0,0.1) 24px)",
                 backgroundSize: "100% 24px",
                 width: "100%",
-                height: isMobile ? "auto" : 320,
+                height: isMobile ? "auto" : 400,
                 textAlign: "center",
                 transform: `rotate(${note.rotate})`,
                 borderRadius: "6px",
@@ -351,7 +399,7 @@ export default function AppointmentLayout() {
                   filter: "drop-shadow(0px 2px 2px rgba(0,0,0,0.6))",
                 }}
               />
-              <Text fw={600} size="sm" mt="xl" c="black">
+              <Text fw={600} size="sm" mt="xl" c="black" style={{ whiteSpace: "pre-line"}}>
                 {note.text}
               </Text>
             </Paper>
