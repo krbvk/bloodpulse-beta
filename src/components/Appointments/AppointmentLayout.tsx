@@ -21,8 +21,6 @@ import {
   Select,
   Text,
   Divider,
-  Switch,
-  Group,
 } from "@mantine/core";
 import { DatePickerInput, TimeInput } from "@mantine/dates";
 import dayjs from "dayjs";
@@ -341,7 +339,15 @@ export default function AppointmentLayout() {
               <Button
                 variant={donationEnabled ? "filled" : "outline"}
                 color={donationEnabled ? "green" : "red"}
-                onClick={() => toggle.mutate({ enabled: !donationEnabled })}
+                onClick={async () => {
+                  try {
+                    await toggle.mutateAsync({ enabled: !donationEnabled }); // 👈 use mutateAsync
+                    await refetch(); // refresh donation status after toggle
+                  } catch (err) {
+                    console.error("Toggle failed:", err);
+                  }
+                }}
+
                 leftSection={
                   donationEnabled ? <IconCheck size={16} /> : <IconX size={16} />
                 }
