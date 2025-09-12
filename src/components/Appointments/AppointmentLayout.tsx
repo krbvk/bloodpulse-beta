@@ -68,9 +68,9 @@ export default function AppointmentLayout() {
     onMutate: (vars) => {
       // console.log("[CLIENT] Toggle called with:", vars);
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       // console.log("[CLIENT] Toggle success, response:", data);
-      refetch();
+      await refetch();
     },
     onError: (error) => {
       console.error("[CLIENT] Toggle failed:", error);
