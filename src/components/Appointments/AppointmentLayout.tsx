@@ -56,7 +56,9 @@ export default function AppointmentLayout() {
     "Blood Donation" | "Blood Request" | null
   >(null);
   const [bloodType, setBloodType] = useState<string | null>(null);
-  const [variant, setVariant] = useState<string | null>(null);
+  const [variant, setVariant] = useState<
+    "whole blood" | "packed RBC" | "fresh plasma" | "frozen plasma" | null
+  >(null);
   const [failed, setFailed] = useState(false);
   const [timeError, setTimeError] = useState<string | null>(null);
   const [subjectCount, setSubjectCount] = useState(1);
@@ -290,7 +292,11 @@ export default function AppointmentLayout() {
                     "frozen plasma",
                   ]}
                   value={variant}
-                  onChange={setVariant}
+                  onChange={(value) =>
+                  setVariant(
+                    value as "whole blood" | "packed RBC" | "fresh plasma" | "frozen plasma" | null
+                  )
+                }
                   withAsterisk
                 />
               </>
