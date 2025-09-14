@@ -105,6 +105,7 @@ model Appointment {
   datetime    DateTime
   message     String
   bloodType   String?
+  variant    String?
   displaySubject String
   subject   AppointmentSubject @default(BloodDonation)
   createdAt   DateTime @default(now())
