@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { api } from "@/trpc/react";
 import {
   IconCheck,
-  IconClock,
   IconMail,
   IconPin,
   IconX,
@@ -17,12 +16,11 @@ import {
   Button,
   Notification,
   Stack,
-  ActionIcon,
   Select,
   Text,
   Divider,
 } from "@mantine/core";
-import { DatePickerInput, TimeInput } from "@mantine/dates";
+import { DatePickerInput } from "@mantine/dates";
 import dayjs from "dayjs";
 import CustomLoader from "@/components/Loader/CustomLoader";
 import { useRouter } from "next/navigation";
@@ -34,6 +32,20 @@ import { generateAppointmentMessage } from "@/utils/generateAppointmentMessage";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+// ✅ Fixed time options (8 AM – 5 PM)
+const timeOptions = [
+  "8:00 AM",
+  "9:00 AM",
+  "10:00 AM",
+  "11:00 AM",
+  "12:00 PM",
+  "1:00 PM",
+  "2:00 PM",
+  "3:00 PM",
+  "4:00 PM",
+  "5:00 PM",
+];
+
 export default function AppointmentLayout() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -44,11 +56,12 @@ export default function AppointmentLayout() {
     "Blood Donation" | "Blood Request" | null
   >(null);
   const [bloodType, setBloodType] = useState<string | null>(null);
+  const [variant, setVariant] = useState<
+    "whole blood" | "packed RBC" | "fresh plasma" | "frozen plasma" | null
+  >(null);
   const [failed, setFailed] = useState(false);
   const [timeError, setTimeError] = useState<string | null>(null);
   const [subjectCount, setSubjectCount] = useState(1);
-  const timeInputRef = useRef<HTMLInputElement | null>(null);
-
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
@@ -61,12 +74,23 @@ export default function AppointmentLayout() {
     return <CustomLoader />;
   }
 
+  // --- NEW: donation toggle status ---
+  const { data: donationEnabled, refetch } =
+    api.donationControl.getStatus.useQuery();
+
+  const toggle = api.donationControl.toggle.useMutation({
+    onSuccess: async () => {
+      await refetch();
+    },
+  });
+
   const createAppointment = api.appointment.create.useMutation({
     onSuccess: () => {
       setSuccess(true);
       setAppointmentDate(null);
       setAppointmentTime("");
       setBloodType(null);
+      setVariant(null);
       setSubjectCount((prev) => prev + 1);
     },
     onError: (error) => {
@@ -78,20 +102,25 @@ export default function AppointmentLayout() {
 
   const handleSubmit = () => {
     if (!appointmentDate || !appointmentTime || !subject) return;
-    if (subject === "Blood Request" && !bloodType) {
+    if (subject === "Blood Request" && (!bloodType || !variant)) {
       setFailed(true);
       return;
     }
 
-    const [hoursStr, minutesStr] = appointmentTime.split(":");
-    const hours = Number(hoursStr);
-    const minutes = Number(minutesStr);
+    // --- NEW: enforce donation only today ---
+    if (
+      subject === "Blood Donation" &&
+      !dayjs(appointmentDate).isSame(dayjs(), "day")
+    ) {
+      setFailed(true);
+      return;
+    }
 
-    const datetime = dayjs(appointmentDate)
-      .set("hour", hours)
-      .set("minute", minutes)
-      .set("second", 0)
-      .set("millisecond", 0)
+    // Parse selected time (e.g., "8:00 AM")
+    const datetime = dayjs(
+      `${dayjs(appointmentDate).format("YYYY-MM-DD")} ${appointmentTime}`,
+      "YYYY-MM-DD h:mm A"
+    )
       .tz("Asia/Manila")
       .toDate();
 
@@ -112,39 +141,8 @@ export default function AppointmentLayout() {
       displaySubject,
       message: generatedMessage,
       bloodType: bloodType ?? undefined,
+      variant: subject === "Blood Request" ? variant ?? undefined : undefined,
     });
-  };
-
-  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.currentTarget.value;
-    const [hoursStr, minutesStr] = input.split(":");
-
-    const hours = Number(hoursStr);
-    const minutes = Number(minutesStr);
-
-    if (
-      !isNaN(hours) &&
-      !isNaN(minutes) &&
-      hours >= 0 &&
-      hours <= 23 &&
-      minutes >= 0 &&
-      minutes <= 59
-    ) {
-      const dateToCheck = appointmentDate ?? new Date();
-      const newTime = new Date(dateToCheck);
-      newTime.setHours(hours, minutes, 0, 0);
-      const now = new Date();
-      const isSameDay = newTime.toDateString() === now.toDateString();
-      if (newTime < now && isSameDay) {
-        setTimeError("Cannot set a past time for the current day.");
-        setAppointmentTime("");
-      } else {
-        setTimeError(null);
-        setAppointmentTime(input);
-      }
-    } else {
-      setAppointmentTime("");
-    }
   };
 
   return (
@@ -152,6 +150,20 @@ export default function AppointmentLayout() {
       <Title order={2} mb="lg" ta="center">
         Book an Appointment
       </Title>
+
+      {donationEnabled !== undefined && (
+        <Box maw={800} mx="auto" mb="md">
+          <Notification
+            color={donationEnabled ? "green" : "red"}
+            title={donationEnabled ? "Donation Open" : "Donation Closed"}
+            withBorder
+          >
+            {donationEnabled
+              ? "Blood Donation is open for today!"
+              : "Blood Donation is currently unavailable. Please wait for the official OLFU RCY blood donation drive event."}
+          </Notification>
+        </Box>
+      )}
 
       {success && (
         <Box maw={800} mx="auto">
@@ -212,33 +224,24 @@ export default function AppointmentLayout() {
                 setTimeError(null);
               }}
               minDate={new Date()}
+              maxDate={
+                subject === "Blood Donation" && donationEnabled
+                  ? new Date()
+                  : undefined
+              }
               withAsterisk
               clearable
               popoverProps={{ withinPortal: true }}
             />
 
-            <TimeInput
+            {/* ✅ Replace TimeInput with Select */}
+            <Select
               label="Time"
               placeholder="Select time"
+              data={timeOptions}
               value={appointmentTime}
-              onChange={handleTimeChange}
+              onChange={(value) => setAppointmentTime(value ?? "")}
               withAsterisk
-              ref={timeInputRef}
-              rightSection={
-                <ActionIcon
-                  variant="subtle"
-                  onClick={() => {
-                    const inputEl = timeInputRef.current;
-                    if (inputEl?.showPicker) {
-                      inputEl.showPicker();
-                    } else {
-                      inputEl?.focus();
-                    }
-                  }}
-                >
-                  <IconClock size={18} />
-                </ActionIcon>
-              }
             />
 
             {timeError && (
@@ -250,23 +253,53 @@ export default function AppointmentLayout() {
             <Select
               label="Subject"
               placeholder="Select request type"
-              data={["Blood Donation", "Blood Request"]}
-              value={subject}
-              onChange={(value) =>
-                setSubject(value as "Blood Donation" | "Blood Request" | null)
+              data={
+                donationEnabled
+                  ? ["Blood Donation", "Blood Request"]
+                  : ["Blood Request"]
               }
+              value={subject}
+              onChange={(value) => {
+                const selected =
+                  value as "Blood Donation" | "Blood Request" | null;
+                setSubject(selected);
+
+                if (selected === "Blood Donation" && donationEnabled) {
+                  setAppointmentDate(new Date()); // force today
+                }
+              }}
               withAsterisk
             />
 
             {subject === "Blood Request" && (
-              <Select
-                label="Blood Type"
-                placeholder="Select blood type"
-                data={["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]}
-                value={bloodType}
-                onChange={setBloodType}
-                withAsterisk
-              />
+              <>
+                <Select
+                  label="Blood Type"
+                  placeholder="Select blood type"
+                  data={["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]}
+                  value={bloodType}
+                  onChange={setBloodType}
+                  withAsterisk
+                />
+
+                <Select
+                  label="Variant"
+                  placeholder="Select variant"
+                  data={[
+                    "whole blood",
+                    "packed RBC",
+                    "fresh plasma",
+                    "frozen plasma",
+                  ]}
+                  value={variant}
+                  onChange={(value) =>
+                  setVariant(
+                    value as "whole blood" | "packed RBC" | "fresh plasma" | "frozen plasma" | null
+                  ) ?? null
+                }
+                  withAsterisk
+                />
+              </>
             )}
 
             <Button
@@ -279,16 +312,44 @@ export default function AppointmentLayout() {
                 !appointmentTime ||
                 !subject ||
                 !!timeError ||
-                (subject === "Blood Request" && !bloodType)
+                (subject === "Blood Request" && (!bloodType || !variant))
               }
             >
               Send Appointment Request
             </Button>
+            {session?.user?.role === "ADMIN" && (
+              <Button
+                variant={donationEnabled ? "filled" : "outline"}
+                color={donationEnabled ? "green" : "red"}
+                onClick={async () => {
+                  try {
+                    await toggle.mutateAsync({
+                      enabled: !donationEnabled,
+                    });
+                    await refetch();
+                  } catch (err) {
+                    console.error("Toggle failed:", err);
+                  }
+                }}
+                leftSection={
+                  donationEnabled ? (
+                    <IconCheck size={16} />
+                  ) : (
+                    <IconX size={16} />
+                  )
+                }
+              >
+                {donationEnabled
+                  ? "Disable Blood Donation"
+                  : "Enable Blood Donation"}
+              </Button>
+            )}
             <Divider my="xs" />
             <Text size="sm" c="dimmed" ta="center" mt="md">
-              <strong>Note:</strong> Booking an appointment here only schedules your
-              request. You will still need to fill up the official onsite form when you
-              arrive for blood donation or blood request processing.
+              <strong>Note:</strong> Booking an appointment here only schedules
+              your request. You will still need to fill up the official onsite
+              form when you arrive for blood donation or blood request
+              processing.
             </Text>
           </Stack>
         </Paper>
@@ -302,24 +363,14 @@ export default function AppointmentLayout() {
             width: isMobile ? "100%" : 260,
           }}
         >
-          {[ 
+          {[
             {
               color: "#1565c0",
-              text: `“OLFU RCY blood donation scheduling is available only 
-                Monday to Friday, 8:00 AM – 5:00 PM. 
-                If you book an appointment beyond these hours, 
-                OLFU RCY may not respond immediately. 
+              text: `“OLFU RCY Blood Donation is available only every 3 months during the official OLFU RCY blood donation drive.\n 
+                OLFU RCY Blood Request scheduling is available only Monday to Friday, 8:00 AM – 5:00 PM. 
+                For Blood Request, if you book an appointment beyond these hours, OLFU RCY may not respond immediately. 
                 Your request will likely be addressed on the next working day.”`,
               rotate: "-2deg",
-            },
-            {
-              color: "#c62828",
-              text: `“OLFU RCY blood request scheduling is available only 
-                Monday to Friday, 8:00 AM – 5:00 PM. 
-                If you book an appointment beyond these hours, 
-                OLFU RCY may not respond immediately. 
-                Your request will likely be addressed on the next working day.”`,
-              rotate: "2deg",
             },
           ].map((note, i) => (
             <Paper
@@ -332,7 +383,7 @@ export default function AppointmentLayout() {
                   "repeating-linear-gradient(to bottom, transparent 0px, transparent 23px, rgba(0,0,0,0.1) 24px)",
                 backgroundSize: "100% 24px",
                 width: "100%",
-                height: isMobile ? "auto" : 320,
+                height: isMobile ? "auto" : 400,
                 textAlign: "center",
                 transform: `rotate(${note.rotate})`,
                 borderRadius: "6px",
@@ -351,7 +402,13 @@ export default function AppointmentLayout() {
                   filter: "drop-shadow(0px 2px 2px rgba(0,0,0,0.6))",
                 }}
               />
-              <Text fw={600} size="sm" mt="xl" c="black">
+              <Text
+                fw={600}
+                size="sm"
+                mt="xl"
+                c="black"
+                style={{ whiteSpace: "pre-line" }}
+              >
                 {note.text}
               </Text>
             </Paper>

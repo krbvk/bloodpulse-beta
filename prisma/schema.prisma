@@ -105,6 +105,7 @@ model Appointment {
   datetime    DateTime
   message     String
   bloodType   String?
+  variant    String?
   displaySubject String
   subject   AppointmentSubject @default(BloodDonation)
   createdAt   DateTime @default(now())
@@ -121,4 +122,10 @@ enum Role {
 enum AppointmentSubject {
   BloodDonation
   BloodRequest
+}
+
+model DonationControl {
+  id       Int      @id @default(1) // single row (always id=1)
+  enabled  Boolean  @default(false)
+  updatedAt DateTime @updatedAt
 }

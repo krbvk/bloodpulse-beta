@@ -51,7 +51,7 @@ export default function Options() {
         style={{
           ...sharedBoxStyles,
           width: '100%',
-          height: '100%',
+          height: isMobile ? '350px' : '100%',
           overflow: 'hidden',
           padding: 0,
           borderRadius: isMobile ? 0 : 5,
