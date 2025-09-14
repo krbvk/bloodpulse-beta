@@ -240,7 +240,7 @@ export default function AppointmentLayout() {
               placeholder="Select time"
               data={timeOptions}
               value={appointmentTime}
-              onChange={(value) => setAppointmentTime(value || "")}
+              onChange={(value) => setAppointmentTime(value ?? "")}
               withAsterisk
             />
 
@@ -295,7 +295,7 @@ export default function AppointmentLayout() {
                   onChange={(value) =>
                   setVariant(
                     value as "whole blood" | "packed RBC" | "fresh plasma" | "frozen plasma" | null
-                  )
+                  ) ?? null
                 }
                   withAsterisk
                 />
