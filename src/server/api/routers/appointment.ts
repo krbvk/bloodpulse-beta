@@ -33,6 +33,9 @@ export const appointmentRouter = createTRPCRouter({
               { message: "Use A+, A-, B+, B-, AB+, AB-, O+, or O-" }
             )
         ),
+        variant: z
+          .enum(["whole blood", "packed RBC", "fresh plasma", "frozen plasma"])
+          .optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -56,6 +59,7 @@ export const appointmentRouter = createTRPCRouter({
           displaySubject: input.displaySubject,
           requesterId: ctx.session.user.id,
           bloodType: input.bloodType ?? undefined,
+          variant: input.variant ?? undefined,
         },
       });
 
@@ -75,11 +79,15 @@ export const appointmentRouter = createTRPCRouter({
             subject: input.displaySubject,
             text: `Appointment request from: (${ctx.session.user.email})
           Appointment is for: ${formattedDate}
-          ${input.subject === "Blood Request" && input.bloodType ? `Blood type: ${input.bloodType}` : ""}
+          ${
+            input.subject === "Blood Request" && input.bloodType
+              ? `Blood type needed: ${input.bloodType}${input.variant ? " - " + input.variant : ""}`
+              : ""
+          }
           Message:
           ${message}`,
 
-          html: `
+            html: `
             <div style="font-family: Arial, sans-serif; font-size: 14px; color: #000; line-height: 1.6;">
               <p>
                 <strong>Appointment request from:</strong>
@@ -88,11 +96,13 @@ export const appointmentRouter = createTRPCRouter({
               <p><strong>Appointment is for:</strong> ${formattedDate}</p>
               ${
                 input.subject === "Blood Request" && input.bloodType
-                  ? `<p><strong>Blood type needed:</strong> ${input.bloodType}</p>`
+                  ? `<p><strong>Blood type needed:</strong> ${input.bloodType}${
+                      input.variant ? " - " + input.variant : ""
+                    }</p>`
                   : ""
               }
               <p><strong>Message:</strong></p>
-              <div style="white-space: pre-line; font-family: inherit; margin: 0;">${message}
+              <div style="white-space: pre-line; font-family: inherit; margin: 0;">${message}</div>
             </div>
           `.trim(),
           });

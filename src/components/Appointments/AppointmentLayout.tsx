@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { api } from "@/trpc/react";
 import {
   IconCheck,
-  IconClock,
   IconMail,
   IconPin,
   IconX,
@@ -17,12 +16,11 @@ import {
   Button,
   Notification,
   Stack,
-  ActionIcon,
   Select,
   Text,
   Divider,
 } from "@mantine/core";
-import { DatePickerInput, TimeInput } from "@mantine/dates";
+import { DatePickerInput } from "@mantine/dates";
 import dayjs from "dayjs";
 import CustomLoader from "@/components/Loader/CustomLoader";
 import { useRouter } from "next/navigation";
@@ -34,6 +32,20 @@ import { generateAppointmentMessage } from "@/utils/generateAppointmentMessage";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+// ✅ Fixed time options (8 AM – 5 PM)
+const timeOptions = [
+  "8:00 AM",
+  "9:00 AM",
+  "10:00 AM",
+  "11:00 AM",
+  "12:00 PM",
+  "1:00 PM",
+  "2:00 PM",
+  "3:00 PM",
+  "4:00 PM",
+  "5:00 PM",
+];
+
 export default function AppointmentLayout() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -44,10 +56,10 @@ export default function AppointmentLayout() {
     "Blood Donation" | "Blood Request" | null
   >(null);
   const [bloodType, setBloodType] = useState<string | null>(null);
+  const [variant, setVariant] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   const [timeError, setTimeError] = useState<string | null>(null);
   const [subjectCount, setSubjectCount] = useState(1);
-  const timeInputRef = useRef<HTMLInputElement | null>(null);
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
@@ -65,15 +77,8 @@ export default function AppointmentLayout() {
     api.donationControl.getStatus.useQuery();
 
   const toggle = api.donationControl.toggle.useMutation({
-    onMutate: (vars) => {
-      // console.log("[CLIENT] Toggle called with:", vars);
-    },
-    onSuccess: async (data) => {
-      // console.log("[CLIENT] Toggle success, response:", data);
+    onSuccess: async () => {
       await refetch();
-    },
-    onError: (error) => {
-      console.error("[CLIENT] Toggle failed:", error);
     },
   });
 
@@ -83,6 +88,7 @@ export default function AppointmentLayout() {
       setAppointmentDate(null);
       setAppointmentTime("");
       setBloodType(null);
+      setVariant(null);
       setSubjectCount((prev) => prev + 1);
     },
     onError: (error) => {
@@ -94,7 +100,7 @@ export default function AppointmentLayout() {
 
   const handleSubmit = () => {
     if (!appointmentDate || !appointmentTime || !subject) return;
-    if (subject === "Blood Request" && !bloodType) {
+    if (subject === "Blood Request" && (!bloodType || !variant)) {
       setFailed(true);
       return;
     }
@@ -108,15 +114,11 @@ export default function AppointmentLayout() {
       return;
     }
 
-    const [hoursStr, minutesStr] = appointmentTime.split(":");
-    const hours = Number(hoursStr);
-    const minutes = Number(minutesStr);
-
-    const datetime = dayjs(appointmentDate)
-      .set("hour", hours)
-      .set("minute", minutes)
-      .set("second", 0)
-      .set("millisecond", 0)
+    // Parse selected time (e.g., "8:00 AM")
+    const datetime = dayjs(
+      `${dayjs(appointmentDate).format("YYYY-MM-DD")} ${appointmentTime}`,
+      "YYYY-MM-DD h:mm A"
+    )
       .tz("Asia/Manila")
       .toDate();
 
@@ -137,39 +139,8 @@ export default function AppointmentLayout() {
       displaySubject,
       message: generatedMessage,
       bloodType: bloodType ?? undefined,
+      variant: subject === "Blood Request" ? variant ?? undefined : undefined,
     });
-  };
-
-  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.currentTarget.value;
-    const [hoursStr, minutesStr] = input.split(":");
-
-    const hours = Number(hoursStr);
-    const minutes = Number(minutesStr);
-
-    if (
-      !isNaN(hours) &&
-      !isNaN(minutes) &&
-      hours >= 0 &&
-      hours <= 23 &&
-      minutes >= 0 &&
-      minutes <= 59
-    ) {
-      const dateToCheck = appointmentDate ?? new Date();
-      const newTime = new Date(dateToCheck);
-      newTime.setHours(hours, minutes, 0, 0);
-      const now = new Date();
-      const isSameDay = newTime.toDateString() === now.toDateString();
-      if (newTime < now && isSameDay) {
-        setTimeError("Cannot set a past time for the current day.");
-        setAppointmentTime("");
-      } else {
-        setTimeError(null);
-        setAppointmentTime(input);
-      }
-    } else {
-      setAppointmentTime("");
-    }
   };
 
   return (
@@ -178,19 +149,19 @@ export default function AppointmentLayout() {
         Book an Appointment
       </Title>
 
-    {donationEnabled !== undefined && (
-      <Box maw={800} mx="auto" mb="md">
-        <Notification
-          color={donationEnabled ? "green" : "red"}
-          title={donationEnabled ? "Donation Open" : "Donation Closed"}
-          withBorder
-        >
-          {donationEnabled
-            ? "Blood Donation is open for today!"
-            : "Blood Donation is currently unavailable. Please wait for the official OLFU RCY blood donation drive event."}
-        </Notification>
-      </Box>
-    )}
+      {donationEnabled !== undefined && (
+        <Box maw={800} mx="auto" mb="md">
+          <Notification
+            color={donationEnabled ? "green" : "red"}
+            title={donationEnabled ? "Donation Open" : "Donation Closed"}
+            withBorder
+          >
+            {donationEnabled
+              ? "Blood Donation is open for today!"
+              : "Blood Donation is currently unavailable. Please wait for the official OLFU RCY blood donation drive event."}
+          </Notification>
+        </Box>
+      )}
 
       {success && (
         <Box maw={800} mx="auto">
@@ -252,35 +223,23 @@ export default function AppointmentLayout() {
               }}
               minDate={new Date()}
               maxDate={
-                subject === "Blood Donation" && donationEnabled ? new Date() : undefined
+                subject === "Blood Donation" && donationEnabled
+                  ? new Date()
+                  : undefined
               }
               withAsterisk
               clearable
               popoverProps={{ withinPortal: true }}
             />
 
-            <TimeInput
+            {/* ✅ Replace TimeInput with Select */}
+            <Select
               label="Time"
               placeholder="Select time"
+              data={timeOptions}
               value={appointmentTime}
-              onChange={handleTimeChange}
+              onChange={(value) => setAppointmentTime(value || "")}
               withAsterisk
-              ref={timeInputRef}
-              rightSection={
-                <ActionIcon
-                  variant="subtle"
-                  onClick={() => {
-                    const inputEl = timeInputRef.current;
-                    if (inputEl?.showPicker) {
-                      inputEl.showPicker();
-                    } else {
-                      inputEl?.focus();
-                    }
-                  }}
-                >
-                  <IconClock size={18} />
-                </ActionIcon>
-              }
             />
 
             {timeError && (
@@ -299,7 +258,8 @@ export default function AppointmentLayout() {
               }
               value={subject}
               onChange={(value) => {
-                const selected = value as "Blood Donation" | "Blood Request" | null;
+                const selected =
+                  value as "Blood Donation" | "Blood Request" | null;
                 setSubject(selected);
 
                 if (selected === "Blood Donation" && donationEnabled) {
@@ -310,14 +270,30 @@ export default function AppointmentLayout() {
             />
 
             {subject === "Blood Request" && (
-              <Select
-                label="Blood Type"
-                placeholder="Select blood type"
-                data={["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]}
-                value={bloodType}
-                onChange={setBloodType}
-                withAsterisk
-              />
+              <>
+                <Select
+                  label="Blood Type"
+                  placeholder="Select blood type"
+                  data={["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]}
+                  value={bloodType}
+                  onChange={setBloodType}
+                  withAsterisk
+                />
+
+                <Select
+                  label="Variant"
+                  placeholder="Select variant"
+                  data={[
+                    "whole blood",
+                    "packed RBC",
+                    "fresh plasma",
+                    "frozen plasma",
+                  ]}
+                  value={variant}
+                  onChange={setVariant}
+                  withAsterisk
+                />
+              </>
             )}
 
             <Button
@@ -330,7 +306,7 @@ export default function AppointmentLayout() {
                 !appointmentTime ||
                 !subject ||
                 !!timeError ||
-                (subject === "Blood Request" && !bloodType)
+                (subject === "Blood Request" && (!bloodType || !variant))
               }
             >
               Send Appointment Request
@@ -341,18 +317,25 @@ export default function AppointmentLayout() {
                 color={donationEnabled ? "green" : "red"}
                 onClick={async () => {
                   try {
-                    await toggle.mutateAsync({ enabled: !donationEnabled }); // 👈 use mutateAsync
-                    await refetch(); // refresh donation status after toggle
+                    await toggle.mutateAsync({
+                      enabled: !donationEnabled,
+                    });
+                    await refetch();
                   } catch (err) {
                     console.error("Toggle failed:", err);
                   }
                 }}
-
                 leftSection={
-                  donationEnabled ? <IconCheck size={16} /> : <IconX size={16} />
+                  donationEnabled ? (
+                    <IconCheck size={16} />
+                  ) : (
+                    <IconX size={16} />
+                  )
                 }
               >
-                {donationEnabled ? "Disable Blood Donation" : "Enable Blood Donation"}
+                {donationEnabled
+                  ? "Disable Blood Donation"
+                  : "Enable Blood Donation"}
               </Button>
             )}
             <Divider my="xs" />
@@ -413,7 +396,13 @@ export default function AppointmentLayout() {
                   filter: "drop-shadow(0px 2px 2px rgba(0,0,0,0.6))",
                 }}
               />
-              <Text fw={600} size="sm" mt="xl" c="black" style={{ whiteSpace: "pre-line"}}>
+              <Text
+                fw={600}
+                size="sm"
+                mt="xl"
+                c="black"
+                style={{ whiteSpace: "pre-line" }}
+              >
                 {note.text}
               </Text>
             </Paper>
