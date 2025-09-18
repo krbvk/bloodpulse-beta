@@ -32,7 +32,10 @@ export const appointmentRouter = createTRPCRouter({
       where: { email: { not: null } },
       select: { email: true },
     });
-    const emails = users.map((u) => u.email!) as string[];
+    
+    const emails = users
+    .map((u) => u.email)
+    .filter((email): email is string => email !== null);
 
     if (emails.length === 0) {
       throw new Error("No user emails found");
