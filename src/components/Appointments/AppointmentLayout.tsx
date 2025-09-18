@@ -8,6 +8,7 @@ import {
   IconMail,
   IconPin,
   IconX,
+  IconSend,
 } from "@tabler/icons-react";
 import {
   Box,
@@ -19,6 +20,7 @@ import {
   Select,
   Text,
   Divider,
+  TextInput,
 } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import dayjs from "dayjs";
@@ -62,6 +64,7 @@ export default function AppointmentLayout() {
   const [failed, setFailed] = useState(false);
   const [timeError, setTimeError] = useState<string | null>(null);
   const [subjectCount, setSubjectCount] = useState(1);
+  const [location, setLocation] = useState(""); // ✅ new state for location
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
@@ -74,7 +77,7 @@ export default function AppointmentLayout() {
     return <CustomLoader />;
   }
 
-  // --- NEW: donation toggle status ---
+  // --- Donation toggle status ---
   const { data: donationEnabled, refetch } =
     api.donationControl.getStatus.useQuery();
 
@@ -100,6 +103,17 @@ export default function AppointmentLayout() {
     },
   });
 
+  // --- NEW: bulk email mutation ---
+  const sendToAll = api.appointment.getAllUserEmails.useMutation({
+    onSuccess: (res) => {
+      alert(`✅ Email sent to ${res.sentTo.length} users`);
+      setLocation(""); // clear location input
+    },
+    onError: (err) => {
+      alert(`❌ Failed to send: ${err.message}`);
+    },
+  });
+
   const handleSubmit = () => {
     if (!appointmentDate || !appointmentTime || !subject) return;
     if (subject === "Blood Request" && (!bloodType || !variant)) {
@@ -107,7 +121,6 @@ export default function AppointmentLayout() {
       return;
     }
 
-    // --- NEW: enforce donation only today ---
     if (
       subject === "Blood Donation" &&
       !dayjs(appointmentDate).isSame(dayjs(), "day")
@@ -116,7 +129,6 @@ export default function AppointmentLayout() {
       return;
     }
 
-    // Parse selected time (e.g., "8:00 AM")
     const datetime = dayjs(
       `${dayjs(appointmentDate).format("YYYY-MM-DD")} ${appointmentTime}`,
       "YYYY-MM-DD h:mm A"
@@ -234,7 +246,6 @@ export default function AppointmentLayout() {
               popoverProps={{ withinPortal: true }}
             />
 
-            {/* ✅ Replace TimeInput with Select */}
             <Select
               label="Time"
               placeholder="Select time"
@@ -265,7 +276,7 @@ export default function AppointmentLayout() {
                 setSubject(selected);
 
                 if (selected === "Blood Donation" && donationEnabled) {
-                  setAppointmentDate(new Date()); // force today
+                  setAppointmentDate(new Date());
                 }
               }}
               withAsterisk
@@ -293,10 +304,15 @@ export default function AppointmentLayout() {
                   ]}
                   value={variant}
                   onChange={(value) =>
-                  setVariant(
-                    value as "whole blood" | "packed RBC" | "fresh plasma" | "frozen plasma" | null
-                  ) ?? null
-                }
+                    setVariant(
+                      value as
+                        | "whole blood"
+                        | "packed RBC"
+                        | "fresh plasma"
+                        | "frozen plasma"
+                        | null
+                    ) ?? null
+                  }
                   withAsterisk
                 />
               </>
@@ -317,33 +333,69 @@ export default function AppointmentLayout() {
             >
               Send Appointment Request
             </Button>
+
             {session?.user?.role === "ADMIN" && (
-              <Button
-                variant={donationEnabled ? "filled" : "outline"}
-                color={donationEnabled ? "green" : "red"}
-                onClick={async () => {
-                  try {
-                    await toggle.mutateAsync({
-                      enabled: !donationEnabled,
-                    });
-                    await refetch();
-                  } catch (err) {
-                    console.error("Toggle failed:", err);
+              <>
+                <Button
+                  variant={donationEnabled ? "filled" : "outline"}
+                  color={donationEnabled ? "green" : "red"}
+                  onClick={async () => {
+                    try {
+                      await toggle.mutateAsync({
+                        enabled: !donationEnabled,
+                      });
+                      await refetch();
+                    } catch (err) {
+                      console.error("Toggle failed:", err);
+                    }
+                  }}
+                  leftSection={
+                    donationEnabled ? (
+                      <IconCheck size={16} />
+                    ) : (
+                      <IconX size={16} />
+                    )
                   }
-                }}
-                leftSection={
-                  donationEnabled ? (
-                    <IconCheck size={16} />
-                  ) : (
-                    <IconX size={16} />
-                  )
-                }
-              >
-                {donationEnabled
-                  ? "Disable Blood Donation"
-                  : "Enable Blood Donation"}
-              </Button>
+                >
+                  {donationEnabled
+                    ? "Disable Blood Donation"
+                    : "Enable Blood Donation"}
+                </Button>
+
+                {/* ✅ New: Bulk Email with Location */}
+                {donationEnabled && (
+                  <Paper shadow="sm" radius="md" p="md" withBorder>
+                    <Text fw={600} mb="sm">
+                      Send Blood Donation Drive Invitation
+                    </Text>
+                    <TextInput
+                      label="Location"
+                      placeholder="Enter event location"
+                      value={location}
+                      onChange={(e) => setLocation(e.currentTarget.value)}
+                      required
+                    />
+                    <Button
+                      mt="md"
+                      color="blue"
+                      fullWidth
+                      leftSection={<IconSend size={16} />}
+                      onClick={() => {
+                        if (!location.trim()) {
+                          alert("⚠️ Please enter a location before sending.");
+                          return;
+                        }
+                        sendToAll.mutate({ location });
+                      }}
+                      loading={sendToAll.status === "pending"}
+                    >
+                      Send Email To All Users
+                    </Button>
+                  </Paper>
+                )}
+              </>
             )}
+
             <Divider my="xs" />
             <Text size="sm" c="dimmed" ta="center" mt="md">
               <strong>Note:</strong> Booking an appointment here only schedules
