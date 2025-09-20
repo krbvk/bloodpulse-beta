@@ -94,14 +94,28 @@ export default function DonorLayout() {
     },
   });
 
-  const filteredDonors = useMemo(() => {
-    if (!searchQuery) {
-      return donors;
+const filteredDonors = useMemo(() => {
+  if (!searchQuery) return donors;
+
+  const query = searchQuery.trim().toUpperCase();
+
+  return donors.filter((donor) => {
+    const blood = donor.bloodType.toUpperCase();
+
+    // If query includes + or -, require exact match
+    if (query.includes("+") || query.includes("-")) {
+      return blood === query;
     }
-    return donors.filter(
-      (donor) => donor.bloodType.toLowerCase() === searchQuery.toLowerCase()
-    );
-  }, [donors, searchQuery]);
+
+    // Otherwise match base type exactly (A, B, AB, O)
+    // Example: typing "A" => matches A+ and A-, but not AB
+    if (["A", "B", "AB", "O"].includes(query)) {
+      return blood.startsWith(query) && blood.length <= query.length + 1;
+    }
+
+    return false;
+  });
+}, [donors, searchQuery]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
