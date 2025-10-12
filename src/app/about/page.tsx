@@ -14,6 +14,8 @@ import VisionCard from '@/components/Information/Vision';
 import AboutCard from '@/components/Information/About';
 import Services from '@/components/Information/Services';
 import CustomLoader from "@/components/Loader/CustomLoader";
+import ContactSupport from "@/components/Information/Contact";
+
 
 const AboutPage = () => {
   const [splashes, setSplashes] = useState<{ id: number; x: number; y: number }[]>([]);
@@ -112,6 +114,10 @@ const AboutPage = () => {
 
           <Box id="services" w="100%" mt="xl">
             <Services />
+          </Box>
+
+          <Box w="100%" mt="xl">
+            <ContactSupport />
           </Box>
         </Flex>
       </Container>

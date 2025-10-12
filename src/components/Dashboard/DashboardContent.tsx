@@ -180,12 +180,12 @@ function RemindersCard({
   const reminders = [
     {
       title: "Wait after your last donation",
-      description: "You shouldwait at least 3 months after your last donation.",
+      description: "You should wait at least 3 months after your last donation.",
       image: "/month.svg",
     },
      {
       title: "Be healthy",
-      description: "you must be in good health and free from any illness.",
+      description: "You must be in good health and free from any illness.",
       image: "/healthy.svg",
     },
     {
@@ -206,7 +206,7 @@ function RemindersCard({
     },
     {
       title: "Be honest",
-      description: "provide accurate information about your health.",
+      description: "Provide accurate information about your health.",
       image: "/honest.svg",
     },
     {
@@ -394,12 +394,12 @@ function RemindersCardDont({
   const reminders = [
     {
       title: "Weight restrictions",
-      description: "don't donate if you weigh less than 110 lbs (50 kg).",
+      description: "Don't donate if you weigh less than 110 lbs (50 kg).",
       image: "/weight.svg",
     },
     {
       title: "Illnesses",
-      description: "Don't donate if you have a cough,cold or fever.",
+      description: "Don't donate if you have a cough, cold or fever.",
       image: "/illnes.svg",
     },
     {
@@ -418,19 +418,19 @@ function RemindersCardDont({
       image: "/alcohol.svg",
     },
     {
-      title: "Tatto",
+      title: "Tattoo",
       description: "Wait at least one year to donate after getting tattoo.",
       image: "/tatto.svg",
     },
 
      {
       title: "Vaccines",
-      description: "Anti-rabies & tetanus - atleast one year. Flu,Hepatitis B, others- no symptoms.",
+      description: "Anti-rabies & tetanus - atleast one year. Flu, Hepatitis B, others - no symptoms.",
       image: "/vaccine.svg",
     },
     {
       title: "Dental Procedures",
-      description: "tooth extraction - at least 3 days. wisdom tooth- at least 1 year.",
+      description: "Tooth extraction - at least 3 days. wisdom tooth - at least 1 year.",
       image: "/dental.svg",
     },
   ];
