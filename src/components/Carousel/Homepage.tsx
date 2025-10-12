@@ -7,7 +7,7 @@ import { useRef, useState, useEffect } from "react";
 import Autoplay from "embla-carousel-autoplay";
 const Services = lazy(() => import("@/components/Slides/Services"));
 const Benefits = lazy(() => import("@/components/Slides/Benefits"));
-const FAQ = lazy(() => import("@/components/Slides/faq"));
+const FAQ = lazy(() => import("@/components/Slides/Faq"));
 const Introduction = lazy(() => import("@/components/Slides/Introduction"));
 import type { EmblaCarouselType } from "embla-carousel";
 import { lazy, Suspense } from "react";

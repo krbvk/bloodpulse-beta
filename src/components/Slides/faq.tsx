@@ -1,5 +1,6 @@
 "use client";
-import { Box, Title, Accordion, ScrollArea, Divider } from "@mantine/core";
+import { Box, Title, Accordion, ScrollArea, Divider, Text, Anchor, Stack } from "@mantine/core";
+import { IconMail } from "@tabler/icons-react";
 
 const FAQ = () => {
   const faqs = [
@@ -85,16 +86,6 @@ const FAQ = () => {
         Frequently Asked Questions
       </Title>
 
-      <Divider
-        size="sm"
-        style={{
-          width: "80px",
-          backgroundColor: "#FF4D4D",
-          marginBottom: "2rem",
-          borderRadius: "3px",
-        }}
-      />
-
       <ScrollArea
         type="hover"
         style={{
@@ -145,6 +136,44 @@ const FAQ = () => {
             </Accordion.Item>
           ))}
         </Accordion>
+
+        <Divider my="xl" />
+
+        {/* Contact & Support Section */}
+        <Stack gap="xs" align="center">
+          <Title
+            order={3}
+            style={{
+              color: "#b71c1c",
+              fontWeight: 700,
+              textAlign: "center",
+            }}
+          >
+            Contact and Support
+          </Title>
+
+          <Text size="sm" color="dimmed" style={{ textAlign: "center", maxWidth: "600px" }}>
+            Need help or have questions? You can reach us at the email below.
+          </Text>
+
+          <Box
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              marginTop: "0.5rem",
+            }}
+          >
+            <IconMail color="#b71c1c" size={20} />
+            <Anchor
+              href="mailto:bdodchigue8776val@student.fatima.edu.ph"
+              underline="hover"
+              style={{ color: "#b71c1c", fontWeight: 600 }}
+            >
+              bdodchigue8776val@student.fatima.edu.ph
+            </Anchor>
+          </Box>
+        </Stack>
       </ScrollArea>
     </Box>
   );
