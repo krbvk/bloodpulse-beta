@@ -145,13 +145,21 @@ const DashboardNavbar = ({ toggleSidebar }: Props) => {
                 </UnstyledButton>
               </Menu.Target>
               <Menu.Dropdown>
-                <Menu.Label>{email}</Menu.Label>
-                <Menu.Item onClick={() => router.push("/settings")}>
+                <Menu.Label>
+                  <Text
+                    size="xs"
+                    fw={500}
+                    style={{ whiteSpace: "normal", wordBreak: "break-all", maxWidth: "200px" }}
+                  >
+                    {email}
+                  </Text>
+                </Menu.Label>
+                {/* <Menu.Item onClick={() => router.push("/settings")}>
                   <Group gap="xs">
                     <IconSettings size={16} />
                     Settings
                   </Group>
-                </Menu.Item>
+                </Menu.Item> */}
                 <Menu.Item onClick={handleSignOut} color="red">
                   <Group gap="xs">
                     <IconLogout size={16} />
@@ -161,7 +169,7 @@ const DashboardNavbar = ({ toggleSidebar }: Props) => {
               </Menu.Dropdown>
             </Menu>
 
-            {isMobile && (
+          
               <>
                 <ActionIcon
                   onClick={() => setCalendarModalOpen(true)}
@@ -198,7 +206,7 @@ const DashboardNavbar = ({ toggleSidebar }: Props) => {
                   />
                 </Modal>
               </>
-            )}
+       
           </Group>
         </Flex>
       </Container>

@@ -18,11 +18,13 @@ import {
   Select,
   Group,
   Drawer,
+  Stack,
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import CustomLoader from "@/components/Loader/CustomLoader";
 import { api } from "@/trpc/react";
+import { useForm } from "@mantine/form";
 
 type Gender = "Male" | "Female" | "Other";
 
@@ -31,33 +33,41 @@ export default function DonorProfileLayout() {
   const router = useRouter();
 
   const [editOpened, setEditOpened] = useState(false);
-  const [sidebarOpened, setSidebarOpened] = useState(false); // overlay sidebar state
+  const [sidebarOpened, setSidebarOpened] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [formValues, setFormValues] = useState<{
-    name: string;
-    age: number;
-    gender: Gender;
-    contactEmail: string;
-    bloodType: string;
-  }>({
-    name: "",
-    age: 0,
-    gender: "Male",
-    contactEmail: "",
-    bloodType: "",
-  });
 
-  // Fetch donor profile
   const { data: donor, isLoading, refetch } = api.donor.getIsUserDonor.useQuery();
   const updateProfile = api.donor.updateProfile.useMutation();
+
+  // ✅ Mantine form with validation
+  const form = useForm({
+    initialValues: {
+      name: "",
+      age: 0,
+      gender: "Male" as Gender,
+      contactEmail: "",
+      bloodType: "",
+    },
+    validate: {
+      name: (value) =>
+        value.trim().length === 0
+          ? "Name is required"
+          : /^[A-Za-z\s]+$/.test(value)
+          ? null
+          : "Name must only contain letters and spaces",
+      age: (value) => (value <= 0 ? "Please enter a valid age" : null),
+      contactEmail: (value) =>
+        /^\S+@\S+\.\S+$/.test(value) ? null : "Invalid email address",
+    },
+  });
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/");
 
     if (donor) {
-      setFormValues({
-        name: donor.name,
-        age: Number(donor.age),
+      form.setValues({
+        name: donor.name ?? "",
+        age: Number(donor.age ?? 0),
         gender: donor.gender as Gender,
         contactEmail: donor.contactEmail ?? "",
         bloodType: donor.bloodType ?? "",
@@ -69,10 +79,10 @@ export default function DonorProfileLayout() {
 
   const { email, image } = session.user;
 
-  const handleEditSave = async () => {
+  const handleEditSave = async (values: typeof form.values) => {
     setSaving(true);
     try {
-      await updateProfile.mutateAsync(formValues);
+      await updateProfile.mutateAsync(values);
       await refetch();
       setEditOpened(false);
     } catch (error: unknown) {
@@ -84,7 +94,7 @@ export default function DonorProfileLayout() {
 
   return (
     <Box>
-      {/* Sidebar Drawer (overlay) */}
+      {/* Sidebar Drawer */}
       <Drawer
         opened={sidebarOpened}
         onClose={() => setSidebarOpened(false)}
@@ -92,7 +102,6 @@ export default function DonorProfileLayout() {
         padding="md"
         size="250px"
       >
-        {/* Replace with your actual Sidebar content */}
         <Text>Dashboard</Text>
         <Text>Profile</Text>
         <Text>Settings</Text>
@@ -100,20 +109,34 @@ export default function DonorProfileLayout() {
 
       {/* Content Area */}
       <Box px={{ base: "md", sm: "lg" }} py="lg" style={{ maxWidth: 900, margin: "0 auto" }}>
-        <Flex justify="space-between" align="center" mb="lg">
+        <Paper shadow="md" radius="lg" p={{ base: "md", sm: "xl" }} withBorder>
+          <Flex justify="space-between" align="center" mb="lg">
           <Title order={2} style={{ textAlign: "center", flex: 1 }}>
             Donor Profile
           </Title>
         </Flex>
-
-        <Paper shadow="sm" radius="md" p={{ base: "md", sm: "xl" }} withBorder>
           {/* Profile Header */}
           <Flex direction="column" align="center" mb="xl">
-            <Avatar src={image ?? "/placeholder-avatar.png"} size={100} radius="xl" alt={donor?.name ?? "User Avatar"} />
-            <Text fw={700} size="lg" mt="md" style={{ textAlign: "center" }}>
+            <Avatar
+              src={image ?? "/placeholder-avatar.png"}
+              size={120}
+              radius={9999}
+              alt={donor?.name ?? "User Avatar"}
+            />
+            <Text fw={700} size="xl" mt="md" ta="center">
               {donor?.name ?? "No Name Set"}
             </Text>
-            <Text size="sm" c="dimmed" mt={4} style={{ textAlign: "center" }}>
+            <Text
+              size="sm"
+              c="dimmed"
+              mt={4}
+              ta="center"
+              style={{
+                wordBreak: "break-word",
+                overflowWrap: "anywhere",
+                maxWidth: "100%",
+              }}
+            >
               {email}
             </Text>
             {donor?.isDonor ? (
@@ -126,26 +149,42 @@ export default function DonorProfileLayout() {
               </Badge>
             )}
 
-            <Button mt="md" variant="outline" onClick={() => setEditOpened(true)}>
+            <Button
+              mt="md"
+              variant="gradient"
+              gradient={{ from: "red", to: "pink" }}
+              onClick={() => setEditOpened(true)}
+            >
               Edit Profile
             </Button>
           </Flex>
 
           <Divider my="md" />
 
+          {/* Profile Info */}
           <Grid gutter="md">
             <Grid.Col span={{ base: 12, sm: 6 }}>
               <Text size="xs" c="dimmed" fw={500} mb={4}>
                 Full Name
               </Text>
-              <Text fw={500}>{donor?.name ?? "No Name Set"}</Text>
+              <Text
+                fw={600}
+                style={{ wordBreak: "break-word", overflowWrap: "anywhere", maxWidth: "100%" }}
+              >
+                {donor?.name ?? "No Name Set"}
+              </Text>
             </Grid.Col>
 
             <Grid.Col span={{ base: 12, sm: 6 }}>
               <Text size="xs" c="dimmed" fw={500} mb={4}>
                 Email Address
               </Text>
-              <Text fw={500}>{email ?? "—"}</Text>
+              <Text
+                fw={600}
+                style={{ wordBreak: "break-word", overflowWrap: "anywhere", maxWidth: "100%" }}
+              >
+                {email ?? "—"}
+              </Text>
             </Grid.Col>
 
             {donor?.isDonor && (
@@ -154,35 +193,40 @@ export default function DonorProfileLayout() {
                   <Text size="xs" c="dimmed" fw={500} mb={4}>
                     Age
                   </Text>
-                  <Text fw={500}>{Number(donor?.age ?? 0)}</Text>
+                  <Text fw={600}>{Number(donor?.age ?? 0)}</Text>
                 </Grid.Col>
 
                 <Grid.Col span={{ base: 12, sm: 6 }}>
                   <Text size="xs" c="dimmed" fw={500} mb={4}>
                     Gender
                   </Text>
-                  <Text fw={500}>{donor?.gender ?? "—"}</Text>
+                  <Text fw={600}>{donor?.gender ?? "—"}</Text>
                 </Grid.Col>
 
                 <Grid.Col span={{ base: 12, sm: 6 }}>
                   <Text size="xs" c="dimmed" fw={500} mb={4}>
                     Contact Email
                   </Text>
-                  <Text fw={500}>{donor?.contactEmail ?? "—"}</Text>
+                  <Text
+                    fw={600}
+                    style={{ wordBreak: "break-word", overflowWrap: "anywhere", maxWidth: "100%" }}
+                  >
+                    {donor?.contactEmail ?? "—"}
+                  </Text>
                 </Grid.Col>
 
                 <Grid.Col span={{ base: 12, sm: 6 }}>
                   <Text size="xs" c="dimmed" fw={500} mb={4}>
                     Blood Type
                   </Text>
-                  <Text fw={500}>{donor?.bloodType ?? "—"}</Text>
+                  <Text fw={600}>{donor?.bloodType ?? "—"}</Text>
                 </Grid.Col>
 
                 <Grid.Col span={{ base: 12, sm: 6 }}>
                   <Text size="xs" c="dimmed" fw={500} mb={4}>
                     Number of Donations
                   </Text>
-                  <Text fw={500}>{Number(donor?.donationCount ?? 0)}</Text>
+                  <Text fw={600}>{Number(donor?.donationCount ?? 0)}</Text>
                 </Grid.Col>
               </>
             )}
@@ -191,44 +235,57 @@ export default function DonorProfileLayout() {
 
         {/* Edit Modal */}
         <Modal opened={editOpened} onClose={() => setEditOpened(false)} title="Edit Profile" centered>
-          <TextInput
-            label="Full Name"
-            value={formValues.name}
-            onChange={(e) => setFormValues({ ...formValues, name: e.currentTarget.value })}
-            mb="sm"
-          />
+          <form onSubmit={form.onSubmit(handleEditSave)}>
+            <Stack>
+              <TextInput
+                label="Full Name"
+                placeholder="Enter your full name"
+                radius="md"
+                withAsterisk
+                {...form.getInputProps("name")}
+              />
 
-          <NumberInput
-            label="Age"
-            value={formValues.age}
-            onChange={(value) => setFormValues({ ...formValues, age: Number(value ?? 0) })}
-            mb="sm"
-            min={0}
-          />
+              <NumberInput
+                label="Age"
+                placeholder="Enter your age"
+                min={1}
+                radius="md"
+                withAsterisk
+                {...form.getInputProps("age")}
+              />
 
-          <Select
-            label="Gender"
-            data={["Male", "Female", "Other"]}
-            value={formValues.gender}
-            onChange={(value) => value && setFormValues({ ...formValues, gender: value as Gender })}
-            mb="sm"
-          />
+              <Select
+                label="Gender"
+                placeholder="Select gender"
+                radius="md"
+                data={["Male", "Female", "Other"]}
+                {...form.getInputProps("gender")}
+              />
 
-          <TextInput
-            label="Contact Email"
-            value={formValues.contactEmail}
-            onChange={(e) => setFormValues({ ...formValues, contactEmail: e.currentTarget.value })}
-            mb="sm"
-          />
+              <TextInput
+                label="Contact Email"
+                placeholder="Enter your contact email"
+                radius="md"
+                withAsterisk
+                {...form.getInputProps("contactEmail")}
+              />
 
-          <Group mt="md" style={{ justifyContent: "flex-end" }}>
-            <Button onClick={handleEditSave} loading={saving}>
-              Save Changes
-            </Button>
-            <Button variant="outline" onClick={() => setEditOpened(false)}>
-              Cancel
-            </Button>
-          </Group>
+              <Group justify="flex-end" mt="md">
+                <Button
+                  type="submit"
+                  radius="md"
+                  loading={saving}
+                  variant="gradient"
+                  gradient={{ from: "red", to: "pink" }}
+                >
+                  Save Changes
+                </Button>
+                <Button variant="light" color="gray" radius="md" onClick={() => setEditOpened(false)}>
+                  Cancel
+                </Button>
+              </Group>
+            </Stack>
+          </form>
         </Modal>
       </Box>
     </Box>

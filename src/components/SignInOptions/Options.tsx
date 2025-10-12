@@ -8,11 +8,13 @@ import {
   Text,
   Divider,
   rem,
-  Image
+  Image as MantineImage, // 👈 alias Mantine's Image
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { GoogleSignInButton } from '../GoogleSignin/GoogleSignInButton';
 import { ResendSignIn } from '../Resend/Resend';
+import NextImage from 'next/image';
+import Head from 'next/head';
 
 export default function Options() {
   const isMobile = useMediaQuery('(max-width: 600px)');
@@ -27,6 +29,10 @@ export default function Options() {
   };
 
   return (
+    <>
+    <Head>
+      <link rel="preload" as="image" href="/signin-banner.svg" />
+    </Head>
     <Flex
       direction={isMobile ? 'column' : 'row'}
       justify="center"
@@ -37,35 +43,38 @@ export default function Options() {
         margin: '0 auto',
         borderRadius: isMobile ? 0 : 5,
         overflow: 'hidden',
-        height: isMobile ? 'auto' : '500px', 
+        height: isMobile ? 'auto' : '500px',
       }}
     >
-      {/* Left Box Container (just the image now) */}
+      {/* Left Box Container (Hero Banner) */}
       <Box
         style={{
           ...sharedBoxStyles,
-          width: '100%',  // Half the width on desktop to align with the right box
-          height: '100%',  // Ensure it takes up 100% of the height of the container
+          width: '100%',
+          height: isMobile ? '350px' : '100%',
           overflow: 'hidden',
           padding: 0,
           borderRadius: isMobile ? 0 : 5,
+          position: 'relative', // required for NextImage with "fill"
         }}
       >
-        <Image
+        <NextImage
           src="/signin-banner.svg"
           alt="Hero Banner"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            display: 'block',
-            borderRadius: 0, // No border-radius needed here
-          }}
+          fill
+          priority // 👈 preloads this image
+          style={{ objectFit: 'cover' }}
         />
       </Box>
 
       {/* Right Box Container */}
-      <Box style={{ ...sharedBoxStyles, backgroundColor: 'white', height: '100%' }}>
+      <Box
+        style={{
+          ...sharedBoxStyles,
+          backgroundColor: 'white',
+          height: '100%',
+        }}
+      >
         <Flex direction="column" align="center" justify="center" style={{ height: '100%' }}>
           <Stack gap={isMobile ? 6 : 10} align="center" mb="md">
             <Flex align="center" gap="xs" justify="center">
@@ -81,7 +90,7 @@ export default function Options() {
               >
                 BLOODPULSE:
               </Title>
-              <Image
+              <MantineImage
                 src="/web-app-manifest-192x192.png"
                 alt="BloodPulse Logo"
                 width={28}
@@ -124,5 +133,6 @@ export default function Options() {
         </Flex>
       </Box>
     </Flex>
+    </>
   );
 }
