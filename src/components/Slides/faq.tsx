@@ -2,7 +2,7 @@
 import { Box, Title, Accordion, ScrollArea, Divider, Text, Anchor, Stack } from "@mantine/core";
 import { IconMail } from "@tabler/icons-react";
 
-const FAQ = () => {
+const Faq = () => {
   const faqs = [
     {
       q: "Can I use the website on my phone?",
@@ -179,4 +179,4 @@ const FAQ = () => {
   );
 };
 
-export default FAQ;
+export default Faq;

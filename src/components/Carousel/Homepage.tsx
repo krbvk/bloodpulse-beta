@@ -7,7 +7,7 @@ import { useRef, useState, useEffect } from "react";
 import Autoplay from "embla-carousel-autoplay";
 const Services = lazy(() => import("@/components/Slides/Services"));
 const Benefits = lazy(() => import("@/components/Slides/Benefits"));
-const FAQ = lazy(() => import("@/components/Slides/Faq"));
+const Faq = lazy(() => import("@/components/Slides/Faq"));
 const Introduction = lazy(() => import("@/components/Slides/Introduction"));
 import type { EmblaCarouselType } from "embla-carousel";
 import { lazy, Suspense } from "react";
@@ -17,7 +17,7 @@ const HomePageCarousel = () => {
     <Suspense key="introduction-1" fallback={<div>Loading...</div>}><Introduction /></Suspense>,
     <Suspense key="benefits-2" fallback={<div>Loading...</div>}><Benefits /></Suspense>,
     <Suspense key="services-3" fallback={<div>Loading...</div>}><Services /></Suspense>,
-    <Suspense key="faq-4" fallback={<div>Loading...</div>}><FAQ /></Suspense>,
+    <Suspense key="faq-4" fallback={<div>Loading...</div>}><Faq /></Suspense>,
   ];
   const [active, setActive] = useState(0);
   const carouselRef = useRef<EmblaCarouselType | null>(null);
