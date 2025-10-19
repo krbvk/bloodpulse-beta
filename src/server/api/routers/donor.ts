@@ -83,7 +83,8 @@ export const donorRouter = createTRPCRouter({
           .string()
           .email()
           .refine((val) =>
-            /@(gmail|yahoo|outlook|hotmail)\.com$/i.test(val)
+            /@(gmail|yahoo|outlook|hotmail)\.com$/i.test(val) ||
+            /@student\.fatima\.edu\.ph$/i.test(val),
           ),
         contactEmail: z.string().email().optional(),
         donationCount: z.number().min(0).optional(),
