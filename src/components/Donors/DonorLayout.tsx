@@ -136,7 +136,7 @@ const filteredDonors = useMemo(() => {
   };
 
   const validateEmail = (email: string) => {
-    const regex = /^[\w.-]+@(gmail\.com|yahoo\.com|([\w-]+\.)*fatima\.edu(\.ph)?)$/i;
+    const regex = /^[a-z0-9._-]+@(gmail\.com|yahoo\.com|([a-z0-9-]+\.)*fatima\.edu(\.ph)?)$/;
     return regex.test(email);
   };
 
