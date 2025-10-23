@@ -37,18 +37,21 @@ export default function ProfileLayout() {
       age: undefined as number | undefined,
       email: "",
     },
-    validate: {
-      name: (value) =>
-        value.trim().length === 0
-          ? "Name is required"
-          : /^[A-Za-z\s]+$/.test(value)
-          ? null
-          : "Name must only contain letters and spaces",
-      age: (value) =>
-        value === undefined || value <= 0
-          ? "Please enter a valid age"
-          : null,
-    },
+ validate: {
+  name: (value) =>
+    value.trim().length === 0
+      ? "Name is required"
+      : /^[A-Za-z\s]+$/.test(value)
+      ? null
+      : "Name must only contain letters and spaces",
+
+  age: (value) => {
+    if (value === undefined || value <= 0) return "Please enter a valid age";
+    if (value < 18) return "Age must be 18 or above";
+    return null;
+  },
+},
+
   });
 
   useEffect(() => {
@@ -66,21 +69,28 @@ export default function ProfileLayout() {
     return <CustomLoader />;
   }
 
-  const handleSubmit = (values: typeof form.values): void => {
-    const payload: Record<string, unknown> = {};
+const handleSubmit = (values: typeof form.values): void => {
+  // Check age restriction
+  if (values.age !== undefined && values.age < 18) {
+    form.setFieldError("age", "Age must be 18 or above");
+    return;
+  }
 
-    if (values.name?.trim()) payload.name = values.name.trim();
-    if (values.gender?.trim()) payload.gender = values.gender.trim();
-    if (typeof values.age === "number" && values.age > 0) payload.age = values.age;
+  const payload: Record<string, unknown> = {};
 
-    if (Object.keys(payload).length > 0) {
-      updateProfile.mutate(payload, {
-        onSuccess: () => {
-          void refetch().then(() => setIsEditing(false));
-        },
-      });
-    }
-  };
+  if (values.name?.trim()) payload.name = values.name.trim();
+  if (values.gender?.trim()) payload.gender = values.gender.trim();
+  if (typeof values.age === "number" && values.age >= 18) payload.age = values.age;
+
+  if (Object.keys(payload).length > 0) {
+    updateProfile.mutate(payload, {
+      onSuccess: () => {
+        void refetch().then(() => setIsEditing(false));
+      },
+    });
+  }
+};
+
 
   return (
     <Box
