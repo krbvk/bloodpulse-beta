@@ -140,40 +140,57 @@ const Faq = () => {
         <Divider my="xl" />
 
         {/* Contact & Support Section */}
-        <Stack gap="xs" align="center">
-          <Title
-            order={3}
-            style={{
-              color: "#b71c1c",
-              fontWeight: 700,
-              textAlign: "center",
-            }}
-          >
-            Contact and Support
-          </Title>
+<Stack gap="xs" align="center">
+  <Title
+    order={3}
+    style={{
+      color: "#b71c1c",
+      fontWeight: 700,
+      textAlign: "center",
+    }}
+  >
+    Contact and Support
+  </Title>
 
-          <Text size="sm" color="dimmed" style={{ textAlign: "center", maxWidth: "600px" }}>
-            Need help or have questions? You can reach us at the email below.
-          </Text>
+  <Text
+    size="sm"
+    color="dimmed"
+    style={{ textAlign: "center", maxWidth: "600px" }}
+  >
+    Need help or have questions? You can reach us at the email below.
+  </Text>
 
-          <Box
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              marginTop: "0.5rem",
-            }}
-          >
-            <IconMail color="#b71c1c" size={20} />
-            <Anchor
-              href="mailto:bdodchigue8776val@student.fatima.edu.ph"
-              underline="hover"
-              style={{ color: "#b71c1c", fontWeight: 600 }}
-            >
-              bdodchigue8776val@student.fatima.edu.ph
-            </Anchor>
-          </Box>
-        </Stack>
+  <Box
+    style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flexWrap: "wrap", // allows wrapping on smaller screens
+      gap: "0.5rem",
+      marginTop: "0.5rem",
+      wordBreak: "break-all", // ensures long emails won't overflow
+      textAlign: "center",
+      width: "100%", // ensures it adapts to the container width
+    }}
+  >
+    <IconMail color="#b71c1c" size={20} />
+    <Anchor
+      href="mailto:bdodchigue8776val@student.fatima.edu.ph"
+      underline="hover"
+      style={{
+        color: "#b71c1c",
+        fontWeight: 600,
+        wordBreak: "break-all", // breaks long email strings
+        overflowWrap: "anywhere", // ensures it wraps properly
+        whiteSpace: "normal", // allows line breaks if needed
+        textAlign: "center",
+      }}
+    >
+      bdodchigue8776val@student.fatima.edu.ph
+    </Anchor>
+  </Box>
+</Stack>
+
       </ScrollArea>
     </Box>
   );

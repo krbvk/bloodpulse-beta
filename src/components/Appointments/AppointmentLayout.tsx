@@ -169,6 +169,8 @@ export default function AppointmentLayout() {
             color={donationEnabled ? "green" : "red"}
             title={donationEnabled ? "Donation Open" : "Donation Closed"}
             withBorder
+            withCloseButton={false}
+
           >
             {donationEnabled
               ? "Blood Donation is open for today!"
