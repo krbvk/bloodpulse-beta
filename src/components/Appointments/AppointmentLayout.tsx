@@ -52,7 +52,7 @@ export default function AppointmentLayout() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [appointmentDate, setAppointmentDate] = useState<Date | null>(null);
-  const [appointmentTime, setAppointmentTime] = useState<string>("");
+  const [appointmentTime, setAppointmentTime] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [subject, setSubject] = useState<
     "Blood Donation" | "Blood Request" | null
@@ -91,7 +91,8 @@ export default function AppointmentLayout() {
     onSuccess: () => {
       setSuccess(true);
       setAppointmentDate(null);
-      setAppointmentTime("");
+      setAppointmentTime(null);
+      setSubject(null);
       setBloodType(null);
       setVariant(null);
       setSubjectCount((prev) => prev + 1);
@@ -120,21 +121,26 @@ export default function AppointmentLayout() {
       setFailed(true);
       return;
     }
+    const now = dayjs().tz("Asia/Manila");
+    const datetime = dayjs(
+      `${dayjs(appointmentDate).format("YYYY-MM-DD")} ${appointmentTime}`,
+      "YYYY-MM-DD h:mm A"
+    ).tz("Asia/Manila");
+
+    if (datetime.isBefore(now)) {
+      setTimeError("Selected time has already passed. Please choose a valid time.");
+      setFailed(true);
+      return;
+    }
 
     if (
       subject === "Blood Donation" &&
       !dayjs(appointmentDate).isSame(dayjs(), "day")
     ) {
       setFailed(true);
+      setTimeError("Blood Donation can only be booked for today.");
       return;
     }
-
-    const datetime = dayjs(
-      `${dayjs(appointmentDate).format("YYYY-MM-DD")} ${appointmentTime}`,
-      "YYYY-MM-DD h:mm A"
-    )
-      .tz("Asia/Manila")
-      .toDate();
 
     const formattedDate = dayjs(datetime).format("MMMM D, YYYY");
     const formattedTime = dayjs(datetime).format("hh:mm A");
@@ -148,7 +154,7 @@ export default function AppointmentLayout() {
     const displaySubject = `[${subjectCount}] Appointment - ${subject}`;
 
     createAppointment.mutate({
-      datetime,
+      datetime: datetime.toDate(),
       subject,
       displaySubject,
       message: generatedMessage,
@@ -179,31 +185,44 @@ export default function AppointmentLayout() {
         </Box>
       )}
 
+      {/* ✅ Floating Notifications (Bottom-Left Corner) */}
+    <Box
+      style={{
+        position: "fixed",
+        bottom: "20px",
+        left: "20px",
+        zIndex: 9999,
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+      }}
+    >
       {success && (
-        <Box maw={800} mx="auto">
-          <Notification
-            icon={<IconCheck />}
-            color="green"
-            title="Request Sent"
-            onClose={() => setSuccess(false)}
-            mb="md"
-          >
-            Your appointment request has been sent successfully.
-          </Notification>
-        </Box>
-      )}
+      <Notification
+        icon={<IconCheck />}
+        color="green"
+        title="Request Sent"
+        onClose={() => setSuccess(false)}
+        withBorder
+        radius="md"
+      >
+        Your appointment request has been sent successfully.
+    </Notification>
+    )}
 
-      {failed && (
-        <Notification
-          icon={<IconX />}
-          color="red"
-          title="Error"
-          onClose={() => setFailed(false)}
-          mb="md"
-        >
-          Failed to send appointment request. Please try again.
-        </Notification>
-      )}
+    {failed && (
+      <Notification
+        icon={<IconX />}
+        color="red"
+        title="Error"
+        onClose={() => setFailed(false)}
+        withBorder
+        radius="md"
+      >
+        Failed to send appointment request. Please try again.
+      </Notification>
+    )}
+  </Box>
 
       {/* Responsive two-column layout */}
       <Box
@@ -236,6 +255,7 @@ export default function AppointmentLayout() {
               onChange={(d) => {
                 setAppointmentDate(d);
                 setTimeError(null);
+                setFailed(false);
               }}
               minDate={new Date()}
               maxDate={
@@ -253,7 +273,13 @@ export default function AppointmentLayout() {
               placeholder="Select time"
               data={timeOptions}
               value={appointmentTime}
-              onChange={(value) => setAppointmentTime(value ?? "")}
+              onChange={(value) => {
+                setAppointmentTime(value);
+                if (timeError) {
+                  setTimeError(null);
+                  setFailed(false);
+                }
+              }}
               withAsterisk
             />
 

@@ -57,8 +57,9 @@ export default function DonorProfileLayout() {
           : "Name must only contain letters and spaces",
 
       age: (value) => {
-        if (value <= 0) return "Please enter a valid age";
+        if (value === undefined || value <= 0) return "Please enter a valid age";
         if (value < 18) return "Age must be 18 or above";
+        if (value > 150) return "Please enter a realistic age";
         return null;
       },
 
@@ -206,7 +207,9 @@ export default function DonorProfileLayout() {
                   <Text size="xs" c="dimmed" fw={500} mb={4}>
                     Age
                   </Text>
-                  <Text fw={600}>{Number(donor?.age ?? 0)}</Text>
+                  <Text fw={600}>
+                    {Number(donor?.age ?? 0) > 100 ? "100+" : donor?.age ?? "—"}
+                  </Text>
                 </Grid.Col>
 
                 <Grid.Col span={{ base: 12, sm: 6 }}>
@@ -262,6 +265,7 @@ export default function DonorProfileLayout() {
                 label="Age"
                 placeholder="Enter your age"
                 min={1}
+                max={150}
                 radius="md"
                 withAsterisk
                 {...form.getInputProps("age")}
