@@ -187,6 +187,8 @@ const DashboardNavbar = ({ toggleSidebar }: Props) => {
                   size="xs"
                   centered
                   overlayProps={{ blur: 2 }}
+                  withinPortal
+                  zIndex={1000}
                 >
                   <Calendar
                     size="md"

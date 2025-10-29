@@ -48,6 +48,7 @@ export default function ProfileLayout() {
   age: (value) => {
     if (value === undefined || value <= 0) return "Please enter a valid age";
     if (value < 18) return "Age must be 18 or above";
+    if (value > 125) return "Please enter a realistic age";
     return null;
   },
 },
@@ -218,6 +219,7 @@ const handleSubmit = (values: typeof form.values): void => {
               label="Age"
               placeholder="Enter your age"
               min={1}
+              max={125}
               radius="md"
               withAsterisk
               {...form.getInputProps("age")}
