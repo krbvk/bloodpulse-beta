@@ -48,7 +48,7 @@ export default function ProfileLayout() {
   age: (value) => {
     if (value === undefined || value <= 0) return "Please enter a valid age";
     if (value < 18) return "Age must be 18 or above";
-    if (value > 125) return "Please enter a realistic age";
+    if (value > 150) return "Please enter a realistic age";
     return null;
   },
 },
@@ -178,7 +178,11 @@ const handleSubmit = (values: typeof form.values): void => {
             <Text size="xs" c="dimmed" fw={500} mb={4}>
               Age
             </Text>
-            <Text fw={600}>{profile?.age ?? "—"}</Text>
+            <Text fw={600}>
+              {(profile?.age ?? 0) > 100
+                ? "100+"
+                : profile?.age ?? "—"}
+              </Text>
           </Grid.Col>
         </Grid>
         <Divider my="lg" />
@@ -219,7 +223,7 @@ const handleSubmit = (values: typeof form.values): void => {
               label="Age"
               placeholder="Enter your age"
               min={1}
-              max={125}
+              max={150}
               radius="md"
               withAsterisk
               {...form.getInputProps("age")}
