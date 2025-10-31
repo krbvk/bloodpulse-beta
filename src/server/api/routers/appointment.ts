@@ -146,6 +146,9 @@ export const appointmentRouter = createTRPCRouter({
             to: userEmail,
             replyTo: ctx.session.user.email ?? undefined,
             subject: input.displaySubject,
+            headers: {
+              "Message-ID": `<${Date.now()}-${ctx.session.user.email}@bloodpulse.tech>`, // 👈 unique per email
+            },
             text: `Appointment request from: (${ctx.session.user.email})
 Appointment is for: ${formattedDate}
 ${
