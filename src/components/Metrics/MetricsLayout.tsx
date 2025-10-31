@@ -34,11 +34,9 @@ import {
 } from "recharts";
 import { api } from "@/trpc/react";
 
-/* ------------------------------- Types --------------------------------- */
 type Demographic = { label: string; value: number };
 type BloodTypeStat = { type: string; needed: number; donated: number };
 
-/* ----------------------------- Components ------------------------------ */
 function StatCard({
   label,
   value,
@@ -129,21 +127,19 @@ function PieChartTemplate({ data, colors }: { data: { type: string; percentage: 
   );
 }
 
-/* ----------------------------- Main ------------d------------------------ */
 const MetricsLayout: React.FC = () => {
   const theme = useMantineTheme();
   const { data: neededVsDonated } = api.statistics.getNeededVsDonated.useQuery();
   const { data: demographics } = api.statistics.getDonorDemographics.useQuery();
-
+  const { data: userdemographics } = api.user.getUserDemographics.useQuery();
   const { data: getTotalUsers } = api.user.getTotalUsers.useQuery();
-
-
   const bloodTypeStats: BloodTypeStat[] = neededVsDonated?.bloodTypeStats ?? [];
   const mostNeededBloodType = neededVsDonated?.mostNeeded ?? { type: "", needed: 0 };
   const mostDonatedBloodType = neededVsDonated?.mostDonated ?? { type: "", donated: 0 };
   const donorGender: Demographic[] = demographics?.gender ?? [];
   const donorAge: Demographic[] = demographics?.age ?? [];
-
+  const userAge: Demographic[] = userdemographics?.age ?? [];
+  const userGender: Demographic[] = userdemographics?.gender ?? [];
   const neededBloodTypes = bloodTypeStats.map(({ type, needed }) => ({ type, percentage: needed }));
   const donatedBloodTypes = bloodTypeStats.map(({ type, donated }) => ({ type, percentage: donated }));
 
@@ -166,10 +162,10 @@ const MetricsLayout: React.FC = () => {
           icon={<IconUsers size={18} />}
         />
         <StatCard
-  label="Number of Users"
-  value={`${getTotalUsers?.count ?? 0}`}
-  icon={<IconUsers size={18} />}
-/>
+          label="Number of Users"
+          value={`${getTotalUsers?.count ?? 0}`}
+          icon={<IconUsers size={18} />}
+        />
 
       </SimpleGrid>
 
@@ -191,20 +187,76 @@ const MetricsLayout: React.FC = () => {
         </Paper>
       </SimpleGrid>
 
-      <Grid gutter="lg">
+      <Grid gutter="lg" mb="lg">
         <Grid.Col span={{ base: 12, md: 8 }}>
           <Paper withBorder p="lg" radius="lg" shadow="sm">
             <Title order={5} mb="xs">Blood Type Needs vs Donations</Title>
             <Text size="sm" c="dimmed" mb="md">
               Visual comparison of demand and donations by blood type
             </Text>
-            <BloodTypeChart bloodTypeStats={bloodTypeStats} />
+             <BloodTypeChart bloodTypeStats={bloodTypeStats} /> 
+          </Paper>
+        </Grid.Col>
+        </Grid>
+
+        <Grid gutter="lg">
+        <Grid.Col span={{ base: 12, md: 4 }}>
+          <Paper withBorder p="lg" radius="lg" shadow="sm">
+            <Title order={5} mb="xs">User Demographics</Title>
+            <Text size="sm" c="dimmed">Gender distribution</Text>
+            <Group mt="sm" justify="space-between" align="center">
+              <RingProgress
+                size={140}
+                thickness={12}
+                sections={userGender.map((g, idx) => ({
+                  value: g.value,
+                  color: `red.${idx + 5}` as const,
+                }))}
+                label={
+                  <Stack gap={0} align="center">
+                    <Text fw={700}>100%</Text>
+                    <Text size="xs" c="dimmed">Donors</Text>
+                  </Stack>
+                }
+              />
+              <Stack gap={6}>
+                {userGender.map((g, idx) => (
+                  <Group key={g.label} gap="xs">
+                    <Badge
+                      variant="filled"
+                      color={["red", "blue", "green", "yellow", "purple"][idx % 5]}
+                      size="xs"
+                      radius="sm"
+                    >
+                      &nbsp;
+                    </Badge>
+                    <Text size="sm">
+                      {g.label}: <Text span fw={600}>{g.value}%</Text>
+                    </Text>
+                  </Group>
+                ))}
+              </Stack>
+            </Group>
+
+            <Divider my="md" />
+            <Text size="sm" c="dimmed" mb={6}>Age groups</Text>
+            <Stack gap="sm">
+              {userAge.map((a) => (
+                <div key={a.label}>
+                  <Group justify="space-between">
+                    <Text size="sm">{a.label}</Text>
+                    <Text size="sm" c="dimmed">{a.value}%</Text>
+                  </Group>
+                  <Progress value={a.value} color="red" />
+                </div>
+              ))}
+            </Stack>
           </Paper>
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, md: 4 }}>
           <Paper withBorder p="lg" radius="lg" shadow="sm">
-            <Title order={5} mb="xs">Donor Demographics</Title>
+            <Title order={5} mb="xs">Blood Donor Demographics</Title>
             <Text size="sm" c="dimmed">Gender distribution</Text>
 
             <Group mt="sm" justify="space-between" align="center">
