@@ -114,4 +114,41 @@ export const statisticsRouter = createTRPCRouter({
 
     return { gender, age };
   }),
+
+   // === 3. Blood request reasons statistics ===
+getBloodRequestReasonsStats: publicProcedure.query(async ({ ctx }) => {
+  const requests = await ctx.db.appointment.findMany({
+    select: { causeOfBloodRequest: true },
+  });
+
+  if (!requests.length) {
+    return { message: "No blood request data found.", reasons: [] };
+  }
+
+  const reasonsCount: Record<string, number> = {};
+
+  for (const req of requests) {
+    const cause =
+      req.causeOfBloodRequest?.trim()?.toLowerCase() ?? "unknown";
+    reasonsCount[cause] = (reasonsCount[cause] ?? 0) + 1;
+  }
+
+  // Convert to array for charts or tables
+  const reasons = Object.entries(reasonsCount)
+    .map(([name, count]) => ({
+      name:
+        name
+          .split(" ")
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(" ") || "Unknown",  
+      count,
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  return {
+    message: "Blood request reason statistics fetched successfully.",
+    totalRequests: requests.length,
+    reasons,
+  };
+}),
 });

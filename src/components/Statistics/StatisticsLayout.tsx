@@ -19,6 +19,9 @@ import html2canvas from "html2canvas";
 
 const StatisticsLayout: React.FC = () => {
   const reportRef = useRef<HTMLDivElement>(null);
+  
+  const { data: bloodRequestReasons, isLoading: loadingReasons } =
+    api.statistics.getBloodRequestReasonsStats.useQuery();
 
   const { data: neededVsDonated, isLoading: loadingBlood } =
     api.statistics.getNeededVsDonated.useQuery();
@@ -26,6 +29,7 @@ const StatisticsLayout: React.FC = () => {
   const { data: demographics, isLoading: loadingDemo } =
     api.statistics.getDonorDemographics.useQuery();
 
+    
   // 📄 Generate PDF function
   const handleExportPDF = async () => {
     if (!reportRef.current) return;
@@ -42,7 +46,7 @@ const StatisticsLayout: React.FC = () => {
     pdf.save("Bloodpulse_Statistics_Report.pdf");
   };
 
-  if (loadingBlood || loadingDemo) {
+  if (loadingBlood || loadingDemo || loadingReasons) {
     return (
       <Box p="xl" ta="center">
         <Loader />
@@ -103,8 +107,8 @@ const StatisticsLayout: React.FC = () => {
 
                   <Box mt="sm">
                     {neededVsDonated.bloodTypeStats.map((b, i) => (
-                      <Group key={i} spacing="xs" justify="space-between" mb={4}>
-                        <Group spacing="xs">
+                      <Group key={i} gap="xs" justify="space-between" mb={4}>
+                        <Group gap="xs">
                           <Box
                             w={10}
                             h={10}
@@ -210,11 +214,11 @@ const StatisticsLayout: React.FC = () => {
                   {demographics.gender.map((g, i) => (
                     <Group
                       key={i}
-                      spacing="xs"
+                      gap="xs"
                       justify="space-between"
                       mb={4}
                     >
-                      <Group spacing="xs">
+                      <Group gap="xs">
                         <Box
                           w={10}
                           h={10}
@@ -237,28 +241,74 @@ const StatisticsLayout: React.FC = () => {
             )}
           </Box>
         </Paper>
+
+        
+        {/* === Blood Request Reasons === */}
+        <Paper withBorder p="lg" radius="lg" shadow="sm" mt="lg">
+          <Title order={5} mb="xs">
+            Blood Request Reasons
+          </Title>
+          <Text size="sm" c="dimmed">
+            Displays the most common reasons patients request blood.
+          </Text>
+
+          <Box mt="md">
+            {bloodRequestReasons?.reasons?.length ? (
+              <>
+                <BarChart
+                  h={220}
+                  withLegend={false}
+                  data={bloodRequestReasons.reasons}
+                  dataKey="name"
+                  series={[{ name: "count", color: "orange" }]}
+                />
+
+                <Box mt="sm">
+                  {bloodRequestReasons.reasons.map((r, i) => (
+                    <Group key={i} justify="space-between" mb={4}>
+                      <Text size="sm" fw={500}>
+                        {r.name}
+                      </Text>
+                      <Text size="sm" c="dimmed">
+                        {r.count} requests
+                      </Text>
+                    </Group>
+                  ))}
+                </Box>
+              </>
+            ) : (
+              <Text ta="center" c="dimmed">
+                No blood request data available
+              </Text>
+            )}
+          </Box>
+        </Paper>
         
 
-        {/* === Key Observations === */}
-        <Paper withBorder p="lg" radius="lg" shadow="sm" mt="lg">
-          <Group>
-            <IconTrendingUp color="red" />
-            <Title order={5}>Key Observations</Title>
-          </Group>
-          <Text size="sm" mt="xs" c="dimmed">
-            - {neededVsDonated?.mostDonated?.type || "N/A"} remains the most
-            donated blood type.
-            <br />
-            - {neededVsDonated?.mostNeeded?.type || "N/A"} shows highest demand.
-            <br />
-            - Majority of donors are in the 18–25 age group.
-            <br />
-            - Male donors account for approximately{" "}
-            {demographics?.gender?.find((g) => g.label === "Male")?.value ??
-              "N/A"}
-            % of total donors.
-          </Text>
-        </Paper>
+      <Paper withBorder p="lg" radius="lg" shadow="sm" mt="lg">
+  <Group>
+    <IconTrendingUp color="red" />
+    <Title order={5}>Key Observations</Title>
+  </Group>
+  <Text size="sm" mt="xs" c="dimmed">
+    - {neededVsDonated?.mostDonated?.type ?? "N/A"} remains the most donated blood type.
+    <br />
+    - {neededVsDonated?.mostNeeded?.type ?? "N/A"} shows the highest demand among patients.
+    <br />
+    - Majority of donors are in the 18–25 age group.
+    <br />
+    - Male donors account for approximately{" "}
+    {demographics?.gender?.find((g) => g.label === "Male")?.value ?? "N/A"}%
+    of total donors.
+    <br />
+    - The most common reason for blood requests is{" "}
+    <b>
+      {bloodRequestReasons?.reasons?.[0]?.name ?? "not yet recorded"}
+    </b>
+    , with{" "}
+    {bloodRequestReasons?.reasons?.[0]?.count ?? 0} requests.
+  </Text>
+</Paper>
       </div>
     </Box>
   );

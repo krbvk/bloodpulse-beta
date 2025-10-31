@@ -129,11 +129,14 @@ function PieChartTemplate({ data, colors }: { data: { type: string; percentage: 
   );
 }
 
-/* ----------------------------- Main ------------------------------------ */
+/* ----------------------------- Main ------------d------------------------ */
 const MetricsLayout: React.FC = () => {
   const theme = useMantineTheme();
   const { data: neededVsDonated } = api.statistics.getNeededVsDonated.useQuery();
   const { data: demographics } = api.statistics.getDonorDemographics.useQuery();
+
+  const { data: getTotalUsers } = api.user.getTotalUsers.useQuery();
+
 
   const bloodTypeStats: BloodTypeStat[] = neededVsDonated?.bloodTypeStats ?? [];
   const mostNeededBloodType = neededVsDonated?.mostNeeded ?? { type: "", needed: 0 };
@@ -162,6 +165,12 @@ const MetricsLayout: React.FC = () => {
           value={`${mostDonatedBloodType.type} (${mostDonatedBloodType.donated})`}
           icon={<IconUsers size={18} />}
         />
+        <StatCard
+  label="Number of Users"
+  value={`${getTotalUsers?.count ?? 0}`}
+  icon={<IconUsers size={18} />}
+/>
+
       </SimpleGrid>
 
       <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg" mb="lg">

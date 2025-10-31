@@ -29,32 +29,45 @@ export default function ProfileLayout() {
   const updateProfile = api.user.updateProfile.useMutation();
   const [isEditing, setIsEditing] = useState(false);
 
-  // ✅ Validation
+  // ✅ Mantine Form with validation rules
   const form = useForm({
     initialValues: {
       name: "",
       gender: "",
       age: undefined as number | undefined,
       email: "",
+      contactnumber: "",
     },
- validate: {
-  name: (value) =>
-    value.trim().length === 0
-      ? "Name is required"
-      : /^[A-Za-z\s]+$/.test(value)
-      ? null
-      : "Name must only contain letters and spaces",
 
-  age: (value) => {
-    if (value === undefined || value <= 0) return "Please enter a valid age";
-    if (value < 18) return "Age must be 18 or above";
-    if (value > 150) return "Please enter a realistic age";
-    return null;
-  },
+    validate: {
+      name: (value) =>
+        value.trim().length === 0
+          ? "Name is required"
+          : /^[A-Za-z\s]+$/.test(value)
+          ? null
+          : "Name must only contain letters and spaces",
+
+      age: (value) => {
+        if (value === undefined || value <= 0)
+          return "Please enter a valid age";
+        if (value < 18) return "Age must be 18 or above";
+        if (value > 150) return "Please enter a realistic age";
+        return null;
+      },
+
+      contactnumber: (value) => {
+  const phRegex = /^(09\d{9}|(\+639)\d{9})$/;
+
+  if (value.trim().length === 0) return "Contact number is required";
+  if (!phRegex.test(value.trim()))
+    return "Please enter a valid Philippine number (e.g. 09171234567)";
+  return null;
 },
 
+    },
   });
 
+  // ✅ Load profile into form
   useEffect(() => {
     if (profile) {
       form.setValues({
@@ -62,6 +75,7 @@ export default function ProfileLayout() {
         gender: profile.gender ?? "",
         age: profile.age ?? undefined,
         email: profile.email ?? "",
+        contactnumber: profile.contactnumber ?? "",
       });
     }
   }, [profile]);
@@ -70,28 +84,30 @@ export default function ProfileLayout() {
     return <CustomLoader />;
   }
 
-const handleSubmit = (values: typeof form.values): void => {
-  // Check age restriction
-  if (values.age !== undefined && values.age < 18) {
-    form.setFieldError("age", "Age must be 18 or above");
-    return;
-  }
+  // ✅ Handle form submit
+  const handleSubmit = (values: typeof form.values): void => {
+    if (values.age !== undefined && values.age < 18) {
+      form.setFieldError("age", "Age must be 18 or above");
+      return;
+    }
 
-  const payload: Record<string, unknown> = {};
+    const payload: Record<string, unknown> = {};
 
-  if (values.name?.trim()) payload.name = values.name.trim();
-  if (values.gender?.trim()) payload.gender = values.gender.trim();
-  if (typeof values.age === "number" && values.age >= 18) payload.age = values.age;
+    if (values.name?.trim()) payload.name = values.name.trim();
+    if (values.gender?.trim()) payload.gender = values.gender.trim();
+    if (typeof values.age === "number" && values.age >= 18)
+      payload.age = values.age;
+    if (values.contactnumber?.trim())
+      payload.contactnumber = values.contactnumber.trim();
 
-  if (Object.keys(payload).length > 0) {
-    updateProfile.mutate(payload, {
-      onSuccess: () => {
-        void refetch().then(() => setIsEditing(false));
-      },
-    });
-  }
-};
-
+    if (Object.keys(payload).length > 0) {
+      updateProfile.mutate(payload, {
+        onSuccess: () => {
+          void refetch().then(() => setIsEditing(false));
+        },
+      });
+    }
+  };
 
   return (
     <Box
@@ -99,7 +115,6 @@ const handleSubmit = (values: typeof form.values): void => {
       py="lg"
       style={{ maxWidth: 900, margin: "0 auto" }}
     >
-
       <Paper
         shadow="md"
         radius="lg"
@@ -108,10 +123,11 @@ const handleSubmit = (values: typeof form.values): void => {
         style={{
           backgroundColor: "var(--mantine-color-body)",
         }}
-      > 
-      <Title order={2} mb="lg" ta="center" fw={700}>
-        My Profile
-      </Title>
+      >
+        <Title order={2} mb="lg" ta="center" fw={700}>
+          My Profile
+        </Title>
+
         {/* Profile Header */}
         <Flex direction="column" align="center" mb="xl">
           <Avatar
@@ -135,6 +151,19 @@ const handleSubmit = (values: typeof form.values): void => {
             }}
           >
             {profile?.email}
+          </Text>
+          <Text
+            size="sm"
+            c="dimmed"
+            mt={4}
+            ta="center"
+            style={{
+              wordBreak: "break-word",
+              overflowWrap: "anywhere",
+              maxWidth: "100%",
+            }}
+          >
+            {profile?.contactnumber ?? "No Contact Number Set"}
           </Text>
 
           <Button
@@ -179,16 +208,25 @@ const handleSubmit = (values: typeof form.values): void => {
               Age
             </Text>
             <Text fw={600}>
-              {(profile?.age ?? 0) > 100
-                ? "100+"
-                : profile?.age ?? "—"}
-              </Text>
+              {(profile?.age ?? 0) > 100 ? "100+" : profile?.age ?? "—"}
+            </Text>
+          </Grid.Col>
+
+          {/* ✅ Contact Number */}
+          <Grid.Col span={{ base: 12, sm: 6 }}>
+            <Text size="xs" c="dimmed" fw={500} mb={4}>
+              Contact Number
+            </Text>
+            <Text fw={600}>{profile?.contactnumber ?? "—"}</Text>
           </Grid.Col>
         </Grid>
+
         <Divider my="lg" />
+
         <Text size="sm" c="dimmed" ta="center" mt="md">
-          <strong>Note:</strong> This profile is for your website account only.  
-          You will still need to fill up a form onsite if you are donating blood or making a blood request.
+          <strong>Note:</strong> This profile is for your website account only.
+          You will still need to fill up a form onsite if you are donating blood
+          or making a blood request.
         </Text>
       </Paper>
 
@@ -227,6 +265,19 @@ const handleSubmit = (values: typeof form.values): void => {
               radius="md"
               withAsterisk
               {...form.getInputProps("age")}
+            />
+
+            {/* ✅ Contact Number Input */}
+            <TextInput
+              label="Contact Number"
+              placeholder="Enter contact number"
+              radius="md"
+              withAsterisk
+              {...form.getInputProps("contactnumber")}
+              onInput={(e) => {
+                e.currentTarget.value = e.currentTarget.value.replace(/\D/g, ""); // allow only digits
+              }}
+              maxLength={11} // optional for PH format
             />
 
             <Group justify="flex-end" mt="md">

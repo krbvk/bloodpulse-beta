@@ -108,13 +108,16 @@ export const appointmentRouter = createTRPCRouter({
       const formattedDateLong = dayjs(input.datetime).tz("Asia/Manila").format("MMMM D, YYYY");
       const formattedTime = dayjs(input.datetime).tz("Asia/Manila").format("hh:mm A");
 
-      const message = generateAppointmentMessage({
+      const messageBase = generateAppointmentMessage({
         subject: input.subject,
         formattedDate: formattedDateLong,
         formattedTime,
         bloodType: input.bloodType,
-        causeOfBloodRequest: input.causeOfBloodRequest, // ✅ included in message generator
       });
+
+      const message = input.causeOfBloodRequest
+        ? `${messageBase}\n\nReason: ${input.causeOfBloodRequest}`
+        : messageBase;
 
       const appointment = await ctx.db.appointment.create({
         data: {

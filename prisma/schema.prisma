@@ -54,6 +54,7 @@ model User {
   role          Role          @default(USER)
   age           Int?
   gender        String?
+  contactnumber String?
   accounts      Account[]
   appointments  Appointment[] @relation("UserAppointments")
   posts         Post[]
@@ -82,6 +83,7 @@ model Donor {
   email         String   @unique
   gender        String
   age           Int
+  contactnumber String?
   contactEmail  String?
   donationCount Int?     @default(0)
   createdAt     DateTime @default(now())
