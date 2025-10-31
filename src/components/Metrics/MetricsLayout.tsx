@@ -215,7 +215,7 @@ const MetricsLayout: React.FC = () => {
                 label={
                   <Stack gap={0} align="center">
                     <Text fw={700}>100%</Text>
-                    <Text size="xs" c="dimmed">Donors</Text>
+                    <Text size="xs" c="dimmed">Users</Text>
                   </Stack>
                 }
               />
