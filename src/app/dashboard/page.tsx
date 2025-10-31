@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import CustomLoader from "@/components/Loader/CustomLoader";
 import { api } from "@/trpc/react";
 import { useMediaQuery } from "@mantine/hooks";
+import MetricsLayout from "@/components/Metrics/MetricsLayout";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -49,6 +50,7 @@ export default function Dashboard() {
     <Box style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Navbar */}
       <Box style={{ height: "60px", flexShrink: 0 }}>
+        
         <DashboardNavbar toggleSidebar={toggleSidebar} session={session} />
       </Box>
 
@@ -60,6 +62,7 @@ export default function Dashboard() {
           session={session}
           isUserDonor={isUserDonor?.isDonor}
         />
+
 
         {/* Content area */}
         <Box
@@ -73,7 +76,10 @@ export default function Dashboard() {
             padding: "20px",
           }}
         >
+          
           <DashboardContent session={session} />
+           <MetricsLayout />
+         
         </Box>
       </Flex>
     </Box>

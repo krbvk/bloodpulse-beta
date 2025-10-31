@@ -1,4 +1,6 @@
-// src/server/api/routers/user.ts
+
+
+  // src/server/api/routers/user.ts
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 
@@ -14,6 +16,7 @@ export const userRouter = createTRPCRouter({
         gender: true,
         age: true,
         image: true,
+        contactnumber: true,
       },
     });
   }),
@@ -24,6 +27,7 @@ export const userRouter = createTRPCRouter({
         name: z.string().min(1).optional(),
         gender: z.string().optional(),
         age: z.number().optional(),
+        contactnumber: z.string().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -35,6 +39,7 @@ export const userRouter = createTRPCRouter({
           name: input.name,
           gender: input.gender,
           age: input.age,
+          contactnumber: input.contactnumber,
         },
       });
     }),
@@ -48,4 +53,11 @@ export const userRouter = createTRPCRouter({
 
     return { success: true };
   }),
+
+  // ✅ New procedure to get total user count
+  getTotalUsers: protectedProcedure.query(async ({ ctx }) => {
+    const count = await ctx.db.user.count();
+    return { count };
+  }),
 });
+
