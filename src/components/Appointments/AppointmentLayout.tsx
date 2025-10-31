@@ -166,8 +166,11 @@ export default function AppointmentLayout() {
       formattedDate,
       formattedTime,
     });
-    const displaySubject = `[${subjectCount}] Appointment - ${subject}`;
 
+
+    const nextCount = subjectCount + 1;
+    const displaySubject = `[${nextCount}] Appointment - ${subject}`;
+    
     createAppointment.mutate({
       datetime: datetime.toDate(),
       subject,
