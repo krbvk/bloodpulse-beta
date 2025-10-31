@@ -31,7 +31,8 @@ interface Donor {
   name: string;
   email: string;
   bloodType: string;
-  contactEmail: string;
+  contactEmail?: string | null;
+  contactnumber?: string | null;
   donationCount: number;
   gender: "Male" | "Female" | "Other";
   age: number;
@@ -41,7 +42,7 @@ export default function DonorLayout() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { data: donors = [], isLoading } =
-    api.donor.getAll.useQuery() as { data: Donor[]; isLoading: boolean };
+    (api.donor.getAll.useQuery() as unknown) as { data: Donor[]; isLoading: boolean } || { data: [], isLoading: false };
   const utils = api.useUtils();
   const isMobile = useMediaQuery("(max-width: 48em)");
 
@@ -55,15 +56,35 @@ export default function DonorLayout() {
   const [selectMode, setSelectMode] = useState<boolean>(false);
   const [deleteConfirmOpened, setDeleteConfirmOpened] = useState(false);
 
-  const [newDonor, setNewDonor] = useState<Omit<Donor, "id">>({
-    name: "",
-    email: "",
-    bloodType: "",
-    contactEmail: "",
-    donationCount: 0,
-    gender: "Male",
-    age: 18,
-  });
+  // ensure newDonor contains contactnumber
+    interface NewDonorInput {
+      name: string;
+      email: string;
+      bloodType: string;
+      contactEmail?: string;
+      contactnumber: string;
+      donationCount: number;
+      gender: "Male" | "Female" | "Other";
+      age: number;
+    }
+  
+    const [newDonor, setNewDonor] = useState<NewDonorInput>({
+      name: "",
+      email: "",
+      bloodType: "",
+      contactEmail: undefined,
+      contactnumber: "",
+      donationCount: 0,
+      gender: "Male",
+      age: 18,
+    });
+
+  // PH contact number validator
+  const validatePH = (val: string | undefined | null) => {
+    if (!val) return false;
+    // Accept +63XXXXXXXXXX or 09XXXXXXXXX
+    return /^(?:\+63|0)9\d{9}$/.test(val.trim());
+  };
 
   const addDonor = api.donor.create.useMutation({
     onSuccess: async () => {
@@ -74,6 +95,7 @@ export default function DonorLayout() {
         email: "",
         bloodType: "",
         contactEmail: "",
+        contactnumber: "",
         donationCount: 0,
         gender: "Male",
         age: 18,
@@ -94,31 +116,33 @@ export default function DonorLayout() {
       await utils.donor.getAll.invalidate();
       setIsEditing(false);
       setModalOpened(false);
+      setEditableDonor(null);
+      setSelectedDonor(null);
     },
   });
 
-const filteredDonors = useMemo(() => {
-  if (!searchQuery) return donors;
+  const filteredDonors = useMemo(() => {
+    if (!searchQuery) return donors;
 
-  const query = searchQuery.trim().toUpperCase();
+    const query = searchQuery.trim().toUpperCase();
 
-  return donors.filter((donor) => {
-    const blood = donor.bloodType.toUpperCase();
+    return donors.filter((donor) => {
+      const blood = donor.bloodType.toUpperCase();
 
-    // If query includes + or -, require exact match
-    if (query.includes("+") || query.includes("-")) {
-      return blood === query;
-    }
+      // If query includes + or -, require exact match
+      if (query.includes("+") || query.includes("-")) {
+        return blood === query;
+      }
 
-    // Otherwise match base type exactly (A, B, AB, O)
-    // Example: typing "A" => matches A+ and A-, but not AB
-    if (["A", "B", "AB", "O"].includes(query)) {
-      return blood.startsWith(query) && blood.length <= query.length + 1;
-    }
+      // Otherwise match base type exactly (A, B, AB, O)
+      // Example: typing "A" => matches A+ and A-, but not AB
+      if (["A", "B", "AB", "O"].includes(query)) {
+        return blood.startsWith(query) && blood.length <= query.length + 1;
+      }
 
-    return false;
-  });
-}, [donors, searchQuery]);
+      return false;
+    });
+  }, [donors, searchQuery]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -138,12 +162,11 @@ const filteredDonors = useMemo(() => {
     setDeleteConfirmOpened(true);
   };
 
- const validateEmail = (email: string) => {
-  const regex =
-    /^[a-z0-9._-]+@((gmail\.com)|(yahoo\.com)|([a-z0-9-]+\.)*fatima\.edu(\.ph)?)$/i;
-  return regex.test(email);
-};
-
+  const validateEmail = (email: string) => {
+    const regex =
+      /^[a-z0-9._-]+@((gmail\.com)|(yahoo\.com)|([a-z0-9-]+\.)*fatima\.edu(\.ph)?)$/i;
+    return regex.test(email);
+  };
 
   return (
     <Box px="lg" py="lg" maw={900} mx="auto">
@@ -261,114 +284,151 @@ const filteredDonors = useMemo(() => {
       </Paper>
 
       {/* View Modal */}
-    <Modal
-  opened={modalOpened}
-  onClose={() => setModalOpened(false)}
-  title={
-    <Text fw={600} size="lg" c="dark">
-      Donor Details
-    </Text>
-  }
-  centered
-  radius="md"
-  overlayProps={{ opacity: 0.55, blur: 3 }}
->
-  <Stack gap="sm" p="sm">
-    <Paper shadow="xs" radius="md" withBorder p="md" bg="gray.0">
-      <Stack gap="xs">
-        <Group gap="xs">
-          <Text fw={600} c="dimmed" w={130}>
-            Name:
-          </Text>
-          <Text>{selectedDonor?.name ?? "N/A"}</Text>
-        </Group>
-
-        <Group gap="xs">
-          <Text fw={600} c="dimmed" w={130}>
-            Email:
-          </Text>
-          <Text>{selectedDonor?.email ?? "N/A"}</Text>
-        </Group>
-
-        <Group gap="xs">
-          <Text fw={600} c="dimmed" w={130}>
-            Blood Type:
-          </Text>
-          <Text c="red">{selectedDonor?.bloodType ?? "N/A"}</Text>
-        </Group>
-
-        <Group gap="xs">
-          <Text fw={600} c="dimmed" w={130}>
-            Gender:
-          </Text>
-          <Text>{selectedDonor?.gender ?? "N/A"}</Text>
-        </Group>
-
-        <Group gap="xs">
-          <Text fw={600} c="dimmed" w={130}>
-            Age:
-          </Text>
-          <Text>{selectedDonor?.age ?? "N/A"}</Text>
-        </Group>
-
-        <Group gap="xs">
-          <Text fw={600} c="dimmed" w={130}>
-            Contact Email:
-          </Text>
-          <Text>{selectedDonor?.contactEmail ?? "N/A"}</Text>
-        </Group>
-
-        <Group gap="xs">
-          <Text fw={600} c="dimmed" w={130}>
-            Times Donated:
-          </Text>
-          <Text>{selectedDonor?.donationCount ?? 0}</Text>
-        </Group>
-      </Stack>
-    </Paper>
-
-    <Flex justify="end" mt="md">
-      <Button
-        size="sm"
-        variant="gradient"
-        gradient={{ from: "red", to: "pink" }}
-        leftSection={<IconEdit size={16} />}
-        onClick={() => {
-          setEditableDonor(selectedDonor);
-          setIsEditing(true);
+      <Modal
+        opened={modalOpened}
+        onClose={() => {
+          setModalOpened(false);
+          setSelectedDonor(null);
         }}
+        title={
+          <Text fw={600} size="lg" c="dark">
+            Donor Details
+          </Text>
+        }
+        centered
         radius="md"
+        overlayProps={{ opacity: 0.55, blur: 3 }}
       >
-        Edit Donor
-      </Button>
-    </Flex>
-  </Stack>
-</Modal>
+        <Stack gap="sm" p="sm">
+          <Paper shadow="xs" radius="md" withBorder p="md" bg="gray.0">
+            <Stack gap="xs">
+              <Group gap="xs">
+                <Text fw={600} c="dimmed" w={130}>
+                  Name:
+                </Text>
+                <Text>{selectedDonor?.name ?? "N/A"}</Text>
+              </Group>
 
+              <Group gap="xs">
+                <Text fw={600} c="dimmed" w={130}>
+                  Email:
+                </Text>
+                <Text>{selectedDonor?.email ?? "N/A"}</Text>
+              </Group>
+
+              <Group gap="xs">
+                <Text fw={600} c="dimmed" w={130}>
+                  Blood Type:
+                </Text>
+                <Text c="red">{selectedDonor?.bloodType ?? "N/A"}</Text>
+              </Group>
+
+              <Group gap="xs">
+                <Text fw={600} c="dimmed" w={130}>
+                  Gender:
+                </Text>
+                <Text>{selectedDonor?.gender ?? "N/A"}</Text>
+              </Group>
+
+              <Group gap="xs">
+                <Text fw={600} c="dimmed" w={130}>
+                  Age:
+                </Text>
+                <Text>{selectedDonor?.age ?? "N/A"}</Text>
+              </Group>
+
+              <Group gap="xs">
+                <Text fw={600} c="dimmed" w={130}>
+                  Contact Email:
+                </Text>
+                <Text>{selectedDonor?.contactEmail ?? "N/A"}</Text>
+              </Group>
+
+              <Group gap="xs">
+                <Text fw={600} c="dimmed" w={130}>
+                  Contact Number:
+                </Text>
+                <Text>
+                  {selectedDonor?.contactnumber ?? "N/A"}
+                </Text>
+              </Group>
+
+              <Group gap="xs">
+                <Text fw={600} c="dimmed" w={130}>
+                  Times Donated:
+                </Text>
+                <Text>{selectedDonor?.donationCount ?? 0}</Text>
+              </Group>
+            </Stack>
+          </Paper>
+
+          <Flex justify="end" mt="md">
+            <Button
+              size="sm"
+              variant="gradient"
+              gradient={{ from: "red", to: "pink" }}
+              leftSection={<IconEdit size={16} />}
+              onClick={() => {
+                setEditableDonor(selectedDonor);
+                setIsEditing(true);
+                // keep view modal open or close — close to avoid stacking
+                setModalOpened(false);
+              }}
+              radius="md"
+            >
+              Edit Donor
+            </Button>
+          </Flex>
+        </Stack>
+      </Modal>
 
       {/* Edit Modal */}
       <Modal
         opened={isEditing}
-        onClose={() => setIsEditing(false)}
+        onClose={() => {
+          setIsEditing(false);
+          setEditableDonor(null);
+        }}
         title="Edit Donor"
         centered
         size="lg"
       >
-        <Box
+          <Box
           component="form"
           onSubmit={(e) => {
             e.preventDefault();
-            if (editableDonor) updateDonor.mutate(editableDonor);
+            if (!editableDonor) return;
+
+            // simple front-end checks (backend will validate too)
+            if (!editableDonor.name || editableDonor.name.trim().length === 0) return;
+            if (!editableDonor.bloodType || editableDonor.bloodType.trim().length === 0) return;
+            if (!editableDonor.email || !validateEmail(editableDonor.email)) return;
+            if (!editableDonor.contactnumber || !validatePH(editableDonor.contactnumber)) return;
+
+            // Build a payload that matches the expected mutation input types.
+            const payload = {
+              id: editableDonor.id,
+              name: editableDonor.name,
+              email: editableDonor.email,
+              age: editableDonor.age,
+              gender: editableDonor.gender,
+              contactnumber: editableDonor.contactnumber ?? "",
+              bloodType: editableDonor.bloodType,
+              contactEmail: editableDonor.contactEmail ?? undefined,
+              donationCount: editableDonor.donationCount ?? 0,
+            };
+
+            updateDonor.mutate(payload);
           }}
         >
-  <Stack
-    gap="md"
-    style={{
-      maxHeight: isMobile ? "40vh" : "70vh", // ✅ responsive
-      overflowY: "auto",
-      overflowX: "hidden",
-    }}
-  >
+          <Stack
+            gap="md"
+            style={{
+              maxHeight: isMobile ? "40vh" : "70vh", // ✅ responsive
+              overflowY: "auto",
+              overflowX: "hidden",
+            }}
+          >
             <Title order={5} c="blue">
               Personal Information
             </Title>
@@ -399,7 +459,7 @@ const filteredDonors = useMemo(() => {
                   label="Age"
                   type="number"
                   min={18}
-                  value={editableDonor?.age.toString() ?? "18"}
+                  value={(editableDonor?.age ?? 18).toString()}
                   onChange={(e) =>
                     setEditableDonor({
                       ...editableDonor!,
@@ -472,6 +532,27 @@ const filteredDonors = useMemo(() => {
                   }
                 />
               </Grid.Col>
+
+              <Grid.Col span={12}>
+                <TextInput
+                  label="Contact Number"
+                  required
+                  placeholder=" 09XXXXXXXXX"
+                  value={editableDonor?.contactnumber ?? ""}
+                  onChange={(e) =>
+                    setEditableDonor({
+                      ...editableDonor!,
+                      contactnumber: e.target.value,
+                    })
+                  }
+                  error={
+                    editableDonor?.contactnumber &&
+                    !validatePH(editableDonor.contactnumber)
+                      ? "Invalid PH number. Use 09XXXXXXXXX"
+                      : null
+                  }
+                />
+              </Grid.Col>
             </Grid>
 
             <Title order={5} c="blue">
@@ -483,7 +564,7 @@ const filteredDonors = useMemo(() => {
                   label="Donation Count"
                   type="number"
                   min={0}
-                  value={editableDonor?.donationCount.toString() ?? "0"}
+                  value={(editableDonor?.donationCount ?? 0).toString()}
                   onChange={(e) =>
                     setEditableDonor({
                       ...editableDonor!,
@@ -495,7 +576,7 @@ const filteredDonors = useMemo(() => {
             </Grid>
 
             <Flex justify="flex-end" gap="sm" mt="md">
-              <Button variant="outline" onClick={() => setIsEditing(false)}>
+              <Button variant="outline" onClick={() => { setIsEditing(false); setEditableDonor(null); }}>
                 Cancel
               </Button>
               <Button
@@ -554,17 +635,23 @@ const filteredDonors = useMemo(() => {
           component="form"
           onSubmit={(e) => {
             e.preventDefault();
+            // basic front-end validation before calling mutation
+            if (!newDonor.name || newDonor.name.trim().length === 0) return;
+            if (!newDonor.bloodType || newDonor.bloodType.trim().length === 0) return;
+            if (!newDonor.email || !validateEmail(newDonor.email)) return;
+            if (!newDonor.contactnumber || !validatePH(newDonor.contactnumber)) return;
+
             addDonor.mutate(newDonor);
           }}
         >
-            <Stack
-    gap="md"
-    style={{
-      maxHeight: isMobile ? "40vh" : "70vh", // ✅ responsive
-      overflowY: "auto",
-      overflowX: "hidden",
-    }}
-  >
+          <Stack
+            gap="md"
+            style={{
+              maxHeight: isMobile ? "40vh" : "70vh", // ✅ responsive
+              overflowY: "auto",
+              overflowX: "hidden",
+            }}
+          >
             <Title order={5} c="blue">
               Personal Information
             </Title>
@@ -583,7 +670,7 @@ const filteredDonors = useMemo(() => {
                 <Select
                   label="Gender"
                   placeholder="Select"
-                  data={["Male", "Female", "Others"]}
+                  data={["Male", "Female", "Other"]}
                   value={newDonor.gender}
                   onChange={(val) =>
                     setNewDonor({ ...newDonor, gender: (val ?? "Male") as "Male" | "Female" | "Other" })
@@ -647,13 +734,30 @@ const filteredDonors = useMemo(() => {
               <Grid.Col span={12}>
                 <TextInput
                   label="Alternate Contact Email"
-                  value={newDonor.contactEmail}
+                  value={newDonor.contactEmail ?? ""}
                   onChange={(e) =>
                     setNewDonor({ ...newDonor, contactEmail: e.target.value })
                   }
                   error={
                     newDonor.contactEmail && !validateEmail(newDonor.contactEmail)
                       ? "Enter a valid email address (gmail, yahoo, or fatima)"
+                      : null
+                  }
+                />
+              </Grid.Col>
+
+              <Grid.Col span={12}>
+                <TextInput
+                  label="Contact Number"
+                  required
+                  placeholder=" 09XXXXXXXXX"
+                  value={newDonor.contactnumber ?? ""}
+                  onChange={(e) =>
+                    setNewDonor({ ...newDonor, contactnumber: e.target.value })
+                  }
+                  error={
+                    newDonor.contactnumber && !validatePH(newDonor.contactnumber)
+                      ? "Invalid PH number 09XXXXXXXXX"
                       : null
                   }
                 />

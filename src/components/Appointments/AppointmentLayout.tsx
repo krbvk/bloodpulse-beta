@@ -48,12 +48,24 @@ const timeOptions = [
   "5:00 PM",
 ];
 
+// ✅ Reason options for blood request
+const causeOfBloodRequestOptions = [
+  "Blood loss",
+  "Defective production",
+  "Destruction of blood cells",
+  "Coagulation problems",
+  "Medical treatments",
+];
+
 export default function AppointmentLayout() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [appointmentDate, setAppointmentDate] = useState<Date | null>(null);
   const [appointmentTime, setAppointmentTime] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [timeError, setTimeError] = useState<string | null>(null);
+  const [subjectCount, setSubjectCount] = useState(1);
   const [subject, setSubject] = useState<
     "Blood Donation" | "Blood Request" | null
   >(null);
@@ -61,10 +73,10 @@ export default function AppointmentLayout() {
   const [variant, setVariant] = useState<
     "whole blood" | "packed RBC" | "fresh plasma" | "frozen plasma" | null
   >(null);
-  const [failed, setFailed] = useState(false);
-  const [timeError, setTimeError] = useState<string | null>(null);
-  const [subjectCount, setSubjectCount] = useState(1);
-  const [location, setLocation] = useState(""); // ✅ new state for location
+  const [causeOfBloodRequest, setCauseOfBloodRequest] = useState<string | null>(
+    null
+  );
+  const [location, setLocation] = useState("");
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
@@ -95,6 +107,7 @@ export default function AppointmentLayout() {
       setSubject(null);
       setBloodType(null);
       setVariant(null);
+      setCauseOfBloodRequest(null);
       setSubjectCount((prev) => prev + 1);
     },
     onError: (error) => {
@@ -108,7 +121,7 @@ export default function AppointmentLayout() {
   const sendToAll = api.appointment.getAllUserEmails.useMutation({
     onSuccess: (res) => {
       alert(`✅ Email sent to ${res.sentTo.length} users`);
-      setLocation(""); // clear location input
+      setLocation("");
     },
     onError: (err) => {
       alert(`❌ Failed to send: ${err.message}`);
@@ -117,10 +130,14 @@ export default function AppointmentLayout() {
 
   const handleSubmit = () => {
     if (!appointmentDate || !appointmentTime || !subject) return;
-    if (subject === "Blood Request" && (!bloodType || !variant)) {
+    if (
+      subject === "Blood Request" &&
+      (!bloodType || !variant || !causeOfBloodRequest)
+    ) {
       setFailed(true);
       return;
     }
+
     const now = dayjs().tz("Asia/Manila");
     const datetime = dayjs(
       `${dayjs(appointmentDate).format("YYYY-MM-DD")} ${appointmentTime}`,
@@ -144,13 +161,11 @@ export default function AppointmentLayout() {
 
     const formattedDate = dayjs(datetime).format("MMMM D, YYYY");
     const formattedTime = dayjs(datetime).format("hh:mm A");
-
     const generatedMessage = generateAppointmentMessage({
       subject,
       formattedDate,
       formattedTime,
     });
-
     const displaySubject = `[${subjectCount}] Appointment - ${subject}`;
 
     createAppointment.mutate({
@@ -160,6 +175,8 @@ export default function AppointmentLayout() {
       message: generatedMessage,
       bloodType: bloodType ?? undefined,
       variant: subject === "Blood Request" ? variant ?? undefined : undefined,
+      causeOfBloodRequest:
+        subject === "Blood Request" ? causeOfBloodRequest ?? undefined : undefined,
     });
   };
 
@@ -176,7 +193,6 @@ export default function AppointmentLayout() {
             title={donationEnabled ? "Donation Open" : "Donation Closed"}
             withBorder
             withCloseButton={false}
-
           >
             {donationEnabled
               ? "Blood Donation is open for today!"
@@ -185,46 +201,46 @@ export default function AppointmentLayout() {
         </Box>
       )}
 
-      {/* ✅ Floating Notifications (Bottom-Left Corner) */}
-    <Box
-      style={{
-        position: "fixed",
-        bottom: "20px",
-        left: "20px",
-        zIndex: 9999,
-        display: "flex",
-        flexDirection: "column",
-        gap: "10px",
-      }}
-    >
-      {success && (
-      <Notification
-        icon={<IconCheck />}
-        color="green"
-        title="Request Sent"
-        onClose={() => setSuccess(false)}
-        withBorder
-        radius="md"
+      {/* Floating Notifications */}
+      <Box
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          left: "20px",
+          zIndex: 9999,
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+        }}
       >
-        Your appointment request has been sent successfully.
-    </Notification>
-    )}
+        {success && (
+          <Notification
+            icon={<IconCheck />}
+            color="green"
+            title="Request Sent"
+            onClose={() => setSuccess(false)}
+            withBorder
+            radius="md"
+          >
+            Your appointment request has been sent successfully.
+          </Notification>
+        )}
 
-    {failed && (
-      <Notification
-        icon={<IconX />}
-        color="red"
-        title="Error"
-        onClose={() => setFailed(false)}
-        withBorder
-        radius="md"
-      >
-        Failed to send appointment request. Please try again.
-      </Notification>
-    )}
-  </Box>
+        {failed && (
+          <Notification
+            icon={<IconX />}
+            color="red"
+            title="Error"
+            onClose={() => setFailed(false)}
+            withBorder
+            radius="md"
+          >
+            Failed to send appointment request. Please try again.
+          </Notification>
+        )}
+      </Box>
 
-      {/* Responsive two-column layout */}
+      {/* Main layout */}
       <Box
         style={{
           display: "flex",
@@ -235,7 +251,7 @@ export default function AppointmentLayout() {
           marginTop: "2rem",
         }}
       >
-        {/* Left side - Appointment Form */}
+        {/* Left side - Form */}
         <Paper
           shadow="md"
           radius="lg"
@@ -302,7 +318,6 @@ export default function AppointmentLayout() {
                 const selected =
                   value as "Blood Donation" | "Blood Request" | null;
                 setSubject(selected);
-
                 if (selected === "Blood Donation" && donationEnabled) {
                   setAppointmentDate(new Date());
                 }
@@ -331,9 +346,9 @@ export default function AppointmentLayout() {
                     "frozen plasma",
                   ]}
                   value={variant}
-                  onChange={(value) =>
+                  onChange={(v) =>
                     setVariant(
-                      value as
+                      v as
                         | "whole blood"
                         | "packed RBC"
                         | "fresh plasma"
@@ -341,6 +356,16 @@ export default function AppointmentLayout() {
                         | null
                     ) ?? null
                   }
+                  withAsterisk
+                />
+
+                {/* ✅ NEW FIELD: Reason why you need blood */}
+                <Select
+                  label="Reason why you need blood"
+                  placeholder="Select reason"
+                  data={causeOfBloodRequestOptions}
+                  value={causeOfBloodRequest}
+                  onChange={(v) => setCauseOfBloodRequest(v)}
                   withAsterisk
                 />
               </>
@@ -356,12 +381,14 @@ export default function AppointmentLayout() {
                 !appointmentTime ||
                 !subject ||
                 !!timeError ||
-                (subject === "Blood Request" && (!bloodType || !variant))
+                (subject === "Blood Request" &&
+                  (!bloodType || !variant || !causeOfBloodRequest))
               }
             >
               Send Appointment Request
             </Button>
 
+            {/* Admin Panel */}
             {session?.user?.role === "ADMIN" && (
               <>
                 <Button
@@ -390,7 +417,6 @@ export default function AppointmentLayout() {
                     : "Enable Blood Donation"}
                 </Button>
 
-                {/* ✅ New: Bulk Email with Location */}
                 {donationEnabled && (
                   <Paper shadow="sm" radius="md" p="md" withBorder>
                     <Text fw={600} mb="sm">
@@ -434,65 +460,55 @@ export default function AppointmentLayout() {
           </Stack>
         </Paper>
 
-        {/* Right side - Sticky Notes */}
+        {/* Right side - Notes */}
         <Box
           style={{
             display: "flex",
-            flexDirection: isMobile ? "column" : "column",
+            flexDirection: "column",
             gap: "1.5rem",
             width: isMobile ? "100%" : 260,
           }}
         >
-          {[
-            {
-              color: "#1565c0",
-              text: `“OLFU RCY Blood Donation is available only every 3 months during the official OLFU RCY blood donation drive.\n 
-                OLFU RCY Blood Request scheduling is available only Monday to Friday, 8:00 AM – 5:00 PM. 
-                For Blood Request, if you book an appointment beyond these hours, OLFU RCY may not respond immediately. 
-                Your request will likely be addressed on the next working day.”`,
-              rotate: "-2deg",
-            },
-          ].map((note, i) => (
-            <Paper
-              key={i}
-              shadow="xl"
-              p="md"
+          <Paper
+            shadow="xl"
+            p="md"
+            style={{
+              backgroundColor: "#fffef9",
+              backgroundImage:
+                "repeating-linear-gradient(to bottom, transparent 0px, transparent 23px, rgba(0,0,0,0.1) 24px)",
+              backgroundSize: "100% 24px",
+              height: isMobile ? "auto" : 400,
+              textAlign: "center",
+              transform: "rotate(-2deg)",
+              borderRadius: "6px",
+              boxShadow: "4px 6px 15px rgba(0,0,0,0.3)",
+              position: "relative",
+            }}
+          >
+            <IconPin
+              size={26}
               style={{
-                backgroundColor: "#fffef9",
-                backgroundImage:
-                  "repeating-linear-gradient(to bottom, transparent 0px, transparent 23px, rgba(0,0,0,0.1) 24px)",
-                backgroundSize: "100% 24px",
-                width: "100%",
-                height: isMobile ? "auto" : 400,
-                textAlign: "center",
-                transform: `rotate(${note.rotate})`,
-                borderRadius: "6px",
-                boxShadow: "4px 6px 15px rgba(0,0,0,0.3)",
-                position: "relative",
+                position: "absolute",
+                top: -16,
+                left: "50%",
+                transform: "translateX(-50%)",
+                color: "#1565c0",
+                filter: "drop-shadow(0px 2px 2px rgba(0,0,0,0.6))",
               }}
+            />
+            <Text
+              fw={600}
+              size="sm"
+              mt="xl"
+              c="black"
+              style={{ whiteSpace: "pre-line" }}
             >
-              <IconPin
-                size={26}
-                style={{
-                  position: "absolute",
-                  top: -16,
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  color: note.color,
-                  filter: "drop-shadow(0px 2px 2px rgba(0,0,0,0.6))",
-                }}
-              />
-              <Text
-                fw={600}
-                size="sm"
-                mt="xl"
-                c="black"
-                style={{ whiteSpace: "pre-line" }}
-              >
-                {note.text}
-              </Text>
-            </Paper>
-          ))}
+              “OLFU RCY Blood Donation is available only every 3 months during
+              the official OLFU RCY blood donation drive.\n
+              OLFU RCY Blood Request scheduling is available only Monday to
+              Friday, 8:00 AM – 5:00 PM.”
+            </Text>
+          </Paper>
         </Box>
       </Box>
     </Box>
