@@ -55,7 +55,14 @@ export default function DonorProfileLayout() {
           : /^[A-Za-z\s]+$/.test(value)
           ? null
           : "Name must only contain letters and spaces",
-      age: (value) => (value <= 0 ? "Please enter a valid age" : null),
+
+      age: (value) => {
+        if (value === undefined || value <= 0) return "Please enter a valid age";
+        if (value < 18) return "Age must be 18 or above";
+        if (value > 150) return "Please enter a realistic age";
+        return null;
+      },
+
       contactEmail: (value) =>
         /^\S+@\S+\.\S+$/.test(value) ? null : "Invalid email address",
     },
@@ -79,7 +86,13 @@ export default function DonorProfileLayout() {
 
   const { email, image } = session.user;
 
+  // ✅ Updated save handler with age restriction
   const handleEditSave = async (values: typeof form.values) => {
+    if (values.age < 18) {
+      form.setFieldError("age", "Age must be 18 or above");
+      return;
+    }
+
     setSaving(true);
     try {
       await updateProfile.mutateAsync(values);
@@ -111,10 +124,11 @@ export default function DonorProfileLayout() {
       <Box px={{ base: "md", sm: "lg" }} py="lg" style={{ maxWidth: 900, margin: "0 auto" }}>
         <Paper shadow="md" radius="lg" p={{ base: "md", sm: "xl" }} withBorder>
           <Flex justify="space-between" align="center" mb="lg">
-          <Title order={2} style={{ textAlign: "center", flex: 1 }}>
-            Donor Profile
-          </Title>
-        </Flex>
+            <Title order={2} style={{ textAlign: "center", flex: 1 }}>
+              Donor Profile
+            </Title>
+          </Flex>
+
           {/* Profile Header */}
           <Flex direction="column" align="center" mb="xl">
             <Avatar
@@ -193,7 +207,9 @@ export default function DonorProfileLayout() {
                   <Text size="xs" c="dimmed" fw={500} mb={4}>
                     Age
                   </Text>
-                  <Text fw={600}>{Number(donor?.age ?? 0)}</Text>
+                  <Text fw={600}>
+                    {Number(donor?.age ?? 0) > 100 ? "100+" : donor?.age ?? "—"}
+                  </Text>
                 </Grid.Col>
 
                 <Grid.Col span={{ base: 12, sm: 6 }}>
@@ -249,6 +265,7 @@ export default function DonorProfileLayout() {
                 label="Age"
                 placeholder="Enter your age"
                 min={1}
+                max={150}
                 radius="md"
                 withAsterisk
                 {...form.getInputProps("age")}
@@ -280,7 +297,12 @@ export default function DonorProfileLayout() {
                 >
                   Save Changes
                 </Button>
-                <Button variant="light" color="gray" radius="md" onClick={() => setEditOpened(false)}>
+                <Button
+                  variant="light"
+                  color="gray"
+                  radius="md"
+                  onClick={() => setEditOpened(false)}
+                >
                   Cancel
                 </Button>
               </Group>

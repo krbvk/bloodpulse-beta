@@ -17,11 +17,10 @@ export const donorRouter = createTRPCRouter({
           .email()
           .refine(
             (val) =>
-              /@(gmail|yahoo|outlook|hotmail)\.com$/i.test(val) ||
-              /@student\.fatima\.edu\.ph$/i.test(val),
+              /^[a-z0-9._-]+@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|([a-z0-9-]+\.)*fatima\.edu(\.ph)?)$/.test(val),
             {
               message:
-                "Email must be from gmail.com, yahoo.com, outlook.com, hotmail.com, or student.fatima.edu.ph",
+                "Email must be from gmail.com, yahoo.com, outlook.com, hotmail.com, or a fatima.edu.ph subdomain (e.g., student.fatima.edu.ph)",
             }
           ),
         contactEmail: z.string().email().optional(),
@@ -82,8 +81,13 @@ export const donorRouter = createTRPCRouter({
         email: z
           .string()
           .email()
-          .refine((val) =>
-            /@(gmail|yahoo|outlook|hotmail)\.com$/i.test(val)
+          .refine(
+            (val) =>
+              /^[a-z0-9._-]+@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|([a-z0-9-]+\.)*fatima\.edu(\.ph)?)$/.test(val),
+            {
+              message:
+                "Email must be from gmail.com, yahoo.com, outlook.com, hotmail.com, or a fatima.edu.ph subdomain (e.g., student.fatima.edu.ph)",
+            }
           ),
         contactEmail: z.string().email().optional(),
         donationCount: z.number().min(0).optional(),

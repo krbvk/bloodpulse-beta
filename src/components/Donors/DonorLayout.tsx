@@ -16,6 +16,7 @@ import {
   Tooltip,
   Checkbox,
   Text,
+  Group,
 } from "@mantine/core";
 import { useSession } from "next-auth/react";
 import { useState, useMemo, useEffect } from "react";
@@ -23,6 +24,7 @@ import { api } from "@/trpc/react";
 import { IconSearch, IconPlus, IconTrash, IconEdit } from "@tabler/icons-react";
 import CustomLoader from "../Loader/CustomLoader";
 import { useRouter } from "next/navigation";
+import { useMediaQuery } from "@mantine/hooks";
 
 interface Donor {
   id: string;
@@ -41,6 +43,7 @@ export default function DonorLayout() {
   const { data: donors = [], isLoading } =
     api.donor.getAll.useQuery() as { data: Donor[]; isLoading: boolean };
   const utils = api.useUtils();
+  const isMobile = useMediaQuery("(max-width: 48em)");
 
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [modalOpened, setModalOpened] = useState<boolean>(false);
@@ -135,10 +138,12 @@ const filteredDonors = useMemo(() => {
     setDeleteConfirmOpened(true);
   };
 
-  const validateEmail = (email: string) => {
-    const regex = /^[\w-.]+@(gmail|yahoo|fatima)\.[a-z]{2,}$/i;
-    return regex.test(email);
-  };
+ const validateEmail = (email: string) => {
+  const regex =
+    /^[a-z0-9._-]+@((gmail\.com)|(yahoo\.com)|([a-z0-9-]+\.)*fatima\.edu(\.ph)?)$/i;
+  return regex.test(email);
+};
+
 
   return (
     <Box px="lg" py="lg" maw={900} mx="auto">
@@ -256,49 +261,90 @@ const filteredDonors = useMemo(() => {
       </Paper>
 
       {/* View Modal */}
-      <Modal
-        opened={modalOpened}
-        onClose={() => setModalOpened(false)}
-        title="Donor Details"
-        centered
+    <Modal
+  opened={modalOpened}
+  onClose={() => setModalOpened(false)}
+  title={
+    <Text fw={600} size="lg" c="dark">
+      Donor Details
+    </Text>
+  }
+  centered
+  radius="md"
+  overlayProps={{ opacity: 0.55, blur: 3 }}
+>
+  <Stack gap="sm" p="sm">
+    <Paper shadow="xs" radius="md" withBorder p="md" bg="gray.0">
+      <Stack gap="xs">
+        <Group gap="xs">
+          <Text fw={600} c="dimmed" w={130}>
+            Name:
+          </Text>
+          <Text>{selectedDonor?.name ?? "N/A"}</Text>
+        </Group>
+
+        <Group gap="xs">
+          <Text fw={600} c="dimmed" w={130}>
+            Email:
+          </Text>
+          <Text>{selectedDonor?.email ?? "N/A"}</Text>
+        </Group>
+
+        <Group gap="xs">
+          <Text fw={600} c="dimmed" w={130}>
+            Blood Type:
+          </Text>
+          <Text c="red">{selectedDonor?.bloodType ?? "N/A"}</Text>
+        </Group>
+
+        <Group gap="xs">
+          <Text fw={600} c="dimmed" w={130}>
+            Gender:
+          </Text>
+          <Text>{selectedDonor?.gender ?? "N/A"}</Text>
+        </Group>
+
+        <Group gap="xs">
+          <Text fw={600} c="dimmed" w={130}>
+            Age:
+          </Text>
+          <Text>{selectedDonor?.age ?? "N/A"}</Text>
+        </Group>
+
+        <Group gap="xs">
+          <Text fw={600} c="dimmed" w={130}>
+            Contact Email:
+          </Text>
+          <Text>{selectedDonor?.contactEmail ?? "N/A"}</Text>
+        </Group>
+
+        <Group gap="xs">
+          <Text fw={600} c="dimmed" w={130}>
+            Times Donated:
+          </Text>
+          <Text>{selectedDonor?.donationCount ?? 0}</Text>
+        </Group>
+      </Stack>
+    </Paper>
+
+    <Flex justify="end" mt="md">
+      <Button
+        size="sm"
+        variant="gradient"
+        gradient={{ from: "red", to: "pink" }}
+        leftSection={<IconEdit size={16} />}
+        onClick={() => {
+          setEditableDonor(selectedDonor);
+          setIsEditing(true);
+        }}
+        radius="md"
       >
-        <Stack gap="xs">
-          <Text>
-            <strong>Name:</strong> {selectedDonor?.name}
-          </Text>
-          <Text>
-            <strong>Email:</strong> {selectedDonor?.email}
-          </Text>
-          <Text>
-            <strong>Blood Type:</strong> {selectedDonor?.bloodType}
-          </Text>
-          <Text>
-            <strong>Gender:</strong> {selectedDonor?.gender}
-          </Text>
-          <Text>
-            <strong>Age:</strong> {selectedDonor?.age}
-          </Text>
-          <Text>
-            <strong>Contact Email:</strong> {selectedDonor?.contactEmail}
-          </Text>
-          <Text>
-            <strong>Number of times donated:</strong>{" "}
-            {selectedDonor?.donationCount}
-          </Text>
-          <Flex justify="end" mt="sm">
-            <Button
-              size="sm"
-              leftSection={<IconEdit size={16} />}
-              onClick={() => {
-                setEditableDonor(selectedDonor);
-                setIsEditing(true);
-              }}
-            >
-              Edit Donor
-            </Button>
-          </Flex>
-        </Stack>
-      </Modal>
+        Edit Donor
+      </Button>
+    </Flex>
+  </Stack>
+</Modal>
+
 
       {/* Edit Modal */}
       <Modal
@@ -315,7 +361,14 @@ const filteredDonors = useMemo(() => {
             if (editableDonor) updateDonor.mutate(editableDonor);
           }}
         >
-          <Stack gap="md" style={{ maxHeight: "70vh", overflowY: "auto" }}>
+  <Stack
+    gap="md"
+    style={{
+      maxHeight: isMobile ? "40vh" : "70vh", // ✅ responsive
+      overflowY: "auto",
+      overflowX: "hidden",
+    }}
+  >
             <Title order={5} c="blue">
               Personal Information
             </Title>
@@ -504,7 +557,14 @@ const filteredDonors = useMemo(() => {
             addDonor.mutate(newDonor);
           }}
         >
-          <Stack gap="md" style={{ maxHeight: "70vh", overflowY: "auto" }}>
+            <Stack
+    gap="md"
+    style={{
+      maxHeight: isMobile ? "40vh" : "70vh", // ✅ responsive
+      overflowY: "auto",
+      overflowX: "hidden",
+    }}
+  >
             <Title order={5} c="blue">
               Personal Information
             </Title>
