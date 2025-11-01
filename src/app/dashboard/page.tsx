@@ -65,20 +65,20 @@ export default function Dashboard() {
 
 
         {/* Content area */}
-        <Box
-          style={{
-            flex: 1,
-            // Only shift content on desktop, overlay on mobile
-            marginLeft: !isMobile && isSidebarOpen ? 250 : 0,
-            transition: "margin-left 0.3s ease-in-out",
-            overflowY: "auto",
-            height: "calc(100vh - 60px)",
-            padding: "20px",
-          }}
-        >
-          
-          <DashboardContent session={session} />
-           <MetricsLayout />
+     <Box
+  style={{
+    flex: 1,
+    marginLeft: !isMobile && isSidebarOpen ? 250 : 0,
+    transition: "margin-left 0.3s ease-in-out",
+    overflowY: "auto",
+    height: "calc(100vh - 60px)",
+    padding: "20px",
+  }}
+>
+  <MetricsLayout />
+ <DashboardContent session={session} />
+
+
          
         </Box>
       </Flex>

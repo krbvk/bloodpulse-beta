@@ -77,6 +77,8 @@ export default function AppointmentLayout() {
     null
   );
   const [location, setLocation] = useState("");
+  const [urgentBloodType, setUrgentBloodType] = useState<string | null>(null);
+  const [urgentLocation, setUrgentLocation] = useState("");
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
@@ -117,7 +119,7 @@ export default function AppointmentLayout() {
     },
   });
 
-  // --- NEW: bulk email mutation ---
+  // --- Bulk email mutation ---
   const sendToAll = api.appointment.getAllUserEmails.useMutation({
     onSuccess: (res) => {
       alert(`✅ Email sent to ${res.sentTo.length} users`);
@@ -127,6 +129,29 @@ export default function AppointmentLayout() {
       alert(`❌ Failed to send: ${err.message}`);
     },
   });
+
+  // --- NEW: Urgent Blood Request Mutation ---
+  const urgentEmail = api.appointment.sendUrgentBloodRequest.useMutation({
+    onSuccess: (res) => {
+      alert(`🚨 Urgent request sent to ${res.sentTo} users`);
+      setUrgentBloodType(null);
+      setUrgentLocation("");
+    },
+    onError: (err) => {
+      alert(`❌ Failed to send urgent email: ${err.message}`);
+    },
+  });
+
+  const handleUrgentSend = () => {
+    if (!urgentBloodType || !urgentLocation.trim()) {
+      alert("⚠️ Please fill out both blood type and location.");
+      return;
+    }
+    urgentEmail.mutate({
+      bloodType: urgentBloodType,
+      location: urgentLocation,
+    });
+  };
 
   const handleSubmit = () => {
     if (!appointmentDate || !appointmentTime || !subject) return;
@@ -167,10 +192,9 @@ export default function AppointmentLayout() {
       formattedTime,
     });
 
-
     const nextCount = subjectCount + 1;
     const displaySubject = `[${nextCount}] Appointment - ${subject}`;
-    
+
     createAppointment.mutate({
       datetime: datetime.toDate(),
       subject,
@@ -267,6 +291,7 @@ export default function AppointmentLayout() {
           }}
         >
           <Stack gap="md">
+            {/* Existing appointment form */}
             <DatePickerInput
               label="Date"
               placeholder="Select date"
@@ -362,7 +387,6 @@ export default function AppointmentLayout() {
                   withAsterisk
                 />
 
-                {/* ✅ NEW FIELD: Reason why you need blood */}
                 <Select
                   label="Reason why you need blood"
                   placeholder="Select reason"
@@ -408,11 +432,7 @@ export default function AppointmentLayout() {
                     }
                   }}
                   leftSection={
-                    donationEnabled ? (
-                      <IconCheck size={16} />
-                    ) : (
-                      <IconX size={16} />
-                    )
+                    donationEnabled ? <IconCheck size={16} /> : <IconX size={16} />
                   }
                 >
                   {donationEnabled
@@ -421,34 +441,90 @@ export default function AppointmentLayout() {
                 </Button>
 
                 {donationEnabled && (
-                  <Paper shadow="sm" radius="md" p="md" withBorder>
-                    <Text fw={600} mb="sm">
-                      Send Blood Donation Drive Invitation
-                    </Text>
-                    <TextInput
-                      label="Location"
-                      placeholder="Enter event location"
-                      value={location}
-                      onChange={(e) => setLocation(e.currentTarget.value)}
-                      required
-                    />
-                    <Button
-                      mt="md"
-                      color="blue"
-                      fullWidth
-                      leftSection={<IconSend size={16} />}
-                      onClick={() => {
-                        if (!location.trim()) {
-                          alert("⚠️ Please enter a location before sending.");
-                          return;
-                        }
-                        sendToAll.mutate({ location });
-                      }}
-                      loading={sendToAll.status === "pending"}
-                    >
-                      Send Email To All Users
-                    </Button>
-                  </Paper>
+                  <>
+                    <Paper shadow="sm" radius="md" p="md" withBorder mb="md">
+                      <Text fw={600} mb="sm">
+                        Send Blood Donation Drive Invitation
+                      </Text>
+                      <TextInput
+                        label="Location"
+                        placeholder="Enter event location"
+                        value={location}
+                        onChange={(e) => setLocation(e.currentTarget.value)}
+                        required
+                      />
+                      <Button
+                        mt="md"
+                        color="blue"
+                        fullWidth
+                        leftSection={<IconSend size={16} />}
+                        onClick={() => {
+                          if (!location.trim()) {
+                            alert("⚠️ Please enter a location before sending.");
+                            return;
+                          }
+                          sendToAll.mutate({ location });
+                        }}
+                        loading={sendToAll.status === "pending"}
+                      >
+                        Send Email To All Users
+                      </Button>
+                    </Paper>
+
+                  {/* 🚨 Urgent Blood Request Section */}
+{session?.user?.role === "ADMIN" && subject === "Blood Request" && (
+  <Paper
+    shadow="sm"
+    radius="md"
+    p="md"
+    withBorder
+    style={{
+      borderColor: "red",
+      borderWidth: "2px",
+    }}
+  >
+    <Text fw={600} mb="sm" c="red">
+      🚨 Send Urgent Blood Request
+    </Text>
+    <Select
+      label="Blood Type Needed"
+      placeholder="Select blood type"
+      data={[
+        "A+",
+        "A-",
+        "B+",
+        "B-",
+        "AB+",
+        "AB-",
+        "O+",
+        "O-",
+      ]}
+      value={urgentBloodType}
+      onChange={setUrgentBloodType}
+      withAsterisk
+    />
+    <TextInput
+      mt="sm"
+      label="Location"
+      placeholder="Enter urgent location"
+      value={urgentLocation}
+      onChange={(e) => setUrgentLocation(e.currentTarget.value)}
+      required
+    />
+    <Button
+      mt="md"
+      color="red"
+      fullWidth
+      leftSection={<IconSend size={16} />}
+      onClick={handleUrgentSend}
+      loading={urgentEmail.status === "pending"}
+    >
+      Send Urgent Request To All Users
+    </Button>
+  </Paper>
+)}
+
+                  </>
                 )}
               </>
             )}

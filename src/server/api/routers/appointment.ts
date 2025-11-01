@@ -202,4 +202,90 @@ ${message}`,
         where: { requesterId: input },
       });
     }),
+
+    // 🚨 Urgent blood donation broadcast
+sendUrgentBloodRequest: protectedProcedure
+  .input(
+    z.object({
+      bloodType: z
+        .string()
+        .regex(/^(A|B|AB|O)[+-]$/, "Invalid blood type format (use A+, B-, etc.)"),
+      location: z.string().min(3, "Location is required"),
+    })
+  )
+  .mutation(async ({ ctx, input }) => {
+    if (!process.env.AUTH_RESEND_KEY) {
+      throw new Error("Missing Resend API key");
+    }
+
+    // ✅ Optional: Restrict to admins only
+    const currentUser = await ctx.db.user.findUnique({
+      where: { id: ctx.session.user.id },
+      select: { role: true },
+    });
+
+    if (currentUser?.role !== "ADMIN") {
+      throw new Error("Unauthorized: Only admin can send urgent requests.");
+    }
+
+    // 📧 Fetch all user emails
+    const users = await ctx.db.user.findMany({
+      where: { email: { not: null } },
+      select: { email: true },
+    });
+
+    const emails = users
+      .map((u) => u.email)
+      .filter((email): email is string => email !== null);
+
+    if (emails.length === 0) {
+      throw new Error("No user emails found");
+    }
+
+    const resend = new Resend(process.env.AUTH_RESEND_KEY);
+
+    const subject = `🚨 Urgent Blood Request: ${input.bloodType} Needed Immediately`;
+    const textMessage = `
+Urgent Request from BloodPulse:
+
+We are urgently in need of blood donors with blood type ${input.bloodType}.
+If you are nearby, please proceed to ${input.location} as soon as possible.
+
+Every minute counts. Please help save a life today.
+`;
+
+    const htmlMessage = `
+      <div style="font-family: Arial, sans-serif; font-size: 16px; line-height: 1.6; background: #fff3f3; color: #333; padding: 20px;">
+        <div style="max-width: 600px; margin: 0 auto; background: #fff; border-radius: 8px; border: 1px solid #f5c2c2; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 20px;">
+          <h2 style="color: #c62828; text-align: center;">🚨 Urgent Blood Donation Needed</h2>
+          <p>
+            We are in urgent need of <strong>blood donors with blood type ${input.bloodType}</strong>.
+            Your immediate response can help save a life.
+          </p>
+          <p><strong>Location:</strong> ${input.location}</p>
+          <p><strong>Requested by:</strong> Our Lady Of Fatima Red Cross Youth</p>
+      
+          <p style="text-align:center; font-size:14px; color:#555;">
+            Every drop counts. Please act quickly.
+          </p>
+        </div>
+      </div>
+    `;
+
+    const response = await resend.emails.send({
+      from: process.env.EMAIL ?? "noreply@bloodpulse.tech",
+      to: emails,
+      subject,
+      text: textMessage,
+      html: htmlMessage,
+    });
+
+    return {
+      success: true,
+      sentTo: emails.length,
+      response,
+      message: `Urgent email sent to ${emails.length} recipients.`,
+    };
+  }),
+
 });
