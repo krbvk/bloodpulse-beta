@@ -1,47 +1,38 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-  // Further reading:
-  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
   url      = env("DATABASE_URL")
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  createdBy   User   @relation(fields: [createdById], references: [id])
+  id          Int      @id @default(autoincrement())
+  name        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
 
   @@index([name])
 }
 
-// Necessary for Next auth
 model Account {
   id                       String  @id @default(cuid())
   userId                   String
   type                     String
   provider                 String
   providerAccountId        String
-  refresh_token            String? // @db.Text
-  access_token             String? // @db.Text
+  refresh_token            String?
+  access_token             String?
   expires_at               Int?
   token_type               String?
   scope                    String?
-  id_token                 String? // @db.Text
+  id_token                 String?
   session_state            String?
-  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   refresh_token_expires_in Int?
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -61,14 +52,14 @@ model User {
   emailVerified DateTime?
   image         String?
   role          Role          @default(USER)
-  accounts      Account[]
-  sessions      Session[]
-  posts         Post[]
-  appointments  Appointment[] @relation("UserAppointments")
-  gender        String?
   age           Int?
+  gender        String?
+  contactnumber String?
+  accounts      Account[]
+  appointments  Appointment[] @relation("UserAppointments")
+  posts         Post[]
+  sessions      Session[]
 }
-
 
 model VerificationToken {
   identifier String
@@ -86,32 +77,41 @@ model OTP {
 }
 
 model Donor {
-  id        String   @id @default(cuid())
-  name      String
-  bloodType String
-  email     String   @unique
-  gender    String   
-  age       Int  
-  contactEmail String?
-  donationCount  Int?@default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(cuid())
+  name          String
+  bloodType     String
+  email         String   @unique
+  gender        String
+  age           Int
+  contactnumber String?
+  contactEmail  String?
+  donationCount Int?     @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Appointment {
-  id          String   @id @default(cuid())
-  requesterId String
-  requester   User     @relation("UserAppointments", fields: [requesterId], references: [id], onDelete: Cascade)
-  datetime    DateTime
-  message     String
-  bloodType   String?
-  variant    String?
-  displaySubject String
-  subject   AppointmentSubject @default(BloodDonation)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                  String             @id @default(cuid())
+  requesterId         String
+  datetime            DateTime
+  message             String
+  bloodType           String?
+  displaySubject      String
+  subject             AppointmentSubject @default(BloodDonation)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  variant             String?
+  causeOfBloodRequest String?
+  requester           User               @relation("UserAppointments", fields: [requesterId], references: [id], onDelete: Cascade)
 
   @@index([requesterId])
+}
+
+
+model DonationControl {
+  id        Int      @id @default(1)
+  enabled   Boolean  @default(false)
+  updatedAt DateTime @updatedAt
 }
 
 enum Role {
@@ -122,10 +122,4 @@ enum Role {
 enum AppointmentSubject {
   BloodDonation
   BloodRequest
-}
-
-model DonationControl {
-  id       Int      @id @default(1) // single row (always id=1)
-  enabled  Boolean  @default(false)
-  updatedAt DateTime @updatedAt
 }

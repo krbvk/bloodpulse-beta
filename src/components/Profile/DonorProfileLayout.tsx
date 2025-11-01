@@ -26,7 +26,20 @@ import CustomLoader from "@/components/Loader/CustomLoader";
 import { api } from "@/trpc/react";
 import { useForm } from "@mantine/form";
 
+
 type Gender = "Male" | "Female" | "Other";
+
+interface DonorProfile {
+  name: string;
+  age: number;
+  gender: Gender;
+  contactEmail?: string;
+  contactnumber?: string;
+  bloodType?: string;
+  donationCount?: number;
+  isDonor?: boolean;
+}
+
 
 export default function DonorProfileLayout() {
   const { data: session, status } = useSession();
@@ -47,6 +60,7 @@ export default function DonorProfileLayout() {
       gender: "Male" as Gender,
       contactEmail: "",
       bloodType: "",
+      contactnumber: "",
     },
     validate: {
       name: (value) =>
@@ -65,6 +79,13 @@ export default function DonorProfileLayout() {
 
       contactEmail: (value) =>
         /^\S+@\S+\.\S+$/.test(value) ? null : "Invalid email address",
+      
+   contactnumber: (value) =>
+        value.trim().length === 0
+          ? "Contact number is required"
+          : /^[0-9]+$/.test(value)
+          ? null
+          : "Contact number must contain digits only",
     },
   });
 
@@ -78,6 +99,8 @@ export default function DonorProfileLayout() {
         gender: donor.gender as Gender,
         contactEmail: donor.contactEmail ?? "",
         bloodType: donor.bloodType ?? "",
+       contactnumber: donor?.contactnumber ?? "",
+
       });
     }
   }, [status, donor, router]);
@@ -155,11 +178,11 @@ export default function DonorProfileLayout() {
             </Text>
             {donor?.isDonor ? (
               <Badge mt="sm" color="red">
-                Active Donor
+                 Blood Donor
               </Badge>
             ) : (
               <Badge mt="sm" color="gray" variant="light">
-                Not a Donor
+                Not a Blood Donor
               </Badge>
             )}
 
@@ -230,6 +253,17 @@ export default function DonorProfileLayout() {
                     {donor?.contactEmail ?? "—"}
                   </Text>
                 </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <Text size="xs" c="dimmed" fw={500} mb={4}>
+                    Contact Number
+                  </Text>
+                  <Text
+                    fw={600}
+                    style={{ wordBreak: "break-word", overflowWrap: "anywhere", maxWidth: "100%" }}
+                  >
+                    {(donor as DonorProfile)?.contactnumber ?? "—"}
+                  </Text>
+                </Grid.Col>
 
                 <Grid.Col span={{ base: 12, sm: 6 }}>
                   <Text size="xs" c="dimmed" fw={500} mb={4}>
@@ -285,6 +319,13 @@ export default function DonorProfileLayout() {
                 radius="md"
                 withAsterisk
                 {...form.getInputProps("contactEmail")}
+              />
+                <TextInput
+                label="Contact number"
+                placeholder="Enter your contact number"
+                radius="md"
+                withAsterisk
+                {...form.getInputProps("contactnumber")}
               />
 
               <Group justify="flex-end" mt="md">

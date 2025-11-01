@@ -76,7 +76,6 @@ export const statisticsRouter = createTRPCRouter({
 
     const genderCounts: Record<string, number> = {};
     const ageGroups: Record<string, number> = {
-      "0-17": 0,
       "18-25": 0,
       "26-35": 0,
       "36-50": 0,
@@ -86,8 +85,7 @@ export const statisticsRouter = createTRPCRouter({
     donors.forEach((d: DonorDemographics) => {
   // Count age groups safely
   if (typeof d.age === "number") {
-    if (d.age < 18) ageGroups["0-17"] = (ageGroups["0-17"] ?? 0) + 1;
-    else if (d.age <= 25) ageGroups["18-25"] = (ageGroups["18-25"] ?? 0) + 1;
+    if (d.age <= 25) ageGroups["18-25"] = (ageGroups["18-25"] ?? 0) + 1;
     else if (d.age <= 35) ageGroups["26-35"] = (ageGroups["26-35"] ?? 0) + 1;
     else if (d.age <= 50) ageGroups["36-50"] = (ageGroups["36-50"] ?? 0) + 1;
     else ageGroups["51+"] = (ageGroups["51+"] ?? 0) + 1;
@@ -114,4 +112,41 @@ export const statisticsRouter = createTRPCRouter({
 
     return { gender, age };
   }),
+
+   // === 3. Blood request reasons statistics ===
+getBloodRequestReasonsStats: publicProcedure.query(async ({ ctx }) => {
+  const requests = await ctx.db.appointment.findMany({
+    select: { causeOfBloodRequest: true },
+  });
+
+  if (!requests.length) {
+    return { message: "No blood request data found.", reasons: [] };
+  }
+
+  const reasonsCount: Record<string, number> = {};
+
+  for (const req of requests) {
+    const cause =
+      req.causeOfBloodRequest?.trim()?.toLowerCase() ?? "unknown";
+    reasonsCount[cause] = (reasonsCount[cause] ?? 0) + 1;
+  }
+
+  // Convert to array for charts or tables
+  const reasons = Object.entries(reasonsCount)
+    .map(([name, count]) => ({
+      name:
+        name
+          .split(" ")
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(" ") || "Unknown",  
+      count,
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  return {
+    message: "Blood request reason statistics fetched successfully.",
+    totalRequests: requests.length,
+    reasons,
+  };
+}),
 });
