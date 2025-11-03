@@ -9,19 +9,15 @@ import {
   Menu,
   UnstyledButton,
   Burger,
-  Modal,
-  ActionIcon,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { useRouter } from "next/navigation";
-import { IconLogout, IconSettings, IconCalendarEvent } from "@tabler/icons-react";
-import { Calendar } from "@mantine/dates";
+import { IconLogout } from "@tabler/icons-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import type { DefaultSession } from "next-auth";
 import CustomLoader from "@/components/Loader/CustomLoader";
-import dayjs from "dayjs";
 import { api } from "@/trpc/react";
 
 type Props = {
@@ -154,12 +150,6 @@ const DashboardNavbar = ({ toggleSidebar }: Props) => {
                     {email}
                   </Text>
                 </Menu.Label>
-                {/* <Menu.Item onClick={() => router.push("/settings")}>
-                  <Group gap="xs">
-                    <IconSettings size={16} />
-                    Settings
-                  </Group>
-                </Menu.Item> */}
                 <Menu.Item onClick={handleSignOut} color="red">
                   <Group gap="xs">
                     <IconLogout size={16} />
@@ -168,46 +158,6 @@ const DashboardNavbar = ({ toggleSidebar }: Props) => {
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
-
-          
-              <>
-                <ActionIcon
-                  onClick={() => setCalendarModalOpen(true)}
-                  variant="light"
-                  color="white"
-                  aria-label="Calendar"
-                >
-                  <IconCalendarEvent size={22} />
-                </ActionIcon>
-
-                <Modal
-                  opened={calendarModalOpen}
-                  onClose={() => setCalendarModalOpen(false)}
-                  title="Calendar"
-                  size="xs"
-                  centered
-                  overlayProps={{ blur: 2 }}
-                  withinPortal
-                  zIndex={1000}
-                >
-                  <Calendar
-                    size="md"
-                    getDayProps={(date) => {
-                      const isToday = dayjs(date).isSame(new Date(), "day");
-                      return {
-                        style: isToday
-                          ? {
-                              backgroundColor: "#fa5252",
-                              color: "white",
-                              borderRadius: 4,
-                            }
-                          : undefined,
-                      };
-                    }}
-                    style={{ width: "100%" }}
-                  />
-                </Modal>
-              </>
        
           </Group>
         </Flex>
