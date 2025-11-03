@@ -116,6 +116,9 @@ export const statisticsRouter = createTRPCRouter({
    // === 3. Blood request reasons statistics ===
 getBloodRequestReasonsStats: publicProcedure.query(async ({ ctx }) => {
   const requests = await ctx.db.appointment.findMany({
+    where: {
+      subject: "BloodRequest",
+    },
     select: { causeOfBloodRequest: true },
   });
 
