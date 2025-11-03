@@ -9,18 +9,15 @@ import {
   Menu,
   UnstyledButton,
   Burger,
-  Modal,
-  ActionIcon,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { useRouter } from "next/navigation";
-import { IconLogout, IconCalendarEvent } from "@tabler/icons-react";
+import { IconLogout } from "@tabler/icons-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import type { DefaultSession } from "next-auth";
 import CustomLoader from "@/components/Loader/CustomLoader";
-import dayjs from "dayjs";
 import { api } from "@/trpc/react";
 
 type Props = {
