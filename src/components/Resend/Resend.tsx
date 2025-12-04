@@ -9,7 +9,6 @@ import {
   TextInput,
   Notification,
   Modal,
-
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
@@ -17,19 +16,27 @@ import { IconMail } from "@tabler/icons-react";
 import CustomLoader from "../Loader/CustomLoader";
 
 interface ResendSignInProps {
-  fullWidth?: boolean; // <- add fullWidth prop
+  fullWidth?: boolean;
 }
+
+const validateEmail = (email: string) => {
+  const regex =
+    /^[a-z0-9._-]+@((gmail\.com)|(yahoo\.com)|(outlook\.com)|([a-z0-9-]+\.)*fatima\.edu\.ph)$/i;
+  return regex.test(email);
+};
 
 export function ResendSignIn({ fullWidth = false }: ResendSignInProps) {
   const { status, data: session } = useSession();
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
 
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [otpModalOpen, setOtpModalOpen] = useState(false);
   const [otpCode, setOtpCode] = useState("");
   const [email, setEmail] = useState("");
+  const [errorNotification, setErrorNotification] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -45,6 +52,14 @@ export function ResendSignIn({ fullWidth = false }: ResendSignInProps) {
 
     if (typeof emailValue !== "string") return;
 
+    if (!validateEmail(emailValue)) {
+      setEmailError(
+        "Only emails from fatima.edu.ph, gmail.com, yahoo.com, or outlook.com are allowed."
+      );
+      return;
+    }
+
+    setEmailError(null);
     setLoading(true);
 
     const res = await fetch("/api/send-otp", {
@@ -61,7 +76,7 @@ export function ResendSignIn({ fullWidth = false }: ResendSignInProps) {
       setOtpModalOpen(true);
       setTimeout(() => setShowNotification(false), 5000);
     } else {
-      alert("Failed to send OTP. Please try again.");
+      setErrorNotification("Failed to send OTP. Please try again.");
     }
   };
 
@@ -80,7 +95,7 @@ export function ResendSignIn({ fullWidth = false }: ResendSignInProps) {
       setOtpModalOpen(false);
       router.push("/dashboard");
     } else {
-      alert("Invalid OTP. Please try again.");
+      setErrorNotification("Invalid OTP. Please try again.");
     }
   };
 
@@ -101,6 +116,47 @@ export function ResendSignIn({ fullWidth = false }: ResendSignInProps) {
 
   return (
     <>
+      {/* ✅ Notifications placed OUTSIDE the Paper */}
+      {showNotification && (
+        <Notification
+          icon={<IconMail size={18} />}
+          title="Check your email!"
+          color="green"
+          onClose={() => setShowNotification(false)}
+          style={{
+            position: "fixed",
+            top: "20px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 2000,
+            width: "600px",
+            maxWidth: "90vw",
+          }}
+        >
+          We’ve sent a 6-digit OTP to your email. Please enter it below.
+        </Notification>
+      )}
+
+      {emailError && (
+        <Notification
+          title="Invalid Email"
+          color="red"
+          onClose={() => setEmailError(null)}
+          style={{
+            position: "fixed",
+            top: "20px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 2000,
+            width: "600px",
+            maxWidth: "90vw",
+          }}
+        >
+          {emailError}
+        </Notification>
+      )}
+
+      {/* ✅ Paper stays the same height regardless of notifications */}
       <Paper
         shadow="md"
         radius="lg"
@@ -131,31 +187,15 @@ export function ResendSignIn({ fullWidth = false }: ResendSignInProps) {
             </Button>
           </Stack>
         </form>
-
-        {showNotification && (
-          <Notification
-            icon={<IconMail size={18} />}
-            title="Check your email!"
-            color="green"
-            onClose={() => setShowNotification(false)}
-            style={{
-              marginTop: "20px",
-              position: "fixed",
-              top: "20px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              zIndex: 1000,
-              width: "600px",
-              maxWidth: "90vw",
-            }}
-          >
-            We’ve sent a 6-digit OTP to your email. Please enter it below.
-          </Notification>
-        )}
       </Paper>
 
       {/* OTP Modal */}
-      <Modal opened={otpModalOpen} onClose={() => setOtpModalOpen(false)} title="Enter OTP" centered>
+      <Modal
+        opened={otpModalOpen}
+        onClose={() => setOtpModalOpen(false)}
+        title="Enter OTP"
+        centered
+      >
         <Stack gap="md">
           <TextInput
             label={`OTP sent to ${email}`}
