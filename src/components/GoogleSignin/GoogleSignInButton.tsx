@@ -18,10 +18,10 @@ export function GoogleSignInButton() {
   }, [status, router]);
 
   const handleSignIn = async () => {
-    const response = await signIn("google");
-    if (response?.ok) {
-      router.push("/dashboard");
-    }
+    await signIn("google", { callbackUrl: "/dashboard"});
+    // if (response?.ok) {
+    //   router.push("/dashboard");
+    // }
   };
 
   if (status === "loading") {
