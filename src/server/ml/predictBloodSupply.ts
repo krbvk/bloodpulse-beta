@@ -64,5 +64,5 @@ export async function predictNext(values: number[], months: number): Promise<num
   Y.dispose();
 
   // Ensure return type is number[]
-  return Array.from(predictions);
+  return predictions;
 }
