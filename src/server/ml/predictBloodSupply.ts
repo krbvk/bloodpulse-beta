@@ -46,13 +46,14 @@ export async function predictNext(values: number[], months = 12): Promise<number
     const lastWindowTensor = tf.tensor2d([history.slice(-window)]);
     const predTensor = model.predict(lastWindowTensor) as tf.Tensor<tf.Rank.R2>;
 
-    const predArray: number[] = Array.from(await predTensor.data());
-    const predNorm = predArray[0] ?? 0;
+    // Convert tensor data safely to number[]
+    const typedArray = await predTensor.data();
+    const predArray: number[] = Array.from(typedArray, (v) => Number(v)); // <--- type-safe
 
+    const predNorm = predArray[0] ?? 0;
     const pred = predNorm * range + min;
     predictions.push(Math.round(pred));
 
-    // Add the normalized prediction back to history for the next step
     history.push(predNorm);
 
     lastWindowTensor.dispose();
