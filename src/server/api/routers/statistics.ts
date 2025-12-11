@@ -204,7 +204,7 @@ predictBloodSupply: publicProcedure
     });
 
     // --- 3. Predict supply + demand ---
-    const supplyPredictions = [];
+    const supplyPredictions: { type: string; history: number[]; predicted: number[] }[] = [];
     for (const bt of bloodTypes) {
       const history = supplyGrouped[bt];
       if (history && history.some((v) => v > 0)) {
@@ -216,7 +216,7 @@ predictBloodSupply: publicProcedure
       }
     }
 
-    const demandPredictions = [];
+    const demandPredictions: { type: string; history: number[]; predicted: number[] }[] = [];
     for (const bt of bloodTypes) {
       const history = demandGrouped[bt];
       if (history && history.some((v) => v > 0)) {

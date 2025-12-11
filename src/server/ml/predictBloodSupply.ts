@@ -45,11 +45,16 @@ export async function predictNext(values: number[], months: number): Promise<num
 
   for (let i = 0; i < months; i++) {
     const lastWindow = tf.tensor2d([history.slice(-window)]);
-    const predTensor = model.predict(lastWindow) as tf.Tensor;
-    const predNorm = (await predTensor.data())[0]!;
+    const predTensor = model.predict(lastWindow) as tf.Tensor<tf.Rank.R2>;
+    
+    // ⬅️ Type explicitly as Float32Array
+    const predData = await predTensor.data() as Float32Array;
+    const predNorm = predData[0] ?? 0;
+    
     const pred = predNorm * range + min;
     predictions.push(Math.round(pred));
     history.push(predNorm);
+
     lastWindow.dispose();
     predTensor.dispose();
   }
