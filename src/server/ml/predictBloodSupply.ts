@@ -15,7 +15,7 @@ export async function predictNext(values: number[], months = 12): Promise<number
   const max = Math.max(...values);
   const min = Math.min(...values);
   const range = max - min || 1;
-  const norm: number[] = values.map(v => (v - min) / range);
+  const norm: number[] = values.map((v) => (v - min) / range);
 
   // Prepare training data using sliding window
   const window = 3;
@@ -48,9 +48,7 @@ export async function predictNext(values: number[], months = 12): Promise<number
 
     // Convert tensor data safely to number[]
     const typedArray = await predTensor.data();
-    const predArray: number[] = Array.from(typedArray, (v) => Number(v)); // <--- type-safe
-
-    const predNorm = predArray[0] ?? 0;
+    const predNorm = typedArray[0] ?? 0;
     const pred = predNorm * range + min;
     predictions.push(Math.round(pred));
 
@@ -63,5 +61,6 @@ export async function predictNext(values: number[], months = 12): Promise<number
   X.dispose();
   Y.dispose();
 
-  return predictions;
+  // TypeScript-safe return
+  return predictions as number[];
 }

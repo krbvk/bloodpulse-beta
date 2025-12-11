@@ -162,77 +162,81 @@ export const statisticsRouter = createTRPCRouter({
   }),
 
     // predictive
-  predictBloodSupply: publicProcedure
-    .input(z.object({ monthsAhead: z.number().optional() }))
-    .query(async ({ ctx, input }) => {
-      const months = input?.monthsAhead ?? 12;
+predictBloodSupply: publicProcedure
+  .input(z.object({ monthsAhead: z.number().optional() }))
+  .query(async ({ ctx, input }) => {
+    const months = input?.monthsAhead ?? 12;
 
-      const bloodTypes = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
+    const bloodTypes = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
 
-      // --- 1. Get SUPPLY from Donor model ---
-      const donors = await ctx.db.donor.findMany({
-        select: { bloodType: true, donationCount: true },
-      });
+    // --- 1. Get SUPPLY from Donor model ---
+    const donors = await ctx.db.donor.findMany({
+      select: { bloodType: true, donationCount: true },
+    });
 
-      const supplyGrouped: Record<string, number[]> = {};
-      bloodTypes.forEach((bt) => (supplyGrouped[bt] = Array(12).fill(0)));
+    const supplyGrouped: Record<string, number[]> = {};
+    bloodTypes.forEach((bt) => (supplyGrouped[bt] = Array(12).fill(0)));
 
-      donors.forEach((d) => {
-        if (!d.bloodType) return;
-        const bt = d.bloodType;
-        const history: number[] = supplyGrouped[bt] ??= Array(12).fill(0);
+    donors.forEach((d) => {
+      if (!d.bloodType) return;
+      const bt = d.bloodType;
+      const history: number[] = supplyGrouped[bt] ??= Array(12).fill(0);
 
-        const totalDonations = d.donationCount ?? 0;
-        const monthlyDonation = Math.floor(totalDonations / 12);
+      const totalDonations = d.donationCount ?? 0;
+      const monthlyDonation = Math.floor(totalDonations / 12);
 
-        for (let month = 0; month < 12; month++) {
-          history[month]! += monthlyDonation;
-        }
-      });
-
-      // --- 2. Get DEMAND from BloodRequest appointments ---
-      const requests = await ctx.db.appointment.findMany({
-        where: { subject: "BloodRequest" },
-        select: { bloodType: true, datetime: true },
-      });
-
-      const demandGrouped: Record<string, number[]> = {};
-      bloodTypes.forEach((bt) => (demandGrouped[bt] = Array(12).fill(0)));
-
-      requests.forEach((req) => {
-        if (!req.bloodType) return;
-        const bt = req.bloodType;
-        const history: number[] = demandGrouped[bt] ??= Array(12).fill(0);
-
-        const month = req.datetime.getMonth();
-        history[month]! += 1;
-      });
-
-      // --- 3. Predict supply ---
-      const supplyPredictions: Prediction[] = [];
-      for (const bt of bloodTypes) {
-        const history = supplyGrouped[bt] ??= Array(12).fill(0);
-        // Only predict if there is at least some data
-        if (history.some((v) => v > 0)) {
-          const predicted: number[] = await predictNext(history, months);
-          supplyPredictions.push({ type: bt, history, predicted });
-        }
+      for (let month = 0; month < 12; month++) {
+        history[month]! += monthlyDonation;
       }
+    });
 
-      // --- 4. Predict demand ---
-      const demandPredictions: Prediction[] = [];
-      for (const bt of bloodTypes) {
-        const history = demandGrouped[bt] ??= Array(12).fill(0);
-        if (history.some((v) => v > 0)) {
-          const predicted: number[] = await predictNext(history, months);
-          demandPredictions.push({ type: bt, history, predicted });
-        }
+    // --- 2. Get DEMAND from BloodRequest appointments ---
+    const requests = await ctx.db.appointment.findMany({
+      where: { subject: "BloodRequest" },
+      select: { bloodType: true, datetime: true },
+    });
+
+    const demandGrouped: Record<string, number[]> = {};
+    bloodTypes.forEach((bt) => (demandGrouped[bt] = Array(12).fill(0)));
+
+    requests.forEach((req) => {
+      if (!req.bloodType) return;
+      const bt = req.bloodType;
+      const history: number[] = demandGrouped[bt] ??= Array(12).fill(0);
+
+      const month = req.datetime.getMonth();
+      history[month]! += 1;
+    });
+
+    // --- 3. Predict supply ---
+    const supplyPredictions: Prediction[] = [];
+    for (const bt of bloodTypes) {
+      const history = supplyGrouped[bt] ??= Array(12).fill(0);
+      if (history.some((v) => v > 0)) {
+        // Type-safe prediction
+        const predicted: number[] = (await predictNext(history, months)).map(
+          (v) => Number(v)
+        );
+        supplyPredictions.push({ type: bt, history, predicted });
       }
+    }
 
-      return {
-        message: "Blood supply and demand prediction generated.",
-        supply: supplyPredictions,
-        demand: demandPredictions,
-      };
-    }),
+    // --- 4. Predict demand ---
+    const demandPredictions: Prediction[] = [];
+    for (const bt of bloodTypes) {
+      const history = demandGrouped[bt] ??= Array(12).fill(0);
+      if (history.some((v) => v > 0)) {
+        const predicted: number[] = (await predictNext(history, months)).map(
+          (v) => Number(v)
+        );
+        demandPredictions.push({ type: bt, history, predicted });
+      }
+    }
+
+    return {
+      message: "Blood supply and demand prediction generated.",
+      supply: supplyPredictions,
+      demand: demandPredictions,
+    };
+  }),
 });
