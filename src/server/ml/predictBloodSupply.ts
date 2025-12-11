@@ -7,7 +7,7 @@ import * as tf from "@tensorflow/tfjs";
  */
 export async function predictNext(values: number[], months = 12): Promise<number[]> {
   if (!values.length) return Array(months).fill(0);
-  if (values.length === 1) return Array(months).fill(values[0]!);
+  if (values.length === 1) return Array(months).fill(values[0]);
 
   tf.engine().reset();
 
@@ -15,7 +15,7 @@ export async function predictNext(values: number[], months = 12): Promise<number
   const max = Math.max(...values);
   const min = Math.min(...values);
   const range = max - min || 1;
-  const norm: number[] = values.map((v) => (v - min) / range);
+  const norm = values.map((v) => (v - min) / range);
 
   // Prepare training data using sliding window
   const window = 3;
@@ -39,16 +39,15 @@ export async function predictNext(values: number[], months = 12): Promise<number
   await model.fit(X, Y, { epochs: 200, verbose: 0 });
 
   const predictions: number[] = [];
-  const history: number[] = [...norm];
+  const history = [...norm];
 
   // Forecast each month one by one
   for (let i = 0; i < months; i++) {
     const lastWindowTensor = tf.tensor2d([history.slice(-window)]);
     const predTensor = model.predict(lastWindowTensor) as tf.Tensor<tf.Rank.R2>;
 
-    // Convert tensor data safely to number[]
     const typedArray = await predTensor.data();
-    const predNorm = typedArray[0] ?? 0;
+    const predNorm: number = typedArray[0] ?? 0; // <--- fallback to 0
     const pred = predNorm * range + min;
     predictions.push(Math.round(pred));
 
@@ -61,6 +60,5 @@ export async function predictNext(values: number[], months = 12): Promise<number
   X.dispose();
   Y.dispose();
 
-  // TypeScript-safe return
-  return predictions as number[];
+  return predictions; // Safe number[] return
 }
