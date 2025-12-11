@@ -3,6 +3,12 @@ import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { predictNext } from "@/server/ml/predictBloodSupply";
 
 
+type Prediction = {
+  type: string;
+  history: number[];
+  predicted: number[];
+};
+
 type BloodTypeStats = {
   type: string;
   needed: number;
@@ -174,8 +180,6 @@ export const statisticsRouter = createTRPCRouter({
       donors.forEach((d) => {
         if (!d.bloodType) return;
         const bt = d.bloodType;
-
-        // Initialize array safely
         const history: number[] = supplyGrouped[bt] ??= Array(12).fill(0);
 
         const totalDonations = d.donationCount ?? 0;
@@ -198,8 +202,6 @@ export const statisticsRouter = createTRPCRouter({
       requests.forEach((req) => {
         if (!req.bloodType) return;
         const bt = req.bloodType;
-
-        // Initialize array safely
         const history: number[] = demandGrouped[bt] ??= Array(12).fill(0);
 
         const month = req.datetime.getMonth();
@@ -207,9 +209,10 @@ export const statisticsRouter = createTRPCRouter({
       });
 
       // --- 3. Predict supply ---
-      const supplyPredictions: { type: string; history: number[]; predicted: number[] }[] = [];
+      const supplyPredictions: Prediction[] = [];
       for (const bt of bloodTypes) {
         const history = supplyGrouped[bt] ??= Array(12).fill(0);
+        // Only predict if there is at least some data
         if (history.some((v) => v > 0)) {
           const predicted: number[] = await predictNext(history, months);
           supplyPredictions.push({ type: bt, history, predicted });
@@ -217,7 +220,7 @@ export const statisticsRouter = createTRPCRouter({
       }
 
       // --- 4. Predict demand ---
-      const demandPredictions: { type: string; history: number[]; predicted: number[] }[] = [];
+      const demandPredictions: Prediction[] = [];
       for (const bt of bloodTypes) {
         const history = demandGrouped[bt] ??= Array(12).fill(0);
         if (history.some((v) => v > 0)) {

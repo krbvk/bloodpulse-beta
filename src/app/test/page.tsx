@@ -54,13 +54,18 @@ const StatisticsLayout: React.FC = () => {
   const supply = data?.supply ?? [];
   const demand = data?.demand ?? [];
 
+  // Generate buttons dynamically for months 1 through 12
+  const monthOptions = Array.from({ length: 12 }, (_, i) => ({
+    label: `${i + 1} Month${i + 1 > 1 ? "s" : ""}`,
+    value: `${i + 1}`,
+  }));
+
   return (
     <Box p="md">
       <Group justify="space-between" mb="md">
         <div>
           <Title order={2}>
-            Predictive Analysis - Next {monthsAhead} Month
-            {monthsAhead > 1 ? "s" : ""}
+            Predictive Analysis - Next {monthsAhead} Month{monthsAhead > 1 ? "s" : ""}
           </Title>
           <Text c="dimmed" size="sm">
             Forecasts future blood donation supply and demand using TensorFlow AI.
@@ -80,13 +85,7 @@ const StatisticsLayout: React.FC = () => {
       <SegmentedControl
         value={monthsAhead.toString()}
         onChange={(val) => setMonthsAhead(Number(val))}
-        data={[
-          { label: "1 Month", value: "1" },
-          { label: "3 Months", value: "3" },
-          { label: "6 Months", value: "6" },
-          { label: "9 Months", value: "9" },
-          { label: "12 Months", value: "12" },
-        ]}
+        data={monthOptions}
         mb="md"
       />
 
@@ -94,8 +93,7 @@ const StatisticsLayout: React.FC = () => {
         {/* Supply Chart */}
         <Paper withBorder p="lg" radius="lg" shadow="sm" mb="lg">
           <Title order={5} mb="xs">
-            Predicted Blood Supply - Next {monthsAhead} Month
-            {monthsAhead > 1 ? "s" : ""}
+            Predicted Blood Supply - Next {monthsAhead} Month{monthsAhead > 1 ? "s" : ""}
           </Title>
           <Text size="sm" c="dimmed">
             Forecasted total future donations per blood type.
@@ -123,8 +121,7 @@ const StatisticsLayout: React.FC = () => {
         {/* Demand Chart */}
         <Paper withBorder p="lg" radius="lg" shadow="sm" mb="lg">
           <Title order={5} mb="xs">
-            Predicted Blood Demand - Next {monthsAhead} Month
-            {monthsAhead > 1 ? "s" : ""}
+            Predicted Blood Demand - Next {monthsAhead} Month{monthsAhead > 1 ? "s" : ""}
           </Title>
           <Text size="sm" c="dimmed">
             Forecasted future blood requests per blood type.
@@ -153,8 +150,7 @@ const StatisticsLayout: React.FC = () => {
         <Paper withBorder p="lg" radius="lg" shadow="sm">
           <Title order={5}>Key Prediction Notes</Title>
           <Text size="sm" mt="xs" c="dimmed">
-            Model forecasts the next {monthsAhead} month
-            {monthsAhead > 1 ? "s" : ""}.
+            Model forecasts the next {monthsAhead} month{monthsAhead > 1 ? "s" : ""}.
             <br />
             Each blood type includes:
             <br />– Historical patterns
