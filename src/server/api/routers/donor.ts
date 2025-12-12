@@ -182,8 +182,7 @@ export const donorRouter = createTRPCRouter({
     contactEmail: donor.contactEmail ?? undefined,
     contactnumber: typeof donor.contactnumber === "string" ? donor.contactnumber : undefined,
     bloodType: donor.bloodType ?? undefined,
-    lastDonatedAt: donor.lastDonatedAt instanceof Date ? (donor.lastDonatedAt as Date) : undefined,
-
+    lastDonatedAt: donor.lastDonatedAt instanceof Date ? donor.lastDonatedAt : undefined,
 
   };
 }),
