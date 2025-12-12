@@ -170,7 +170,7 @@ const PredictLayout: React.FC = () => {
         <div>
           <Title order={2}>Predictive Analysis - Predict Next Year</Title>
           <Text c="dimmed" size="sm">
-            Forecasts future blood donation supply and demand using TensorFlow AI.
+            Forecasts future blood donation supply and demand using TensorFlow.
           </Text>
         </div>
 
