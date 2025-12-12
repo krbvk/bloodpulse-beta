@@ -11,7 +11,7 @@ import {
   rem,
 } from "@mantine/core";
 import { IconMailHeart } from "@tabler/icons-react";
-import React from "react";
+
 
 const ContactSupport = () => {
   const theme = useMantineTheme();

@@ -11,7 +11,7 @@ import {
 import { useMediaQuery } from "@mantine/hooks";
 import Image, { type StaticImageData } from "next/image";
 import BenefitImageSrc from "@/components/Slides/BenefitImage1.svg";
-import React from "react";
+
 
 const BenefitImage = BenefitImageSrc as StaticImageData;
 
