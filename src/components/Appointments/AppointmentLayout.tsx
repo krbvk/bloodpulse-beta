@@ -583,7 +583,7 @@ export default function AppointmentLayout() {
               style={{ whiteSpace: "pre-line" }}
             >
               “OLFU RCY Blood Donation is available only every 3 months during
-              the official OLFU RCY blood donation drive.\n
+              the official OLFU RCY blood donation drive.
               OLFU RCY Blood Request scheduling is available only Monday to
               Friday, 8:00 AM – 5:00 PM.”
             </Text>

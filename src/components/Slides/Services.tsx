@@ -19,7 +19,6 @@ import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { useMediaQuery } from "@mantine/hooks";
 import ServiceImageSrc from "@/components/Slides/ServiceImage1.svg";
-import React from "react";
 
 const ServiceImage = ServiceImageSrc as StaticImageData;
 

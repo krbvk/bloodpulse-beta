@@ -36,6 +36,7 @@ interface Donor {
   donationCount: number;
   gender: "Male" | "Female" | "Other";
   age: number;
+  lastDonatedAt?: string | null;
 }
 
 export default function DonorLayout() {
@@ -57,7 +58,7 @@ export default function DonorLayout() {
   const [deleteConfirmOpened, setDeleteConfirmOpened] = useState(false);
 
   // ensure newDonor contains contactnumber
-    interface NewDonorInput {
+  interface NewDonorInput {
       name: string;
       email: string;
       bloodType: string;
@@ -66,6 +67,7 @@ export default function DonorLayout() {
       donationCount: number;
       gender: "Male" | "Female" | "Other";
       age: number;
+  lastDonatedAt?: string | null;
     }
   
     const [newDonor, setNewDonor] = useState<NewDonorInput>({
@@ -77,6 +79,7 @@ export default function DonorLayout() {
       donationCount: 0,
       gender: "Male",
       age: 18,
+  lastDonatedAt: undefined,
     });
 
   // PH contact number validator
@@ -359,6 +362,16 @@ export default function DonorLayout() {
                 </Text>
                 <Text>{selectedDonor?.donationCount ?? 0}</Text>
               </Group>
+              <Group gap="xs">
+                <Text fw={600} c="dimmed" w={130}>
+                  Last Donated:
+                </Text>
+                <Text>
+                  {selectedDonor?.lastDonatedAt
+                    ? new Date(selectedDonor.lastDonatedAt).toLocaleDateString()
+                    : "N/A"}
+                </Text>
+              </Group>
             </Stack>
           </Paper>
 
@@ -416,6 +429,10 @@ export default function DonorLayout() {
               bloodType: editableDonor.bloodType,
               contactEmail: editableDonor.contactEmail ?? undefined,
               donationCount: editableDonor.donationCount ?? 0,
+              // include lastDonatedAt if present (use undefined when absent to match mutation type)
+              lastDonatedAt: editableDonor.lastDonatedAt
+                ? new Date(editableDonor.lastDonatedAt)
+                : undefined,
             };
 
             updateDonor.mutate(payload);
@@ -573,6 +590,16 @@ export default function DonorLayout() {
                   }
                 />
               </Grid.Col>
+              <Grid.Col span={6}>
+                <TextInput
+                  label="Last Donated At"
+                  type="date"
+                  value={editableDonor?.lastDonatedAt ?? ""}
+                  onChange={(e) =>
+                    setEditableDonor({ ...editableDonor!, lastDonatedAt: e.target.value })
+                  }
+                />
+              </Grid.Col>
             </Grid>
 
             <Flex justify="flex-end" gap="sm" mt="md">
@@ -641,7 +668,33 @@ export default function DonorLayout() {
             if (!newDonor.email || !validateEmail(newDonor.email)) return;
             if (!newDonor.contactnumber || !validatePH(newDonor.contactnumber)) return;
 
-            addDonor.mutate(newDonor);
+            // build payload converting optional date string to Date
+                        const payload: {
+                          name: string;
+                          bloodType: string;
+                          email: string;
+                          contactEmail?: string | undefined;
+                          contactnumber?: string | undefined;
+                          donationCount?: number | undefined;
+                          gender: "Male" | "Female" | "Other";
+                          age: number;
+                          lastDonatedAt?: Date | undefined;
+                        } = {
+                          name: newDonor.name,
+                          bloodType: newDonor.bloodType,
+                          email: newDonor.email,
+                          contactEmail: newDonor.contactEmail,
+                          contactnumber: newDonor.contactnumber,
+                          donationCount: newDonor.donationCount,
+                          gender: newDonor.gender,
+                          age: newDonor.age,
+                        };
+            
+                        if (newDonor.lastDonatedAt) {
+                          payload.lastDonatedAt = new Date(newDonor.lastDonatedAt);
+                        }
+            
+                        addDonor.mutate(payload);
           }}
         >
           <Stack
@@ -780,6 +833,14 @@ export default function DonorLayout() {
                       donationCount: Number(e.target.value),
                     })
                   }
+                />
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <TextInput
+                  label="Last Donated At"
+                  type="date"
+                  value={newDonor.lastDonatedAt ?? ""}
+                  onChange={(e) => setNewDonor({ ...newDonor, lastDonatedAt: e.target.value })}
                 />
               </Grid.Col>
             </Grid>

@@ -43,6 +43,7 @@ export const donorRouter = createTRPCRouter({
         donationCount: z.number().min(0).default(0).optional(),
         gender: z.enum(["Male", "Female", "Other"]),
         age: z.number().int().min(0),
+        lastDonatedAt: z.date().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -66,6 +67,7 @@ export const donorRouter = createTRPCRouter({
           donationCount: input.donationCount,
           gender: input.gender,
           age: input.age,
+          lastDonatedAt: input.lastDonatedAt,
         },
       });
     }),
@@ -111,6 +113,7 @@ export const donorRouter = createTRPCRouter({
         donationCount: z.number().min(0).optional(),
         gender: z.enum(["Male", "Female", "Other"]),
         age: z.number().int().min(0),
+        lastDonatedAt: z.date().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -140,16 +143,17 @@ export const donorRouter = createTRPCRouter({
           donationCount: input.donationCount,
           gender: input.gender,
           age: input.age,
+          lastDonatedAt: input.lastDonatedAt,
         },
       });
     }),
 
   getIsUserDonor: protectedProcedure.query(async ({ ctx }) => {
-  const userEmail = ctx.session.user.email;
+  const userEmail = ctx.session?.user?.email;
+  if (!userEmail) throw new TRPCError({ code: "UNAUTHORIZED" });
 
-  // Explicitly type the donor result for safety
   const donor = await ctx.db.donor.findUnique({
-    where: { email: userEmail ?? "" },
+    where: { email: userEmail },
     select: {
       name: true,
       age: true,
@@ -158,39 +162,32 @@ export const donorRouter = createTRPCRouter({
       contactEmail: true,
       bloodType: true,
       contactnumber: true,
+      lastDonatedAt: true,
     },
   });
 
   if (!donor) return null;
 
-  // Type guard for gender
   const parseGender = (g: unknown): "Male" | "Female" | "Other" => {
     if (g === "Male" || g === "Female" || g === "Other") return g;
     return "Other";
   };
 
-  // Explicitly destructure donor to ensure type safety
-  const {
-    name,
-    age,
-    gender,
-    donationCount,
-    contactEmail,
-    contactnumber,
-    bloodType,
-  } = donor;
-
   return {
-    isDonor: (donationCount ?? 0) > 0,
-    name,
-    age,
-    gender: parseGender(gender),
-    donationCount: donationCount ?? 0,
-    contactEmail: contactEmail ?? undefined,
-    contactnumber: typeof contactnumber === "string" ? contactnumber : undefined,
-    bloodType: bloodType ?? undefined,
+    isDonor: (donor.donationCount ?? 0) > 0,
+    name: donor.name,
+    age: donor.age,
+    gender: parseGender(donor.gender),
+    donationCount: donor.donationCount ?? 0,
+    contactEmail: donor.contactEmail ?? undefined,
+    contactnumber: typeof donor.contactnumber === "string" ? donor.contactnumber : undefined,
+    bloodType: donor.bloodType ?? undefined,
+    lastDonatedAt: donor.lastDonatedAt instanceof Date ? (donor.lastDonatedAt as Date) : undefined,
+
+
   };
 }),
+
 
   updateProfile: protectedProcedure
     .input(
