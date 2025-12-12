@@ -6,8 +6,8 @@ import * as tf from "@tensorflow/tfjs";
  * @param months Number of months to predict (default 12)
  */
 export async function predictNext(values: number[], months = 12): Promise<number[]> {
-  if (!values.length) return Array(months).fill(0);
-  if (values.length === 1) return Array(months).fill(values[0]);
+  if (!values.length) return new Array<number>(months).fill(0);
+  if (values.length === 1) return new Array<number>(months).fill(values[0] ?? 0);
 
   tf.engine().reset();
 

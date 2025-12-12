@@ -54,6 +54,7 @@
     "@trpc/client": "^11.0.0",
     "@trpc/react-query": "^11.0.0",
     "@trpc/server": "^11.0.0",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "docx": "^9.5.1",
     "embla-carousel": "^8.6.0",

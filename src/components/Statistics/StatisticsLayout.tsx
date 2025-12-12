@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import { useRef } from "react";
 import {
   Box,
   Title,
@@ -16,6 +16,8 @@ import { api } from "@/trpc/react";
 import { BarChart } from "@mantine/charts";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import PredictLayout from "@/components/Statistics/PredictLayout";
+
 
 const StatisticsLayout: React.FC = () => {
   const reportRef = useRef<HTMLDivElement>(null);
@@ -284,6 +286,7 @@ const StatisticsLayout: React.FC = () => {
           </Box>
         </Paper>
         
+        
 
       <Paper withBorder p="lg" radius="lg" shadow="sm" mt="lg">
   <Group>
@@ -309,6 +312,8 @@ const StatisticsLayout: React.FC = () => {
     {bloodRequestReasons?.reasons?.[0]?.count ?? 0} requests.
   </Text>
 </Paper>
+
+<PredictLayout />
       </div>
     </Box>
   );

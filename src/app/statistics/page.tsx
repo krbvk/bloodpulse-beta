@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Center, Flex } from "@mantine/core";
 import { useSession } from "next-auth/react";
 import DashboardNavbar from "@/components/Dashboard/DashboardNavbar";
