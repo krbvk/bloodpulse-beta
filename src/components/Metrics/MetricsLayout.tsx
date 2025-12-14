@@ -30,6 +30,8 @@ import {
 } from "recharts";
 import { api } from "@/trpc/react";
 
+const COLORS = ["blue", "red", "green", "yellow", "purple"] as const;
+
 type Demographic = { label: string; value: number };
 type BloodTypeStat = { type: string; needed: number; donated: number };
 type PieData = { type: string; percentage: number };
@@ -164,7 +166,7 @@ function DemographicsSection({
           thickness={12}
           sections={gender.map((g, idx) => ({
             value: g.value,
-            color: `red.${idx + 5}` as const,
+            color: COLORS[ idx % COLORS.length] ?? "gray",
           }))}
           label={
             <Stack gap={0} align="center">
