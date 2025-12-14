@@ -1,6 +1,16 @@
 import { Paper, Text, Stack, Group } from "@mantine/core";
 
-export function BloodToolTip({ active, payload, label }: any) {
+interface BloodToolTipProps {
+  active?: boolean;
+  payload?: Array<{
+    name: string;
+    value: number | string;
+    color?: string;
+  }>;
+  label?: string | number;
+}
+
+export function BloodToolTip({ active, payload, label }: BloodToolTipProps) {
   if (!active || !payload?.length) return null;
 
   return (
