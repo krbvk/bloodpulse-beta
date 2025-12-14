@@ -18,7 +18,7 @@ export function BloodToolTip({ active, payload, label }: BloodToolTipProps) {
       <Stack gap={4}>
         <Text fw={600}>{label}</Text>
 
-        {payload.map((item: any) => (
+        {payload.map((item) => (
           <Group key={item.name} gap="xs" justify="space-between">
             <Text size="sm" c="dimmed">
               {item.name}
