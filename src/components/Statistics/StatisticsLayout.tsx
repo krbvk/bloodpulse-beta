@@ -18,7 +18,6 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import PredictLayout from "@/components/Statistics/PredictLayout";
 
-
 const StatisticsLayout: React.FC = () => {
   const reportRef = useRef<HTMLDivElement>(null);
   
@@ -95,6 +94,7 @@ const StatisticsLayout: React.FC = () => {
                   <BarChart
                     h={220}
                     withLegend={false}
+                    tooltipProps={{cursor: {fill: "transparent"}}}
                     data={neededVsDonated.bloodTypeStats.map((b) => ({
                       name: b.type,
                       Donated: b.donated,
@@ -153,6 +153,7 @@ const StatisticsLayout: React.FC = () => {
                   <BarChart
                     h={220}
                     withLegend={false}
+                    tooltipProps={{cursor: {fill: "transparent"}}}
                     data={neededVsDonated.bloodTypeStats.map((b) => ({
                       name: b.type,
                       Surplus: b.donated - b.needed,
@@ -207,6 +208,7 @@ const StatisticsLayout: React.FC = () => {
                 <BarChart
                   h={220}
                   withLegend={false}
+                  tooltipProps={{cursor: {fill: "transparent"}}}
                   data={demographics.gender}
                   dataKey="label"
                   series={[{ name: "value", color: "blue" }]}
@@ -260,6 +262,7 @@ const StatisticsLayout: React.FC = () => {
                 <BarChart
                   h={220}
                   withLegend={false}
+                  tooltipProps={{cursor: {fill: "transparent"}}}
                   data={bloodRequestReasons.reasons}
                   dataKey="name"
                   series={[{ name: "count", color: "orange" }]}

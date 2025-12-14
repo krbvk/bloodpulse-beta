@@ -206,6 +206,7 @@ const PredictLayout: React.FC = () => {
             <BarChart
               h={300}
               withLegend
+              tooltipProps={{cursor: {fill: "transparent"}}}
               data={monthlyTotals}
               dataKey="month"
               series={[
@@ -267,6 +268,7 @@ const PredictLayout: React.FC = () => {
               <BarChart
                 h={250}
                 withLegend={false}
+                tooltipProps={{cursor: {fill: "transparent"}}}
                 data={supply.map((p) => ({
                   name: p.type,
                   predicted: p.predicted[0],
@@ -295,6 +297,7 @@ const PredictLayout: React.FC = () => {
               <BarChart
                 h={250}
                 withLegend={false}
+                tooltipProps={{cursor: {fill: "transparent"}}}
                 data={demand.map((p) => ({
                   name: p.type,
                   demand: p.predicted[0],
