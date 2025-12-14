@@ -23,6 +23,8 @@ const PredictLayout: React.FC = () => {
   const reportRef = useRef<HTMLDivElement>(null);
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
 
+  const isSingleMonth = !!selectedMonth;
+
   // Only one option: Predict Next Year
   const monthsAhead = 12;
 
@@ -210,6 +212,12 @@ const PredictLayout: React.FC = () => {
               tooltipProps={{content: <BloodToolTip />}}
               data={monthlyTotals}
               dataKey="month"
+              xAxisProps={{
+                angle: isSingleMonth ? 0 : -35, 
+                textAnchor: isSingleMonth ? "middle" : "end", 
+                height: 70,
+                interval: 0
+              }}
               series={[
                 { name: "Donated", color: "teal" },
                 { name: "Requested", color: "red" },
@@ -240,6 +248,7 @@ const PredictLayout: React.FC = () => {
               tooltipProps={{content: <BloodToolTip />}}
               data={lineChartData}
               dataKey="month"
+              xAxisProps={{angle: -35, textAnchor: "end", height: 70, interval: 0}}
               series={[
                 { name: "Donated", color: "teal" },
                 { name: "Requested", color: "red" },
