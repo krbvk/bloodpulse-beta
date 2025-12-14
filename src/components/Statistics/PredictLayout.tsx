@@ -237,6 +237,7 @@ const PredictLayout: React.FC = () => {
             <LineChart
               h={300}
               withLegend
+              tooltipProps={{content: <BloodToolTip />}}
               data={lineChartData}
               dataKey="month"
               series={[
