@@ -32,6 +32,12 @@ import { api } from "@/trpc/react";
 
 const COLORS = ["blue", "red", "green", "yellow", "purple"] as const;
 
+const GENDER_COLORS: Record<string, string> = {
+  Male: "blue",
+  Female: "red",
+  Other: "green",
+};
+
 type Demographic = { label: string; value: number };
 type BloodTypeStat = { type: string; needed: number; donated: number };
 type PieData = { type: string; percentage: number };
@@ -166,7 +172,7 @@ function DemographicsSection({
           thickness={12}
           sections={gender.map((g, idx) => ({
             value: g.value,
-            color: COLORS[ idx % COLORS.length] ?? "gray",
+            color: GENDER_COLORS[g.label] ?? "gray",
           }))}
           label={
             <Stack gap={0} align="center">
@@ -182,7 +188,7 @@ function DemographicsSection({
             <Group key={g.label} gap="xs">
               <Badge
                 variant="filled"
-                color={["red", "blue", "green", "yellow", "purple"][idx % 5]}
+                color={GENDER_COLORS[g.label] ?? "gray"}
                 size="xs"
                 radius="sm"
               >
