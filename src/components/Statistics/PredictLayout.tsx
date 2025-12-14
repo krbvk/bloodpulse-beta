@@ -17,6 +17,7 @@ import { api } from "@/trpc/react";
 import { BarChart, LineChart } from "@mantine/charts";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { BloodToolTip } from "@/components/Statistics/BloodToolTip";
 
 const PredictLayout: React.FC = () => {
   const reportRef = useRef<HTMLDivElement>(null);
@@ -206,7 +207,7 @@ const PredictLayout: React.FC = () => {
             <BarChart
               h={300}
               withLegend
-              tooltipProps={{cursor: {fill: "transparent"}}}
+              tooltipProps={{content: <BloodToolTip />}}
               data={monthlyTotals}
               dataKey="month"
               series={[
@@ -268,7 +269,7 @@ const PredictLayout: React.FC = () => {
               <BarChart
                 h={250}
                 withLegend={false}
-                tooltipProps={{cursor: {fill: "transparent"}}}
+                tooltipProps={{content: <BloodToolTip />}}
                 data={supply.map((p) => ({
                   name: p.type,
                   predicted: p.predicted[0],
@@ -297,7 +298,7 @@ const PredictLayout: React.FC = () => {
               <BarChart
                 h={250}
                 withLegend={false}
-                tooltipProps={{cursor: {fill: "transparent"}}}
+                tooltipProps={{content: <BloodToolTip />}}
                 data={demand.map((p) => ({
                   name: p.type,
                   demand: p.predicted[0],
