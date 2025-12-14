@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Center, Flex } from "@mantine/core";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -47,14 +47,10 @@ const Page = () => {
     }
 
     if (status === "authenticated" && !isUserDonorLoading) {
-      const role = session?.user?.role;
-      const allowed = isUserDonor?.isDonor === true;
-
-      if (!allowed) {
-        router.replace("/dashboard");
-      }
+  const allowed = isUserDonor?.isDonor === true;
+  if (!allowed) router.replace("/dashboard");
     }
-  }, [status, isUserDonorLoading, isUserDonor, session?.user?.role, router]);
+  }, [status, isUserDonorLoading, isUserDonor, session, router]);
 
   if (status === "loading" || isUserDonorLoading || (status === "authenticated" && !isUserDonor?.isDonor)) {
     return (
