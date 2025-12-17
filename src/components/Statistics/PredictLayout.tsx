@@ -117,7 +117,7 @@ const PredictLayout: React.FC = () => {
   const demand = supplyDemandData?.demand ?? [];
 
   // Month Selector - single option only
-  const monthOptions = [{ label: "Predict Next Year", value: "12" }];
+  // const monthOptions = [{ label: "Predict Next Year", value: "12" }];
 
   if (!analysisData) {
     return (
@@ -171,7 +171,7 @@ const PredictLayout: React.FC = () => {
     <Box p="md" ref={reportRef}>
       <Group justify="space-between" mt="5%">
         <div>
-          <Title order={2}>Predictive Analysis - Predict Next Year</Title>
+          <Title order={2}>Predictive Analysis for 2026</Title>
           <Text c="dimmed" size="sm">
             Forecasts future blood donation supply and demand using TensorFlow.
           </Text>
@@ -263,13 +263,13 @@ const PredictLayout: React.FC = () => {
       </Paper>
 
       {/* Month Selector */}
-      <SegmentedControl value="12" data={monthOptions} mb="md" />
+      {/* <SegmentedControl value="12" data={monthOptions} mb="md" /> */}
 
   <div>
         {/* Supply Chart */}
         <Paper withBorder p="lg" radius="lg" shadow="sm" mb="lg">
           <Title order={5} mb="xs">
-            Predicted Blood Supply - Predict Next Year
+            Predicted Blood Supply for 2026
           </Title>
           <Text size="sm" c="dimmed">
             Forecasted total future donations per blood type.
@@ -298,7 +298,7 @@ const PredictLayout: React.FC = () => {
         {/* Demand Chart */}
         <Paper withBorder p="lg" radius="lg" shadow="sm" mb="lg">
           <Title order={5} mb="xs">
-            Predicted Blood Demand - Predict Next Year
+            Predicted Blood Demand for 2026
           </Title>
           <Text size="sm" c="dimmed">
             Forecasted future blood requests per blood type.
@@ -363,7 +363,7 @@ const PredictLayout: React.FC = () => {
 
 <Paper withBorder p="lg" radius="lg" shadow="sm" mt="lg">
   <Title order={5} mb="xs">
-    Summary & Insights
+    Predictive Analysis Summary and Insights for 2026
   </Title>
 
   <Text size="sm" c="dimmed" lh={1.6}>
