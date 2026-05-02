@@ -1,5 +1,5 @@
-# Read CONTRIBUTING.md
-For contributions
+# Finished capstone project
+Not maintained
 
 # Create T3 App
 
